@@ -71,7 +71,7 @@
     body.querySelector('[data-plan-request]').addEventListener('click',()=>planRequest(id));
     body.querySelector('[data-delete-request]').addEventListener('click',()=>deleteRequest(id));
     body.querySelector('[data-close-request-bottom]').addEventListener('click',()=>document.getElementById('requestDetailDialog').close());
-    document.getElementById('requestDetailDialog').showModal();
+    const dialog=document.getElementById('requestDetailDialog');if(!dialog.open)dialog.showModal();
   }
 
   function changeStage(id,stage){const r=requestById(id);if(!r)return;r.stage=stage;persistRequests();renderRequests();updateRequestDashboard();openRequest(id);}
@@ -115,7 +115,7 @@
   function updateRequestDashboard(){
     const count=state.requests.length;const newCount=state.requests.filter(r=>r.stage==='new').length;
     document.querySelectorAll('.nav-item[data-view="requests"] .badge').forEach(b=>b.textContent=String(count));
-    const cards=[...document.querySelectorAll('.metric-card')];const card=cards.find(c=>c.textContent.includes('Offene Anfragen'));if(card){const strong=card.querySelector('strong');const small=card.querySelector('small');if(strong)strong.textContent=String(count);if(small)small.textContent=`${newCount} neu`}
+    const cards=[...document.querySelectorAll('.metric-card')];const card=cards.find(c=>c.textContent.includes('Offene Anfragen'));if(card){const strong=card.querySelector('strong');const small=card.querySelector('small');if(strong)strong.textContent=String(count);if(small)small.textContent=`${newCount} neu`;}
   }
 
   install();
