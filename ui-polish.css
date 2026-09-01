@@ -1,0 +1,50 @@
+/* TATNERA — final polish layer */
+
+/* Clearer customer choice */
+.customer-mode{display:grid!important;grid-template-columns:1fr 1fr!important;width:min(100%,520px);gap:8px!important;padding:0!important;border:0!important;background:transparent!important}
+.customer-mode button{display:flex!important;flex-direction:column;align-items:flex-start;gap:3px;padding:13px 14px!important;border:1px solid var(--line)!important;border-radius:12px!important;background:#151517!important;text-align:left;color:#ddd!important}
+.customer-mode button strong{font-size:12px;color:#fff}
+.customer-mode button small{font-size:10px;color:var(--muted);font-weight:500}
+.customer-mode button.active{border-color:#d8ff63!important;background:#1d2216!important;box-shadow:inset 0 0 0 1px rgba(216,255,99,.15)}
+.customer-mode button.active strong{color:#d8ff63}
+
+/* Sidebar more submenu */
+.more-nav-wrap{position:relative;margin-bottom:8px}
+.more-nav-toggle{width:100%}
+.more-nav-toggle b{margin-left:auto;font-size:11px;transition:transform .16s ease}
+.more-nav-toggle.open b{transform:rotate(180deg)}
+.more-nav-menu{position:absolute;left:0;right:0;bottom:calc(100% + 7px);padding:7px;border:1px solid var(--line);border-radius:12px;background:#151517;box-shadow:0 16px 35px rgba(0,0,0,.35);z-index:40}
+.more-nav-menu[hidden]{display:none!important}
+.more-nav-menu .nav-item{width:100%;margin:0}
+.more-nav-menu .nav-item+.nav-item{margin-top:3px}
+
+/* Dashboard cockpit */
+.cockpit-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,.85fr);gap:16px}
+.cockpit-grid>.panel{margin:0;padding:20px}
+.cockpit-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:15px}
+.cockpit-head h2,.cockpit-head h3{margin:3px 0 0}
+.cockpit-head h2{font-size:25px}.cockpit-head h3{font-size:18px}
+.cockpit-today{min-height:295px}
+.cockpit-task-grid{display:grid;grid-template-columns:1fr;gap:8px}
+.cockpit-task-grid>button,.cockpit-task-grid>div{border:1px solid var(--line);background:#171719;border-radius:12px;padding:13px 14px;display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;gap:2px 12px;text-align:left;color:inherit}
+.cockpit-task-grid>button{cursor:pointer}
+.cockpit-task-grid>button:hover{border-color:#3b3b40;background:#1b1b1e}
+.cockpit-task-grid span{font-size:12px;color:#e8e8e8}.cockpit-task-grid strong{grid-column:2;grid-row:1/3;font-size:21px}.cockpit-task-grid small{font-size:10px;color:var(--muted)}
+.cockpit-requests,.cockpit-projects{min-height:245px}
+.cockpit-request-list,.cockpit-project-list{display:flex;flex-direction:column;gap:7px}
+.cockpit-request-list button,.cockpit-project-list button{width:100%;border:1px solid var(--line);background:#171719;border-radius:11px;padding:12px 13px;color:inherit;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;text-align:left;cursor:pointer}
+.cockpit-project-list button{grid-template-columns:minmax(0,1fr) auto 18px}
+.cockpit-request-list button:hover,.cockpit-project-list button:hover{border-color:#3b3b40;background:#1b1b1e}
+.cockpit-request-list strong,.cockpit-project-list strong{display:block;font-size:12px;color:#fff}.cockpit-request-list span,.cockpit-project-list span{font-size:10px;color:var(--muted)}
+.cockpit-project-list button>div:nth-child(2){text-align:right}.cockpit-project-list button>div:nth-child(2) strong{font-size:11px}.cockpit-project-list button>div:nth-child(2) small{display:block;font-size:9px;color:var(--muted);margin-bottom:2px}
+
+/* Finance view */
+.finance-view{max-width:1080px}
+.finance-heading{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:16px}.finance-heading h2{font-size:28px;margin:3px 0 6px}.finance-heading p{margin:0}
+.finance-stats{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:12px;margin-bottom:16px}
+.finance-stats article{padding:17px 18px;border:1px solid var(--line);background:#171719;border-radius:14px}.finance-stats article.finance-main{background:#d8ff63;color:#111;border-color:#d8ff63}
+.finance-stats span{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}.finance-stats .finance-main span,.finance-stats .finance-main small{color:#313522}.finance-stats strong{display:block;font-size:25px;margin-bottom:4px}.finance-stats small{font-size:10px;color:var(--muted)}
+.finance-list-panel{padding:20px}.finance-project-list{display:flex;flex-direction:column;gap:7px}.finance-project-list button{width:100%;padding:12px 13px;border:1px solid var(--line);border-radius:11px;background:#171719;color:inherit;display:grid;grid-template-columns:1fr auto 18px;gap:12px;align-items:center;text-align:left;cursor:pointer}.finance-project-list button:hover{background:#1b1b1e;border-color:#3b3b40}.finance-project-list button div:first-child strong{display:block;font-size:12px}.finance-project-list button div:first-child span{font-size:10px;color:var(--muted)}.finance-project-list button div:nth-child(2){text-align:right}.finance-project-list button div:nth-child(2) small{display:block;font-size:9px;color:var(--muted)}.finance-project-list button div:nth-child(2) strong{font-size:12px}
+
+@media(max-width:980px){.cockpit-grid{grid-template-columns:1fr}.finance-stats{grid-template-columns:1fr}}
+@media(max-width:620px){.customer-mode{grid-template-columns:1fr!important}.cockpit-grid>.panel{padding:16px}.cockpit-project-list button{grid-template-columns:1fr 18px}.cockpit-project-list button>div:nth-child(2){display:none}.finance-stats{grid-template-columns:1fr}}
