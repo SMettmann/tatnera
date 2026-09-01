@@ -78,14 +78,38 @@
   function refresh(projectId){const card=document.querySelector(`.aftercare-card[data-aftercare-project="${projectId}"]`),p=projectById(projectId);if(card&&p)renderCard(card,p);}
 
   function planTouchup(projectId){
-    const p=projectById(projectId);if(!p)return;const date=p.aftercare?.followupDate||followupDate(p);p.aftercare.status='Nachstechen geplant';persist();refresh(projectId);
-    state.calendar.anchor=date;state.calendar.view='day';navigate('calendar');
-    setTimeout(()=>{
-      if(typeof openAppointmentDialog==='function'){
-        openAppointmentDialog('',date);
-        const form=document.getElementById('appointmentForm');if(form){form.elements.type.value='touchup';form.elements.customerId.value=p.customerId;form.elements.projectId.value=p.id;form.elements.status.value='Angefragt';form.elements.duration.value=60;form.elements.notes.value='Nachstechen / Heilungskontrolle';}
-      }
-    },0);
+    const p=projectById(projectId);if(!p||typeof openAppointmentDialog!=='function')return;
+    const date=p.aftercare?.followupDate||followupDate(p);
+
+    // Terminfenster direkt über der Tattoo-Akte öffnen. Erst nach Speichern wird navigiert.
+    openAppointmentDialog('',date);
+    const dialog=document.getElementById('appointmentDialog');
+    const form=document.getElementById('appointmentForm');
+    if(!dialog||!form)return;
+
+    form.elements.type.value='touchup';
+    form.elements.artist.value=p.artist||form.elements.artist.value;
+    form.elements.customerId.value=p.customerId;
+    form.elements.projectId.value=p.id;
+    form.elements.status.value='Angefragt';
+    form.elements.duration.value=60;
+    form.elements.notes.value='Nachstechen / Heilungskontrolle';
+
+    let submitted=false;
+    const onSubmit=()=>{
+      submitted=true;
+      setTimeout(()=>{
+        const current=projectById(projectId);if(!current)return;
+        current.aftercare=current.aftercare||{records:[]};
+        current.aftercare.status='Nachstechen geplant';
+        current.aftercare.followupDate=date;
+        persist();refresh(projectId);
+        state.calendar.anchor=date;state.calendar.view='day';navigate('calendar');
+      },0);
+    };
+    const onClose=()=>{if(!submitted)form.removeEventListener('submit',onSubmit);};
+    form.addEventListener('submit',onSubmit,{once:true});
+    dialog.addEventListener('close',onClose,{once:true});
   }
 
   async function handlePhoto(e){const file=e.target.files?.[0];if(!file)return;try{selectedHealingPhoto=await compress(file);renderPhoto();}catch{alert('Das Bild konnte nicht verarbeitet werden.');}}
