@@ -123,7 +123,7 @@
     e.preventDefault();const d=Object.fromEntries(new FormData(e.currentTarget).entries());const payload={id:activeInkId||'ink'+Date.now(),manufacturer:d.manufacturer.trim(),name:d.name.trim(),code:d.code.trim(),batch:d.batch.trim(),purchaseDate:d.purchaseDate,expiryDate:d.expiryDate,notes:d.notes.trim(),photo:selectedPhoto};
     const duplicate=state.inks.find(i=>i.batch.toLowerCase()===payload.batch.toLowerCase()&&i.id!==payload.id);if(duplicate&&!confirm(`Die Charge ${payload.batch} existiert bereits. Trotzdem speichern?`))return;
     const idx=state.inks.findIndex(i=>i.id===payload.id);if(idx>=0)state.inks[idx]=payload;else state.inks.unshift(payload);
-    persistAll();renderInkSettings();injectProjectInkPanel();document.getElementById('inkDialog').close();
+    persistAll();renderInkSettings();document.getElementById('inkDialog').close();
   }
   function deleteInk(){const ink=inkById(activeInkId);if(!ink)return;const uses=usageFor(ink.id);if(uses.length){alert('Diese Charge ist bereits Tattoo-Akten zugeordnet und kann deshalb nicht entfernt werden.');return;}if(!confirm(`Charge ${ink.batch} wirklich entfernen?`))return;state.inks=state.inks.filter(i=>i.id!==ink.id);persistAll();renderInkSettings();document.getElementById('inkDialog').close();}
 
@@ -138,7 +138,7 @@
 
   function projectInkHtml(p){
     const ids=p.inkIds||[];const inks=ids.map(inkById).filter(Boolean);const legacy=(p.colors||[]).filter(label=>{const m=String(label).match(/Charge\s+(.+)$/i);return !m||!state.inks.some(i=>i.batch===m[1].trim());});
-    return `<span class="eyebrow">Ink Passport</span><h3>Verwendete Farben & Chargen</h3><p class="muted">Konkrete Chargen für dieses Tattoo dokumentieren und später rückverfolgen.</p>
+    return `<span class="eyebrow">Ink Passport</span><h3>Farben & Chargen</h3><p class="muted">Konkrete Chargen für dieses Tattoo dokumentieren und später rückverfolgen.</p>
       ${inks.length?`<div class="ink-project-list">${inks.map(ink=>{const st=inkStatus(ink);return `<div class="ink-project-item"><div><strong>${esc(ink.manufacturer)} · ${esc(ink.name)}</strong><small>Charge ${esc(ink.batch)}${ink.code?' · '+esc(ink.code):''}</small>${st.key!=='active'?`<div class="ink-warning-line">⚠ ${esc(st.label)}</div>`:''}</div><div class="right"><span class="ink-status ${st.key}">${esc(st.key==='active'?'Dokumentiert':st.label)}</span><br><button class="ink-action" data-project-ink-usage="${ink.id}">Rückverfolgung</button></div></div>`;}).join('')}</div>`:`<div class="ink-project-empty">Noch keine konkrete Farbe / Charge für dieses Tattoo hinterlegt.</div>`}
       ${legacy.length?`<div class="ink-legacy">Ältere Demo-Angaben: ${legacy.map(esc).join(' · ')}</div>`:''}
       <div class="ink-project-actions"><button class="btn ghost" data-pick-project-inks="${p.id}">+ Farben / Chargen auswählen</button></div>`;
@@ -149,7 +149,7 @@
     const list=document.getElementById('inkPickerList');list.innerHTML=state.inks.length?state.inks.map(ink=>{const st=inkStatus(ink);const checked=selected.has(ink.id);const disabled=st.key==='expired'&&!checked;return `<label class="ink-pick ${disabled?'disabled':''}"><input type="checkbox" name="inkIds" value="${ink.id}" ${checked?'checked':''} ${disabled?'disabled':''}><div><strong>${esc(ink.manufacturer)} · ${esc(ink.name)}</strong><small>Charge ${esc(ink.batch)} · Ablauf ${formatDate(ink.expiryDate)}</small></div><div class="pick-right"><span class="ink-status ${st.key}">${esc(st.label)}</span></div></label>`;}).join(''):'<div class="ink-empty">Lege zuerst unter Einstellungen eine Farbe / Charge an.</div>';
     document.getElementById('inkPickerDialog').showModal();
   }
-  function saveProjectInks(e){e.preventDefault();const p=projectById(activeProjectId);if(!p)return;const ids=[...e.currentTarget.querySelectorAll('input[name="inkIds"]:checked')].map(x=>x.value);p.inkIds=ids;persistAll();document.getElementById('inkPickerDialog').close();injectProjectInkPanel();renderInkSettings();}
+  function saveProjectInks(e){e.preventDefault();const p=projectById(activeProjectId);if(!p)return;const ids=[...e.currentTarget.querySelectorAll('input[name="inkIds"]:checked')].map(x=>x.value);p.inkIds=ids;persistAll();document.getElementById('inkPickerDialog').close();renderInkSettings();openProject(p.id);}
 
   function openUsage(id){
     const ink=inkById(id);if(!ink)return;const uses=usageFor(id);document.getElementById('inkUsageTitle').textContent=`${ink.manufacturer} ${ink.name} · ${ink.batch}`;
