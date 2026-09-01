@@ -169,7 +169,7 @@
 
   <dialog id="customerDialog" class="dialog">
     <form method="dialog" id="customerForm">
-      <div class="dialog-head"><div><span class="eyebrow">Kundenakte</span><h2>Neuen Kunden anlegen</h2></div><button class="close-btn" value="cancel">×</button></div>
+      <div class="dialog-head"><div><span class="eyebrow">Kundenakte</span><h2>Neuen Kunden anlegen</h2></div><button type="button" class="close-btn" onclick="document.getElementById('customerDialog').close()">×</button></div>
       <div class="form-grid">
         <label>Vorname<input required name="firstName" /></label>
         <label>Nachname<input required name="lastName" /></label>
@@ -177,13 +177,13 @@
         <label>Telefon<input name="phone" /></label>
         <label class="full">Notizen<textarea name="notes" rows="3" placeholder="Wichtige Hinweise, Stilwünsche …"></textarea></label>
       </div>
-      <div class="dialog-actions"><button class="btn ghost" value="cancel">Abbrechen</button><button type="submit" class="btn primary" value="default">Kunde speichern</button></div>
+      <div class="dialog-actions"><button type="button" class="btn ghost" onclick="document.getElementById('customerDialog').close()">Abbrechen</button><button type="submit" class="btn primary" value="default">Kunde speichern</button></div>
     </form>
   </dialog>
 
   <dialog id="projectDialog" class="dialog wide-dialog">
     <form method="dialog" id="projectForm">
-      <div class="dialog-head"><div><span class="eyebrow">Tattoo-Akte</span><h2>Neues Tattoo-Projekt</h2></div><button class="close-btn" value="cancel">×</button></div>
+      <div class="dialog-head"><div><span class="eyebrow">Tattoo-Akte</span><h2>Neues Tattoo-Projekt</h2></div><button type="button" class="close-btn" onclick="document.getElementById('projectDialog').close()">×</button></div>
       <div class="form-grid three">
         <label class="full">Kunde<select required name="customerId" id="projectCustomerSelect"></select></label>
         <label>Motiv<input required name="title" placeholder="z. B. Löwe" /></label>
@@ -198,7 +198,7 @@
         <strong>Procreate-Workflow vorbereitet</strong>
         <span>In der Tattoo-Akte können Entwurfsversionen, Referenzbilder, finale Vorlage und Stencil gesammelt werden.</span>
       </div>
-      <div class="dialog-actions"><button class="btn ghost" value="cancel">Abbrechen</button><button type="submit" class="btn primary" value="default">Projekt anlegen</button></div>
+      <div class="dialog-actions"><button type="button" class="btn ghost" onclick="document.getElementById('projectDialog').close()">Abbrechen</button><button type="submit" class="btn primary" value="default">Projekt anlegen</button></div>
     </form>
   </dialog>
 
