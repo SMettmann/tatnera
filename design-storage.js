@@ -4,7 +4,15 @@
 
   function installStyle(){
     const style=document.createElement('style');
-    style.textContent='.design-tile .design-preview{width:100%;height:130px;object-fit:cover;border-radius:9px;margin-bottom:9px;border:1px solid var(--line);background:#111}.design-file-meta{font-size:10px;color:var(--muted);margin-top:4px}';
+    style.textContent=`
+      .design-tile .design-preview{width:100%;height:130px;object-fit:cover;border-radius:9px;margin-bottom:9px;border:1px solid var(--line);background:#111}
+      .design-file-meta{font-size:10px;color:var(--muted);margin-top:4px}
+      #projectDetail .project-tabs{position:relative;z-index:30;pointer-events:auto!important}
+      #projectDetail .project-tab-btn{position:relative;z-index:31;pointer-events:auto!important;cursor:pointer!important}
+      #projectDetail .project-tab-pane{position:relative;z-index:1}
+      #projectDetail .project-tab-pane[hidden]{display:none!important}
+      #projectDetail .project-tab-pane.active{display:block!important}
+    `;
     document.head.appendChild(style);
   }
 
@@ -23,6 +31,50 @@
       };
       reader.readAsDataURL(file);
     });
+  }
+
+  function activateProjectTab(detail,name){
+    if(!detail||!name)return;
+    detail.querySelectorAll('[data-project-tab]').forEach(button=>{
+      const active=button.dataset.projectTab===name;
+      button.type='button';
+      button.classList.toggle('active',active);
+      button.setAttribute('aria-selected',active?'true':'false');
+    });
+    detail.querySelectorAll('[data-project-pane]').forEach(pane=>{
+      const active=pane.dataset.projectPane===name;
+      pane.classList.toggle('active',active);
+      pane.hidden=!active;
+    });
+  }
+
+  function normalizeProjectTabs(){
+    const detail=document.getElementById('projectDetail');if(!detail)return;
+    const buttons=[...detail.querySelectorAll('[data-project-tab]')];if(!buttons.length)return;
+    buttons.forEach(button=>button.type='button');
+    const active=buttons.find(button=>button.classList.contains('active'))?.dataset.projectTab||'overview';
+    activateProjectTab(detail,active);
+  }
+
+  function installRobustProjectTabs(){
+    document.addEventListener('click',event=>{
+      const button=event.target.closest?.('#projectDetail [data-project-tab]');
+      if(!button)return;
+      event.preventDefault();
+      event.stopPropagation();
+      activateProjectTab(document.getElementById('projectDetail'),button.dataset.projectTab);
+    },true);
+
+    document.addEventListener('keydown',event=>{
+      const button=event.target.closest?.('#projectDetail [data-project-tab]');
+      if(!button||!['Enter',' '].includes(event.key))return;
+      event.preventDefault();
+      activateProjectTab(document.getElementById('projectDetail'),button.dataset.projectTab);
+    });
+
+    const detail=document.getElementById('projectDetail');
+    if(detail)new MutationObserver(()=>normalizeProjectTabs()).observe(detail,{childList:true,subtree:true});
+    normalizeProjectTabs();
   }
 
   function enhanceDesignPane(){
@@ -53,7 +105,7 @@
     project.versions=project.versions||[];project.versions.push(version);
     try{persist();}catch(_error){project.versions.pop();alert('Der lokale Browserspeicher ist voll. Für größere Dateien benötigen wir den späteren Cloud-Dateispeicher.');input.value='';return;}
     renderProjects();openProject(project.id);
-    requestAnimationFrame(()=>{document.querySelector('[data-project-tab="design"]')?.click();enhanceDesignPane();});
+    requestAnimationFrame(()=>{activateProjectTab(document.getElementById('projectDetail'),'design');enhanceDesignPane();});
   }
 
   document.addEventListener('change',event=>{
@@ -64,8 +116,12 @@
   },true);
 
   const previousOpenProject=openProject;
-  openProject=function(id){previousOpenProject(id);requestAnimationFrame(enhanceDesignPane);};
+  openProject=function(id){
+    previousOpenProject(id);
+    requestAnimationFrame(()=>{normalizeProjectTabs();enhanceDesignPane();});
+  };
 
   installStyle();
+  installRobustProjectTabs();
   enhanceDesignPane();
 })();
