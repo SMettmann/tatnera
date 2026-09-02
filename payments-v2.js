@@ -18,8 +18,9 @@
     if(!document.querySelector('link[href="payments.css"]')){const link=document.createElement('link');link.rel='stylesheet';link.href='payments.css';document.head.appendChild(link);}
     buildDialogs();
     let changed=false;(state.projects||[]).forEach(p=>{if(!Array.isArray(p.payments)){p.payments=[];changed=true;}});if(changed)persist();
-    const detail=document.getElementById('projectDetail');if(detail)new MutationObserver(()=>queueMicrotask(inject)).observe(detail,{childList:true,subtree:true});
-    document.addEventListener('tatnera:project-opened',inject);inject();
+    document.addEventListener('tatnera:project-opened',inject);
+    document.addEventListener('tatnera:runtime-refresh',inject);
+    inject();
   }
 
   function buildDialogs(){
