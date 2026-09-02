@@ -1,0 +1,27 @@
+/* TATNERA — selectable cursor styles */
+.cursor-settings-panel{margin-bottom:18px}
+.cursor-choice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.cursor-choice{min-height:150px}
+.cursor-choice-preview{height:78px;border:1px solid var(--line);border-radius:11px;background:var(--panel-2);display:grid;place-items:center;margin-bottom:10px;overflow:hidden}
+.cursor-choice-preview img{width:46px;height:46px;object-fit:contain;display:block}
+.cursor-choice-preview svg{width:42px;height:42px;display:block}
+.cursor-choice.active{border-color:var(--accent)!important;box-shadow:inset 0 0 0 1px var(--accent)!important}
+.cursor-choice strong,.cursor-choice small{display:block}
+.cursor-choice strong{font-size:12px;margin-bottom:3px}
+.cursor-choice small{font-size:10px;color:var(--muted);line-height:1.45}
+.cursor-settings-note{margin-top:11px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:var(--panel-2);font-size:10px;color:var(--muted)}
+
+/* Preserve the chosen cursor over buttons, cards, menus and other interactive elements. */
+html[data-cursor="needle"] body,
+html[data-cursor="needle"] body *{cursor:url('tattoo-cursor.svg') 4 3, auto!important}
+html[data-cursor="hand"] body,
+html[data-cursor="hand"] body *{cursor:url('rock-hand-cursor.svg') 18 3, auto!important}
+html[data-cursor="normal"] body,
+html[data-cursor="normal"] body *{cursor:default!important}
+
+/* Text fields intentionally keep the text caret. */
+html[data-cursor] input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]):not([type="color"]),
+html[data-cursor] textarea,
+html[data-cursor] [contenteditable="true"]{cursor:text!important}
+
+@media(max-width:720px){.cursor-choice-grid{grid-template-columns:1fr}}
