@@ -130,4 +130,9 @@
     script.src='workflow-ux.js';
     document.body.appendChild(script);
   }
+  if(!document.querySelector('script[src="theme-switcher.js"]')){
+    const script=document.createElement('script');
+    script.src='theme-switcher.js';
+    document.body.appendChild(script);
+  }
 })();
