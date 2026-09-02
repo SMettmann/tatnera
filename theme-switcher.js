@@ -67,9 +67,15 @@
     applyTheme(currentTheme(),false);
   }
 
+  function installInkDashboard(){
+    if(document.querySelector('script[src="ink-dashboard.js"]'))return;
+    const script=document.createElement('script');script.src='ink-dashboard.js';document.body.appendChild(script);
+  }
+
   installCss();
   applyTheme(currentTheme(),false);
   installSelector();
+  installInkDashboard();
 
   const settings=document.getElementById('settings');
   if(settings)new MutationObserver(()=>{
