@@ -77,9 +77,14 @@
     const script=document.createElement('script');script.src='cursor-switcher.js';document.body.appendChild(script);
   }
 
+  function installHistoryRouter(){
+    if(document.querySelector('script[src="history-router.js"]'))return;
+    const script=document.createElement('script');script.src='history-router.js';document.body.appendChild(script);
+  }
+
   function installDashboardUx(){
-    if(document.querySelector('script[src="dashboard-ux.js"]'))return;
-    const script=document.createElement('script');script.src='dashboard-ux.js';document.body.appendChild(script);
+    if(document.querySelector('script[src="dashboard-ux.js"]')){installHistoryRouter();return;}
+    const script=document.createElement('script');script.src='dashboard-ux.js';script.onload=installHistoryRouter;document.body.appendChild(script);
   }
 
   installCss();
