@@ -1,0 +1,110 @@
+/* TATNERA — complete light-theme override layer
+   Loaded after all feature styles so dynamic modules cannot fall back to dark surfaces. */
+
+html[data-theme="light"] body,
+html[data-theme="light"] .main{background:#f4f5f7!important;color:#1a1d21!important}
+
+/* Requests */
+html[data-theme="light"] .request-detail-dialog,
+html[data-theme="light"] .request-box{background:#fff!important;color:#1a1d21!important;border-color:#dfe2e6!important}
+html[data-theme="light"] .request-detail-note{background:#f5f6f8!important;border-color:#e0e3e6!important}
+html[data-theme="light"] .request-detail-note p{color:#3d4349!important}
+html[data-theme="light"] .request-workflow button{background:#f7f8f9!important;color:#202428!important;border-color:#d8dce0!important}
+html[data-theme="light"] .request-workflow button:hover{background:#eef1f3!important;border-color:#bfc5ca!important}
+html[data-theme="light"] .request-workflow button.active-stage{background:#eef2ec!important;color:#1d2920!important;border-color:#6e7c70!important;box-shadow:inset 3px 0 0 #29352b!important}
+html[data-theme="light"] .request-workflow button.primary-flow{background:#232a24!important;color:#fff!important;border-color:#232a24!important}
+html[data-theme="light"] .request-converted{background:#eef5e9!important;color:#41633d!important;border-color:#cbdcc5!important}
+html[data-theme="light"] .request-stage.new{color:#3d6238!important;border-color:#bad0b5!important;background:#f0f6ed!important}
+html[data-theme="light"] .request-stage.clarify{color:#966021!important;border-color:#e4c79e!important;background:#fff7ea!important}
+html[data-theme="light"] .request-stage.ready{color:#337044!important;border-color:#b8d8c0!important;background:#edf8f0!important}
+html[data-theme="light"] .request-delete{color:#c63d48!important}
+
+/* Settings / Ink passport */
+html[data-theme="light"] #settings .ink-settings{background:#fff!important;color:#1a1d21!important;border:1px solid #dfe2e6!important;border-radius:16px!important;padding:20px!important;box-shadow:0 12px 35px rgba(24,30,38,.08)!important}
+html[data-theme="light"] .ink-stat,
+html[data-theme="light"] .ink-table-wrap{background:#fff!important;color:#1a1d21!important;border-color:#dfe2e6!important}
+html[data-theme="light"] .ink-swatch{background:linear-gradient(135deg,#eef0f2,#dfe3e7)!important;border-color:#d2d6da!important;color:#39463c!important}
+html[data-theme="light"] .ink-project-item,
+html[data-theme="light"] .ink-pick,
+html[data-theme="light"] .ink-usage-row{background:#f8f9fa!important;color:#1a1d21!important;border-color:#dfe2e6!important}
+html[data-theme="light"] .ink-pick:has(input:checked){background:#edf3eb!important;border-color:#8b9b8e!important}
+html[data-theme="light"] .ink-photo-preview{background:#f6f7f8!important;border-color:#cfd4d8!important;color:#777e84!important}
+html[data-theme="light"] .ink-dialog-note{background:#f5f6f8!important;color:#687078!important;border-color:#dce0e4!important}
+html[data-theme="light"] .ink-project-empty,
+html[data-theme="light"] .ink-empty{background:#fafbfc!important;border-color:#cfd4d8!important;color:#777e84!important}
+html[data-theme="light"] .ink-action{color:#36483a!important}
+html[data-theme="light"] .ink-status.active{color:#376b37!important;border-color:#bbd4b7!important;background:#eef7eb!important}
+html[data-theme="light"] .ink-status.soon{color:#956122!important;border-color:#e4c79e!important;background:#fff7ea!important}
+html[data-theme="light"] .ink-status.expired{color:#ad3f48!important;border-color:#e3b8bc!important;background:#fff0f1!important}
+html[data-theme="light"] .ink-stat.warn{border-color:#e2c79f!important}
+html[data-theme="light"] .ink-stat.danger{border-color:#e3b8bc!important}
+
+/* Consent */
+html[data-theme="light"] .consent-card{background:#fff!important;color:#1a1d21!important;border-color:#dfe2e6!important}
+html[data-theme="light"] .consent-summary>div,
+html[data-theme="light"] .health-question,
+html[data-theme="light"] .consent-check{background:#f7f8f9!important;color:#2e3439!important;border-color:#dfe2e6!important}
+html[data-theme="light"] .health-question label,
+html[data-theme="light"] .consent-check{color:#42494f!important}
+html[data-theme="light"] .consent-note{background:#f2f5ef!important;color:#5b6855!important;border-color:#d3dfce!important}
+html[data-theme="light"] .consent-status{background:#f7f8f9!important;color:#555d64!important;border-color:#d7dce0!important}
+
+/* Payments */
+html[data-theme="light"] .payment-card{background:#fff!important;color:#1a1d21!important;border-color:#dfe2e6!important}
+html[data-theme="light"] .payment-summary>div,
+html[data-theme="light"] .deposit-progress{background:#f7f8f9!important;color:#1a1d21!important;border-color:#dfe2e6!important}
+html[data-theme="light"] .deposit-track{background:#dfe3e6!important}
+html[data-theme="light"] .payment-row{border-color:#e1e4e7!important}
+html[data-theme="light"] .payment-dialog-note{background:#f5f6f8!important;color:#687078!important;border-color:#dce0e4!important}
+html[data-theme="light"] .payment-quick{background:#eef5e9!important;color:#3d6539!important;border-color:#c6d8c1!important}
+html[data-theme="light"] .payment-status.open{background:#fff7ea!important;color:#936021!important;border-color:#e5ca9f!important}
+html[data-theme="light"] .payment-status.partial{background:#fffbea!important;color:#7b6d25!important;border-color:#ddd19d!important}
+html[data-theme="light"] .payment-status.paid{background:#eef7eb!important;color:#376b37!important;border-color:#bbd4b7!important}
+html[data-theme="light"] .payment-empty{background:#fafbfc!important;border-color:#cfd4d8!important}
+
+/* Aftercare */
+html[data-theme="light"] .aftercare-card{background:#fff!important;color:#1a1d21!important;border-color:#dfe2e6!important}
+html[data-theme="light"] .aftercare-summary>div,
+html[data-theme="light"] .aftercare-tip,
+html[data-theme="light"] .aftercare-toggle{background:#f7f8f9!important;color:#1a1d21!important;border-color:#dfe2e6!important}
+html[data-theme="light"] .aftercare-toggle span{color:#42494f!important}
+html[data-theme="light"] .aftercare-dialog-note{background:#f5f6f8!important;color:#687078!important;border-color:#dce0e4!important}
+html[data-theme="light"] .aftercare-empty,
+html[data-theme="light"] .healing-photo-preview{background:#fafbfc!important;border-color:#cfd4d8!important;color:#777e84!important}
+html[data-theme="light"] .aftercare-status.open{background:#f6f7f8!important;color:#5a6167!important}
+html[data-theme="light"] .aftercare-status.good{background:#eef7eb!important;color:#376b37!important;border-color:#bbd4b7!important}
+html[data-theme="light"] .aftercare-status.warn{background:#fff7ea!important;color:#956122!important;border-color:#e4c79e!important}
+html[data-theme="light"] .aftercare-status.planned{background:#eef5fb!important;color:#3b6690!important;border-color:#bfd2e3!important}
+html[data-theme="light"] .aftercare-status.done{background:#f0f2f4!important;color:#646b71!important}
+
+/* Tattoo/project surfaces */
+html[data-theme="light"] .project-tab-pane,
+html[data-theme="light"] .project-tab-empty{color:#1a1d21!important}
+html[data-theme="light"] .project-inline-note,
+html[data-theme="light"] .project-appointment-toggle,
+html[data-theme="light"] .project-form-section,
+html[data-theme="light"] .focus-project-actions{background:#fff!important;color:#1a1d21!important;border-color:#dfe2e6!important}
+html[data-theme="light"] .design-tile{background:#f8f9fa!important;color:#1a1d21!important;border-color:#ccd1d6!important}
+
+/* Calendar + conflict dialogs */
+html[data-theme="light"] #calendarConflictDialog>div,
+html[data-theme="light"] #projectConflictDialog>div{background:#fff!important;color:#1a1d21!important}
+html[data-theme="light"] #calendarConflictList>div,
+html[data-theme="light"] .project-conflict-row{background:#f7f8f9!important;color:#1a1d21!important;border-color:#dfe2e6!important}
+
+/* Generic dynamically-created dark rows/cards */
+html[data-theme="light"] .cockpit-task-grid>button,
+html[data-theme="light"] .cockpit-task-grid>div,
+html[data-theme="light"] .cockpit-request-list button,
+html[data-theme="light"] .cockpit-project-list button,
+html[data-theme="light"] .finance-project-list button{background:#f8f9fa!important;color:#1a1d21!important;border-color:#dfe2e6!important}
+html[data-theme="light"] .cockpit-task-grid span,
+html[data-theme="light"] .cockpit-request-list strong,
+html[data-theme="light"] .cockpit-project-list strong{color:#202428!important}
+
+/* Keep text readable across all modules */
+html[data-theme="light"] .request-box strong,
+html[data-theme="light"] .ink-settings strong,
+html[data-theme="light"] .payment-card strong,
+html[data-theme="light"] .aftercare-card strong,
+html[data-theme="light"] .consent-card strong{color:inherit}
