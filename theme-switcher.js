@@ -72,10 +72,16 @@
     const script=document.createElement('script');script.src='ink-dashboard.js';document.body.appendChild(script);
   }
 
+  function installCursorSelector(){
+    if(document.querySelector('script[src="cursor-switcher.js"]'))return;
+    const script=document.createElement('script');script.src='cursor-switcher.js';document.body.appendChild(script);
+  }
+
   installCss();
   applyTheme(currentTheme(),false);
   installSelector();
   installInkDashboard();
+  installCursorSelector();
 
   const settings=document.getElementById('settings');
   if(settings)new MutationObserver(()=>{
