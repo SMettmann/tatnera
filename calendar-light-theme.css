@@ -1,0 +1,131 @@
+/* TATNERA — complete light calendar skin */
+html[data-theme="light"] #calendar,
+html[data-theme="light"] .calendar-shell{color:#1a1d21!important}
+
+html[data-theme="light"] .calendar-board{
+  background:#ffffff!important;
+  border-color:#d9dde2!important;
+  box-shadow:0 12px 34px rgba(31,39,48,.08)!important;
+}
+html[data-theme="light"] .calendar-scroll,
+html[data-theme="light"] .calendar-week,
+html[data-theme="light"] .calendar-day-view,
+html[data-theme="light"] .day-agenda{background:#ffffff!important}
+
+/* Toolbar */
+html[data-theme="light"] .calendar-nav-btn,
+html[data-theme="light"] .mini-add-btn{
+  background:#ffffff!important;
+  color:#252a2f!important;
+  border-color:#d8dce1!important;
+  box-shadow:0 1px 2px rgba(25,32,40,.03)!important;
+}
+html[data-theme="light"] .calendar-nav-btn:hover,
+html[data-theme="light"] .mini-add-btn:hover{
+  background:#f2f4f6!important;
+  border-color:#bcc2c8!important;
+}
+html[data-theme="light"] .calendar-toggle,
+html[data-theme="light"] .artist-filter{
+  background:#edf0f2!important;
+  border-color:#d5dade!important;
+}
+html[data-theme="light"] .calendar-toggle button,
+html[data-theme="light"] .artist-filter button{
+  background:transparent!important;
+  color:#4f565d!important;
+  border-color:transparent!important;
+}
+html[data-theme="light"] .calendar-toggle button:hover,
+html[data-theme="light"] .artist-filter button:hover{background:#ffffff!important;color:#20252a!important}
+html[data-theme="light"] .calendar-toggle button.active,
+html[data-theme="light"] .artist-filter button.active{
+  background:#232a24!important;
+  color:#ffffff!important;
+}
+html[data-theme="light"] .calendar-date-label{color:#1c2024!important}
+html[data-theme="light"] .calendar-legend{color:#717880!important}
+
+/* Week view */
+html[data-theme="light"] .calendar-day{
+  background:#ffffff!important;
+  border-right-color:#e3e6e9!important;
+}
+html[data-theme="light"] .calendar-day.today{background:#f7faf5!important}
+html[data-theme="light"] .calendar-day-head{
+  background:rgba(255,255,255,.97)!important;
+  color:#202428!important;
+  border-bottom-color:#e0e4e7!important;
+  box-shadow:0 1px 0 rgba(30,38,46,.02)!important;
+}
+html[data-theme="light"] .calendar-day.today .calendar-day-head{background:rgba(243,248,240,.98)!important}
+html[data-theme="light"] .calendar-day-head span{color:#858c93!important}
+html[data-theme="light"] .calendar-day-number{color:#30363c!important}
+html[data-theme="light"] .calendar-day.today .calendar-day-number{background:#232a24!important;color:#fff!important}
+html[data-theme="light"] .calendar-events{background:transparent!important}
+html[data-theme="light"] .calendar-empty{
+  background:#fbfcfc!important;
+  color:#90969c!important;
+  border-color:#cfd4d9!important;
+}
+
+/* Event cards */
+html[data-theme="light"] .calendar-event,
+html[data-theme="light"] .day-event-row{
+  background:#f8f9fa!important;
+  color:#1f2428!important;
+  border-color:#dce0e4!important;
+  box-shadow:0 1px 2px rgba(25,32,40,.025)!important;
+}
+html[data-theme="light"] .calendar-event:hover,
+html[data-theme="light"] .day-event-row:hover{
+  background:#f3f5f6!important;
+  border-color:#c6ccd1!important;
+}
+html[data-theme="light"] .calendar-event.tattoo{border-left-color:#3f5943!important}
+html[data-theme="light"] .calendar-event.consultation{border-left-color:#6e9fe6!important}
+html[data-theme="light"] .calendar-event.touchup{border-left-color:#e59a42!important}
+html[data-theme="light"] .calendar-event.block{border-left-color:#8d9399!important;background:#f0f2f4!important}
+html[data-theme="light"] .calendar-event .event-time,
+html[data-theme="light"] .day-event-row .day-time{color:#27382a!important}
+html[data-theme="light"] .calendar-event p,
+html[data-theme="light"] .day-event-row p,
+html[data-theme="light"] .day-event-actions{color:#737a82!important}
+html[data-theme="light"] .event-foot{color:#798087!important}
+html[data-theme="light"] .event-type-pill{background:#e9ecef!important;color:#555c63!important}
+
+/* Day view — remove the black timeline entirely */
+html[data-theme="light"] .calendar-day-view{
+  background:#ffffff!important;
+}
+html[data-theme="light"] .day-time-rail{
+  background:#f7f8fa!important;
+  border-right-color:#dfe3e7!important;
+}
+html[data-theme="light"] .day-time-rail div{color:#8c939a!important}
+html[data-theme="light"] .day-agenda{
+  background-color:#ffffff!important;
+  background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 53px,#eef1f3 54px)!important;
+}
+
+/* New appointment row / empty action */
+html[data-theme="light"] .day-agenda .mini-add-btn,
+html[data-theme="light"] .calendar-events .mini-add-btn{
+  background:#ffffff!important;
+  color:#30363b!important;
+  border-color:#d5dade!important;
+}
+
+/* Dialog helpers */
+html[data-theme="light"] .appointment-dialog-tools{color:#1f2428!important}
+html[data-theme="light"] .danger-btn{
+  background:#fff1f2!important;
+  color:#b53d47!important;
+  border-color:#e4b9bd!important;
+}
+
+/* Keep the calendar readable on hover/selection */
+html[data-theme="light"] #calendar button:focus-visible{
+  outline:2px solid #6d7c70!important;
+  outline-offset:2px!important;
+}
