@@ -7,18 +7,20 @@
   const esc=Core.esc;
   const HISTORY_KEY='tatnera_appointment_history';
   const ACTIVE=['Bestätigt','Angefragt','Einwilligung fehlt','Blockiert'];
-  const TERMINAL=['Abgesagt','Verschoben','No-Show','Abgeschlossen'];
+  const TERMINAL=['Abgesagt','Verschoben','Nicht erschienen','Abgeschlossen'];
 
+  function normalizeStatus(status){return status==='No-Show'?'Nicht erschienen':status;}
+  function normalizeItem(item){return item&&item.status==='No-Show'?{...item,status:'Nicht erschienen'}:item;}
   function loadHistory(){
-    try{const parsed=JSON.parse(localStorage.getItem(HISTORY_KEY)||'null');return Array.isArray(parsed)?parsed:[];}
+    try{const parsed=JSON.parse(localStorage.getItem(HISTORY_KEY)||'null');return Array.isArray(parsed)?parsed.map(normalizeItem):[];}
     catch(_error){return [];}
   }
   state.appointmentHistory=loadHistory();
 
   function saveHistory(){localStorage.setItem(HISTORY_KEY,JSON.stringify(state.appointmentHistory||[]));}
-  function isTerminal(value){const status=typeof value==='string'?value:value?.status;return TERMINAL.includes(String(status||''));}
+  function isTerminal(value){const status=normalizeStatus(typeof value==='string'?value:value?.status);return TERMINAL.includes(String(status||''));}
   function isActive(value){return !isTerminal(value);}
-  function statusClass(status){return ({Abgesagt:'cancelled',Verschoben:'moved','No-Show':'noshow',Abgeschlossen:'completed'})[status]||'neutral';}
+  function statusClass(status){return ({Abgesagt:'cancelled',Verschoben:'moved','Nicht erschienen':'noshow',Abgeschlossen:'completed'})[normalizeStatus(status)]||'neutral';}
   function typeLabel(type){return ({tattoo:'Tattoo',consultation:'Beratung',touchup:'Nachstechen',block:'Blockzeit'})[type]||type||'Termin';}
   function historyForProject(id){return (state.appointmentHistory||[]).filter(item=>item.projectId===id).sort(historySort);}
   function historyForCustomer(id){return (state.appointmentHistory||[]).filter(item=>item.customerId===id).sort(historySort);}
@@ -52,22 +54,28 @@
   }
 
   function migrateTerminalEvents(){
-    const terminal=(state.calendarEvents||[]).filter(isTerminal);if(!terminal.length)return;
-    terminal.forEach(event=>pushHistory({...event,closedAt:event.closedAt||new Date().toISOString()}));
-    state.calendarEvents=(state.calendarEvents||[]).filter(isActive);
+    let changed=false;
+    (state.calendarEvents||[]).forEach(event=>{if(event.status==='No-Show'){event.status='Nicht erschienen';changed=true;}});
+    const terminal=(state.calendarEvents||[]).filter(isTerminal);
+    if(terminal.length){
+      terminal.forEach(event=>pushHistory({...event,closedAt:event.closedAt||new Date().toISOString()}));
+      state.calendarEvents=(state.calendarEvents||[]).filter(isActive);
+      changed=true;
+    }
     saveHistory();
-    try{persist();}catch(_error){}
+    if(changed)try{persist();}catch(_error){}
   }
 
   function pushHistory(item){
     if(!item?.id)return;
+    item=normalizeItem(item);
     const index=(state.appointmentHistory||[]).findIndex(existing=>existing.id===item.id);
     if(index>=0)state.appointmentHistory[index]=item;else state.appointmentHistory.unshift(item);
   }
 
   function syncStatusSelect(eventId=''){
     const form=document.getElementById('appointmentForm'),select=form?.elements.status;if(!select)return;
-    const current=String(select.value||'Bestätigt'),existing=Boolean(eventId&&(state.calendarEvents||[]).some(item=>item.id===eventId));
+    const current=normalizeStatus(String(select.value||'Bestätigt')),existing=Boolean(eventId&&(state.calendarEvents||[]).some(item=>item.id===eventId));
     const options=existing?[...ACTIVE,...TERMINAL]:ACTIVE;
     select.innerHTML=options.map(status=>`<option value="${esc(status)}">${esc(status)}</option>`).join('');
     select.value=options.includes(current)?current:'Bestätigt';
@@ -85,7 +93,7 @@
 
   function payloadFromForm(form){
     const data=Object.fromEntries(new FormData(form).entries());
-    return {id:data.eventId||'',date:data.date,start:data.start,duration:Number(data.duration||60),customerId:data.customerId||'',projectId:data.projectId||'',artist:data.artist||'',type:data.type||'tattoo',status:data.status||'Bestätigt',notes:data.notes||''};
+    return {id:data.eventId||'',date:data.date,start:data.start,duration:Number(data.duration||60),customerId:data.customerId||'',projectId:data.projectId||'',artist:data.artist||'',type:data.type||'tattoo',status:normalizeStatus(data.status||'Bestätigt'),notes:data.notes||''};
   }
 
   function finalizeTerminal(event){
@@ -119,12 +127,12 @@
     try{renderAppointments();renderCalendar();renderCustomers();renderProjects();}catch(_error){}
     document.getElementById('appointmentDialog')?.close();
     document.dispatchEvent(new CustomEvent('tatnera:data-changed',{detail:{type:'appointment-status',status:payload.status,eventId:existing.id,projectId:payload.projectId,customerId:payload.customerId,replacementId:replacement?.id||''}}));
-    document.dispatchEvent(new CustomEvent('tatnera:appointment-terminal',{detail:{appointment:historyEntry,replacement}}));
+    document.dispatchEvent(new CustomEvent('tatnera:appointment-terminal',{detail:{appointment:normalizeItem(historyEntry),replacement}}));
     if(payload.status==='Verschoben'&&replacement)alert('Der bisherige Termin wurde als „Verschoben“ dokumentiert und der neue Termin als „Angefragt“ angelegt.');
   }
 
   function historyRows(items){
-    return items.map(item=>`<div class="appointment-history-row"><div><strong>${esc(dateLabel(item))}</strong><span>${esc(typeLabel(item.type))} · ${esc(item.artist||'—')}${item.notes?' · '+esc(item.notes):''}</span></div><span class="appointment-history-status ${statusClass(item.status)}">${esc(item.status||'—')}</span></div>`).join('');
+    return items.map(item=>{const status=normalizeStatus(item.status);return `<div class="appointment-history-row"><div><strong>${esc(dateLabel(item))}</strong><span>${esc(typeLabel(item.type))} · ${esc(item.artist||'—')}${item.notes?' · '+esc(item.notes):''}</span></div><span class="appointment-history-status ${statusClass(status)}">${esc(status||'—')}</span></div>`;}).join('');
   }
 
   function renderProjectHistory(projectId){
@@ -185,6 +193,7 @@
   });
 
   installStyle();
+  saveHistory();
   migrateTerminalEvents();
   wrapAppointmentDialog();
   syncStatusSelect('');
