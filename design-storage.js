@@ -61,7 +61,6 @@
       const button=event.target.closest?.('#projectDetail [data-project-tab]');
       if(!button)return;
       event.preventDefault();
-      event.stopPropagation();
       activateProjectTab(document.getElementById('projectDetail'),button.dataset.projectTab);
     },true);
 
@@ -124,15 +123,4 @@
   installStyle();
   installRobustProjectTabs();
   enhanceDesignPane();
-
-  if(!document.querySelector('script[src="workflow-ux.js"]')){
-    const script=document.createElement('script');
-    script.src='workflow-ux.js';
-    document.body.appendChild(script);
-  }
-  if(!document.querySelector('script[src="theme-switcher.js"]')){
-    const script=document.createElement('script');
-    script.src='theme-switcher.js';
-    document.body.appendChild(script);
-  }
 })();
