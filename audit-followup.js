@@ -28,6 +28,9 @@
   function installCalendarRequestCompletion(){
     const form=document.getElementById('appointmentForm');if(!form)return;
     form.addEventListener('submit',()=>{
+      // Wird der Termin direkt aus dem Anfrage-Dialog geplant, übernimmt audit-fixes.js den Abschluss.
+      // Dadurch wird dieselbe Anfrage nicht doppelt archiviert.
+      if(document.getElementById('requestDetailDialog')?.open)return;
       const projectId=form.elements.projectId.value;
       if(!projectId)return;
       const linked=state.requests?.find(request=>request.projectId===projectId);
