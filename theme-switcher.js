@@ -67,9 +67,9 @@
     applyTheme(currentTheme(),false);
   }
 
-  function installInkDashboard(){
-    if(document.querySelector('script[src="ink-dashboard.js"]'))return;
-    const script=document.createElement('script');script.src='ink-dashboard.js';document.body.appendChild(script);
+  function installInkDashboard(next){
+    if(document.querySelector('script[src="ink-dashboard.js"]')){next?.();return;}
+    const script=document.createElement('script');script.src='ink-dashboard.js';script.onload=()=>next?.();document.body.appendChild(script);
   }
 
   function installCursorSelector(){
@@ -77,10 +77,15 @@
     const script=document.createElement('script');script.src='cursor-switcher.js';document.body.appendChild(script);
   }
 
+  function installDashboardUx(){
+    if(document.querySelector('script[src="dashboard-ux.js"]'))return;
+    const script=document.createElement('script');script.src='dashboard-ux.js';document.body.appendChild(script);
+  }
+
   installCss();
   applyTheme(currentTheme(),false);
   installSelector();
-  installInkDashboard();
+  installInkDashboard(installDashboardUx);
   installCursorSelector();
 
   const settings=document.getElementById('settings');
