@@ -40,7 +40,9 @@
 
     root.dataset.activeTab=name;
     const id=projectId(root);
-    if(rememberTab)remember(id,name);
+    /* Internal initialisation/restores use emit:false and must not overwrite the last
+       tab the user actually selected. */
+    if(rememberTab&&emit)remember(id,name);
 
     if(emit){
       document.dispatchEvent(new CustomEvent('tatnera:project-tab',{detail:{projectId:id,tab:name}}));
