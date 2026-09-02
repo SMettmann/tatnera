@@ -19,7 +19,9 @@
   function install(){
     if(!document.querySelector('link[href="ink.css"]')){const link=document.createElement('link');link.rel='stylesheet';link.href='ink.css';document.head.appendChild(link);}
     buildSettings();buildDialogs();migrate();renderSettings();
-    const detail=document.getElementById('projectDetail');if(detail)new MutationObserver(()=>queueMicrotask(injectProject)).observe(detail,{childList:true,subtree:true});document.addEventListener('tatnera:project-opened',injectProject);injectProject();
+    document.addEventListener('tatnera:project-opened',injectProject);
+    document.addEventListener('tatnera:runtime-refresh',()=>{renderSettings();injectProject();});
+    injectProject();
   }
 
   function migrate(){let changed=false;(state.projects||[]).forEach(p=>{if(!Array.isArray(p.inkIds)){p.inkIds=[];changed=true;}(p.colors||[]).forEach(label=>{const match=String(label).match(/Charge\s+(.+)$/i);if(!match)return;const ink=(state.inks||[]).find(item=>item.batch===match[1].trim());if(ink&&!p.inkIds.includes(ink.id)){p.inkIds.push(ink.id);changed=true;}});});if(changed)persistAll();}
