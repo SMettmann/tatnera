@@ -3,7 +3,7 @@
 .cursor-choice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .cursor-choice{min-height:150px}
 .cursor-choice-preview{height:78px;border:1px solid var(--line);border-radius:11px;background:var(--panel-2);display:grid;place-items:center;margin-bottom:10px;overflow:hidden}
-.cursor-choice-preview img{width:46px;height:46px;object-fit:contain;display:block}
+.cursor-choice-preview img{width:50px;height:50px;object-fit:contain;display:block}
 .cursor-choice-preview svg{width:42px;height:42px;display:block}
 .cursor-choice.active{border-color:var(--accent)!important;box-shadow:inset 0 0 0 1px var(--accent)!important}
 .cursor-choice strong,.cursor-choice small{display:block}
@@ -11,7 +11,7 @@
 .cursor-choice small{font-size:10px;color:var(--muted);line-height:1.45}
 .cursor-settings-note{margin-top:11px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:var(--panel-2);font-size:10px;color:var(--muted)}
 
-html[data-cursor="needle"]{--tatnera-cursor:url('tattoo-cursor.svg') 4 3,auto}
+html[data-cursor="needle"]{--tatnera-cursor:url('tattoo-cursor.svg?v=2') 36 40,auto}
 html[data-cursor="hand"]{--tatnera-cursor:url('rock-hand-cursor.svg?v=3') 15 4,auto}
 html[data-cursor="normal"]{--tatnera-cursor:default}
 
