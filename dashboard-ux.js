@@ -10,12 +10,11 @@
   function futureEvents(){const today=todayISO();return (state.calendarEvents||[]).filter(e=>e.date>=today).sort((a,b)=>a.date.localeCompare(b.date)||a.start.localeCompare(b.start));}
   function nextEvent(projectId){return futureEvents().find(e=>e.projectId===projectId)||null;}
   function hasFutureEvent(projectId){return Boolean(nextEvent(projectId));}
-  function projectById(id){return state.projects.find(p=>p.id===id);}
 
   function installDialog(){
     if(document.getElementById('dashboardActionDialog'))return;
     const dialog=document.createElement('dialog');dialog.id='dashboardActionDialog';dialog.className='dialog dashboard-action-dialog';
-    dialog.innerHTML=`<div><div class="dialog-head"><div><span class="eyebrow" id="dashboardActionEyebrow">Dashboard</span><h2 id="dashboardActionTitle">Offene Punkte</h2><p class="muted" id="dashboardActionMeta"></p></div><button type="button" class="close-btn" data-close-dashboard-action>×</button></div><div class="dashboard-action-list" id="dashboardActionList"></div><div class="dialog-actions"><button type="button" class="btn ghost" data-close-dashboard-action>Schließen</button></div></div>`;
+    dialog.innerHTML=`<div><div class="dialog-head"><div><span class="eyebrow">Dashboard</span><h2 id="dashboardActionTitle">Offene Punkte</h2><p class="muted" id="dashboardActionMeta"></p></div><button type="button" class="close-btn" data-close-dashboard-action>×</button></div><div class="dashboard-action-list" id="dashboardActionList"></div><div class="dialog-actions"><button type="button" class="btn ghost" data-close-dashboard-action>Schließen</button></div></div>`;
     document.body.appendChild(dialog);
     dialog.querySelectorAll('[data-close-dashboard-action]').forEach(btn=>btn.addEventListener('click',()=>dialog.close()));
     dialog.addEventListener('click',event=>{if(event.target===dialog)dialog.close();});
@@ -42,7 +41,7 @@
     }else if(type==='deposits'){
       rows=state.projects.filter(p=>depositOpen(p)>0);
       title.textContent='Offene Anzahlungen';meta.textContent=`${rows.length} Tattoo${rows.length===1?'':'s'} mit noch offener Anzahlung.`;
-      list.innerHTML=rows.length?rows.map(p=>{const event=nextEvent(p.id);return `<button class="dashboard-action-row" data-action-project="${esc(p.id)}" data-action-tab="payment"><div><strong>${esc(p.title)}</strong><span>${esc(customerName(p.customerId))}${event?' · '+esc(formatDate(event.date)) : ''}</span></div><div><small>Noch offen</small><div class="amount">${esc(euro(depositOpen(p)))}</div></div><span>→</span></button>`;}).join(''):'<div class="dashboard-action-empty">Keine offenen Anzahlungen.</div>';
+      list.innerHTML=rows.length?rows.map(p=>{const event=nextEvent(p.id);return `<button class="dashboard-action-row" data-action-project="${esc(p.id)}" data-action-tab="payments"><div><strong>${esc(p.title)}</strong><span>${esc(customerName(p.customerId))}${event?' · '+esc(formatDate(event.date)) : ''}</span></div><div><small>Noch offen</small><div class="amount">${esc(euro(depositOpen(p)))}</div></div><span>→</span></button>`;}).join(''):'<div class="dashboard-action-empty">Keine offenen Anzahlungen.</div>';
     }
 
     list.querySelectorAll('[data-action-project]').forEach(btn=>btn.addEventListener('click',()=>openProjectTab(btn.dataset.actionProject,btn.dataset.actionTab)));
@@ -69,8 +68,8 @@
     const items=[];
     state.projects.forEach(p=>{
       const event=nextEvent(p.id);
-      if(event&&event.date<=limitDate&& !['Unterschrieben','Vorhanden'].includes(p.consent))items.push({priority:1,kind:'project',projectId:p.id,tab:'documents',severity:'urgent',title:'Einwilligung fehlt',subtitle:`${customerName(p.customerId)} · ${p.title}`,value:`${formatDate(event.date)} · ${event.start}`});
-      if(event&&event.date<=limitDate&&depositOpen(p)>0)items.push({priority:2,kind:'project',projectId:p.id,tab:'payment',severity:'warn',title:`Anzahlung offen · ${euro(depositOpen(p))}`,subtitle:`${customerName(p.customerId)} · ${p.title}`,value:`${formatDate(event.date)} · ${event.start}`});
+      if(event&&event.date<=limit&&!['Unterschrieben','Vorhanden'].includes(p.consent))items.push({priority:1,kind:'project',projectId:p.id,tab:'documents',severity:'urgent',title:'Einwilligung fehlt',subtitle:`${customerName(p.customerId)} · ${p.title}`,value:`${formatDate(event.date)} · ${event.start}`});
+      if(event&&event.date<=limit&&depositOpen(p)>0)items.push({priority:2,kind:'project',projectId:p.id,tab:'payments',severity:'warn',title:`Anzahlung offen · ${euro(depositOpen(p))}`,subtitle:`${customerName(p.customerId)} · ${p.title}`,value:`${formatDate(event.date)} · ${event.start}`});
       const ac=p.aftercare||{};
       if(ac.status==='Nachstechen empfohlen')items.push({priority:1,kind:'project',projectId:p.id,tab:'aftercare',severity:'urgent',title:'Nachstechen empfohlen',subtitle:`${customerName(p.customerId)} · ${p.title}`,value:ac.followupDate?formatDate(ac.followupDate):'prüfen'});
       else if(ac.followupDate&&ac.followupDate<=today&&ac.status!=='Abgeschlossen'&&ac.status!=='Nachstechen geplant')items.push({priority:2,kind:'project',projectId:p.id,tab:'aftercare',severity:'warn',title:'Heilungskontrolle fällig',subtitle:`${customerName(p.customerId)} · ${p.title}`,value:formatDate(ac.followupDate)});
@@ -119,9 +118,7 @@
     card.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();open();}});
   }
 
-  function refresh(){
-    installUsefulPanels();renderTaskButtons();renderUnscheduled();renderNextSteps();renderAppointments();enhanceInkAlert();
-  }
+  function refresh(){installUsefulPanels();renderTaskButtons();renderUnscheduled();renderNextSteps();renderAppointments();enhanceInkAlert();}
 
   function wrapUpdates(){
     const oldPersist=persist;persist=function(){oldPersist();queueMicrotask(refresh);};
