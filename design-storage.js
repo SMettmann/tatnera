@@ -124,4 +124,10 @@
   installStyle();
   installRobustProjectTabs();
   enhanceDesignPane();
+
+  if(!document.querySelector('script[src="workflow-ux.js"]')){
+    const script=document.createElement('script');
+    script.src='workflow-ux.js';
+    document.body.appendChild(script);
+  }
 })();
