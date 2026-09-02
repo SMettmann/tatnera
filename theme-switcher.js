@@ -3,6 +3,11 @@
   const KEY='tatnera_theme';
   const THEMES=new Set(['dark','light','pink']);
 
+  function installCss(){
+    if(document.querySelector('link[href="theme-switcher.css"]'))return;
+    const link=document.createElement('link');link.rel='stylesheet';link.href='theme-switcher.css';document.head.appendChild(link);
+  }
+
   function currentTheme(){
     const saved=localStorage.getItem(KEY);
     return THEMES.has(saved)?saved:'dark';
@@ -55,6 +60,7 @@
     applyTheme(currentTheme(),false);
   }
 
+  installCss();
   applyTheme(currentTheme(),false);
   installSelector();
 
