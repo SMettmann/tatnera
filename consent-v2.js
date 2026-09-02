@@ -69,6 +69,7 @@
 
   document.addEventListener('click',event=>{const open=event.target.closest('[data-open-consent]');if(open){event.preventDefault();openConsent(open.dataset.openConsent);return;}const requested=event.target.closest('[data-request-consent]');if(requested){event.preventDefault();const p=project(requested.dataset.requestConsent);if(p){p.consent='Angefordert';persist();inject();document.dispatchEvent(new CustomEvent('tatnera:data-changed',{detail:{type:'consent',projectId:p.id}}));}}});
   installAssets();
-  const detail=document.getElementById('projectDetail');if(detail)new MutationObserver(()=>queueMicrotask(inject)).observe(detail,{childList:true,subtree:true});
-  document.addEventListener('tatnera:project-opened',inject);inject();
+  document.addEventListener('tatnera:project-opened',inject);
+  document.addEventListener('tatnera:runtime-refresh',inject);
+  inject();
 })();
