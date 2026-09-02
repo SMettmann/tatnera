@@ -14,7 +14,9 @@
   function install(){
     if(!document.querySelector('link[href="aftercare.css"]')){const link=document.createElement('link');link.rel='stylesheet';link.href='aftercare.css';document.head.appendChild(link);}
     buildDialog();let changed=false;(state.projects||[]).forEach(p=>{if(!p.aftercare){p.aftercare={status:'Offen',tattooDate:Core.lastCompletedTattooDate(p.id),followupDate:'',instructionsGiven:false,records:[]};changed=true;}else if(!Array.isArray(p.aftercare.records)){p.aftercare.records=[];changed=true;}});if(changed)persist();
-    const detail=document.getElementById('projectDetail');if(detail)new MutationObserver(()=>queueMicrotask(inject)).observe(detail,{childList:true,subtree:true});document.addEventListener('tatnera:project-opened',inject);inject();
+    document.addEventListener('tatnera:project-opened',inject);
+    document.addEventListener('tatnera:runtime-refresh',inject);
+    inject();
   }
 
   function buildDialog(){
