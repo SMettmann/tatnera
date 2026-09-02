@@ -72,12 +72,10 @@
   }
   function lastCompletedTattooDate(projectId){return completedTattooEvents(projectId).at(-1)?.date||'';}
 
-  function activateProjectTab(name,{emit=true}={}){
-    const detail=document.getElementById('projectDetail');if(!detail||!name)return false;let found=false;
-    detail.querySelectorAll('[data-project-tab]').forEach(button=>{const active=button.dataset.projectTab===name;found=found||active;button.classList.toggle('active',active);button.setAttribute('aria-selected',active?'true':'false');button.type='button';});
-    detail.querySelectorAll('[data-project-pane]').forEach(pane=>{const active=pane.dataset.projectPane===name;pane.classList.toggle('active',active);pane.hidden=!active;});
-    if(found&&emit)document.dispatchEvent(new CustomEvent('tatnera:project-tab',{detail:{projectId:projectIdFromDetail(),tab:name}}));
-    return found;
+  /* Compatibility entry point for modules/history. The actual tab state lives only in
+     project-tabs-runtime.js. Keeping this alias avoids multiple tab implementations. */
+  function activateProjectTab(name,options={}){
+    return window.TatneraProjectTabs?.activate?.(name,options)??false;
   }
 
   window.TatneraCore={esc,getArtists,saveArtists,addArtist,setArtistActive,renameArtist,artistNameFallback,populateArtistSelect,projectIdFromDetail,getProject,currentProject,getCustomer,completedTattooEvents,lastCompletedTattooDate,activateProjectTab,updateTopbarDate};
