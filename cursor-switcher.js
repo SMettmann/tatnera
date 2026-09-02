@@ -29,8 +29,8 @@
       <div class="theme-settings-head"><div><span class="eyebrow">Bedienung</span><h3>Cursor auswählen</h3><p>Wähle deinen Mauszeiger. Die Auswahl bleibt auch über Buttons, Karten und Menüs aktiv.</p></div></div>
       <div class="cursor-choice-grid">
         <button type="button" class="theme-choice cursor-choice" data-cursor-choice="needle" aria-pressed="false">
-          <div class="cursor-choice-preview"><img src="tattoo-cursor.svg" alt="Tattoo-Nadel Cursor"></div>
-          <strong>Tattoo-Nadel</strong><small>Der charakteristische TATNERA Cursor.</small>
+          <div class="cursor-choice-preview"><img src="tattoo-cursor.svg?v=2" alt="Tattoo-Nadel Cursor"></div>
+          <strong>Tattoo-Nadel</strong><small>Minimal, klar und als Tattoo-Maschine erkennbar.</small>
         </button>
         <button type="button" class="theme-choice cursor-choice" data-cursor-choice="normal" aria-pressed="false">
           <div class="cursor-choice-preview"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M10 6v31l8-8 6 13 6-3-6-12h12L10 6Z" fill="#fff" stroke="#111318" stroke-width="3" stroke-linejoin="round"/></svg></div>
