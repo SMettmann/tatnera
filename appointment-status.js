@@ -6,7 +6,7 @@
   const Core=window.TatneraCore;if(!Core)return;
   const esc=Core.esc;
   const HISTORY_KEY='tatnera_appointment_history';
-  const ACTIVE=['Bestätigt','Angefragt','Einwilligung fehlt','Blockiert'];
+  const ACTIVE=['Bestätigt','Angefragt','Einwilligung fehlt','Blockiert','Sitzung läuft'];
   const TERMINAL=['Abgesagt','Verschoben','Nicht erschienen','Abgeschlossen'];
 
   function normalizeStatus(status){return status==='No-Show'?'Nicht erschienen':status;}
@@ -73,10 +73,37 @@
     if(index>=0)state.appointmentHistory[index]=item;else state.appointmentHistory.unshift(item);
   }
 
+  function refreshViews(){
+    try{renderAppointments();renderCalendar();renderCustomers();renderProjects();}catch(_error){}
+  }
+
+  function completeAppointment(eventId,extra={}){
+    const existing=(state.calendarEvents||[]).find(item=>item.id===eventId);if(!existing)return null;
+    const completedAt=extra.completedAt||new Date().toISOString();
+    const historyEntry=normalizeItem({...existing,...extra,id:existing.id,status:'Abgeschlossen',closedAt:extra.closedAt||completedAt,completedAt});
+    pushHistory(historyEntry);
+    state.calendarEvents=(state.calendarEvents||[]).filter(item=>item.id!==existing.id);
+    if(existing.type==='tattoo'&&existing.projectId){
+      const project=Core.getProject(existing.projectId);
+      if(project){project.lastCompletedAppointmentId=existing.id;project.lastCompletedAt=completedAt;if(['Entwurf','Termin geplant'].includes(project.status))project.status='In Arbeit';}
+    }
+    saveHistory();persist();refreshViews();
+    document.dispatchEvent(new CustomEvent('tatnera:data-changed',{detail:{type:'appointment-status',status:'Abgeschlossen',eventId:existing.id,projectId:existing.projectId||'',customerId:existing.customerId||''}}));
+    document.dispatchEvent(new CustomEvent('tatnera:appointment-terminal',{detail:{appointment:historyEntry,replacement:null}}));
+    return historyEntry;
+  }
+  Core.completeAppointment=completeAppointment;
+
   function syncStatusSelect(eventId=''){
     const form=document.getElementById('appointmentForm'),select=form?.elements.status;if(!select)return;
-    const current=normalizeStatus(String(select.value||'Bestätigt')),existing=Boolean(eventId&&(state.calendarEvents||[]).some(item=>item.id===eventId));
-    const options=existing?[...ACTIVE,...TERMINAL]:ACTIVE;
+    const record=eventId?(state.calendarEvents||[]).find(item=>item.id===eventId):null;
+    if(record?.status==='Sitzung läuft'){
+      select.innerHTML='<option value="Sitzung läuft">Sitzung läuft</option>';
+      select.value='Sitzung läuft';
+      return;
+    }
+    const current=normalizeStatus(String(select.value||'Bestätigt')),existing=Boolean(record);
+    const options=existing?[...ACTIVE.filter(status=>status!=='Sitzung läuft'),...TERMINAL]:ACTIVE.filter(status=>status!=='Sitzung läuft');
     select.innerHTML=options.map(status=>`<option value="${esc(status)}">${esc(status)}</option>`).join('');
     select.value=options.includes(current)?current:'Bestätigt';
   }
@@ -102,6 +129,12 @@
     const existing=(state.calendarEvents||[]).find(item=>item.id===payload.id);
     if(!existing){alert('Dieser Status kann nur für einen bereits angelegten Termin verwendet werden.');return;}
 
+    if(payload.status==='Abgeschlossen'){
+      completeAppointment(existing.id,payload);
+      document.getElementById('appointmentDialog')?.close();
+      return;
+    }
+
     let historyEntry={...existing,...payload,id:existing.id,closedAt:new Date().toISOString()};
     let replacement=null;
     if(payload.status==='Verschoben'){
@@ -112,19 +145,12 @@
         historyEntry.rescheduledTo=replacement.id;
       }
     }
-    if(payload.status==='Abgeschlossen')historyEntry.completedAt=new Date().toISOString();
 
     pushHistory(historyEntry);
     state.calendarEvents=(state.calendarEvents||[]).filter(item=>item.id!==existing.id);
     if(replacement)state.calendarEvents.push(replacement);
 
-    if(payload.status==='Abgeschlossen'&&payload.type==='tattoo'&&payload.projectId){
-      const project=Core.getProject(payload.projectId);
-      if(project){project.lastCompletedAppointmentId=existing.id;project.lastCompletedAt=historyEntry.completedAt;if(['Entwurf','Termin geplant'].includes(project.status))project.status='In Arbeit';}
-    }
-
-    saveHistory();persist();
-    try{renderAppointments();renderCalendar();renderCustomers();renderProjects();}catch(_error){}
+    saveHistory();persist();refreshViews();
     document.getElementById('appointmentDialog')?.close();
     document.dispatchEvent(new CustomEvent('tatnera:data-changed',{detail:{type:'appointment-status',status:payload.status,eventId:existing.id,projectId:payload.projectId,customerId:payload.customerId,replacementId:replacement?.id||''}}));
     document.dispatchEvent(new CustomEvent('tatnera:appointment-terminal',{detail:{appointment:normalizeItem(historyEntry),replacement}}));
