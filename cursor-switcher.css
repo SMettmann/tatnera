@@ -15,7 +15,7 @@
 html[data-cursor="needle"] body,
 html[data-cursor="needle"] body *{cursor:url('tattoo-cursor.svg') 4 3, auto!important}
 html[data-cursor="hand"] body,
-html[data-cursor="hand"] body *{cursor:url('rock-hand-cursor.svg') 18 3, auto!important}
+html[data-cursor="hand"] body *{cursor:url('rock-hand-cursor.svg?v=2') 19 2, auto!important}
 html[data-cursor="normal"] body,
 html[data-cursor="normal"] body *{cursor:default!important}
 
