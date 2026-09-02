@@ -17,11 +17,11 @@
 
   function currentTheme(){
     const saved=localStorage.getItem(KEY);
-    return THEMES.has(saved)?saved:'dark';
+    return THEMES.has(saved)?saved:'light';
   }
 
   function applyTheme(theme,save=true){
-    const value=THEMES.has(theme)?theme:'dark';
+    const value=THEMES.has(theme)?theme:'light';
     document.documentElement.dataset.theme=value;
     if(save)localStorage.setItem(KEY,value);
     document.querySelectorAll('[data-theme-choice]').forEach(button=>{
@@ -37,11 +37,11 @@
       <div class="theme-choice-grid">
         <button type="button" class="theme-choice" data-theme-choice="dark" aria-pressed="false">
           <div class="theme-choice-preview"><span class="theme-preview-sidebar"></span><span class="theme-preview-main"><i class="theme-preview-line"></i><i class="theme-preview-card"></i><i class="theme-preview-button"></i></span></div>
-          <strong>Dunkel</strong><small>Aktueller TATNERA Look mit Lime-Akzenten.</small>
+          <strong>Dunkel</strong><small>Dunkler TATNERA Look mit Lime-Akzenten.</small>
         </button>
         <button type="button" class="theme-choice" data-theme-choice="light" aria-pressed="false">
           <div class="theme-choice-preview"><span class="theme-preview-sidebar"></span><span class="theme-preview-main"><i class="theme-preview-line"></i><i class="theme-preview-card"></i><i class="theme-preview-button"></i></span></div>
-          <strong>Hell</strong><small>Helle Flächen, dunkle Schrift und ruhige Kontraste.</small>
+          <strong>Hell · Standard</strong><small>Das Standard-Layout für TATNERA mit hellen Flächen und klaren Kontrasten.</small>
         </button>
         <button type="button" class="theme-choice" data-theme-choice="pink" aria-pressed="false">
           <div class="theme-choice-preview"><span class="theme-preview-sidebar"></span><span class="theme-preview-main"><i class="theme-preview-line"></i><i class="theme-preview-card"></i><i class="theme-preview-button"></i></span></div>
