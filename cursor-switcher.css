@@ -11,15 +11,27 @@
 .cursor-choice small{font-size:10px;color:var(--muted);line-height:1.45}
 .cursor-settings-note{margin-top:11px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:var(--panel-2);font-size:10px;color:var(--muted)}
 
-/* Preserve the chosen cursor over buttons, cards, menus and other interactive elements. */
-html[data-cursor="needle"] body,
-html[data-cursor="needle"] body *{cursor:url('tattoo-cursor.svg') 4 3, auto!important}
-html[data-cursor="hand"] body,
-html[data-cursor="hand"] body *{cursor:url('rock-hand-cursor.svg?v=2') 19 2, auto!important}
-html[data-cursor="normal"] body,
-html[data-cursor="normal"] body *{cursor:default!important}
+html[data-cursor="needle"]{--tatnera-cursor:url('tattoo-cursor.svg') 4 3,auto}
+html[data-cursor="hand"]{--tatnera-cursor:url('rock-hand-cursor.svg?v=3') 15 4,auto}
+html[data-cursor="normal"]{--tatnera-cursor:default}
 
-/* Text fields intentionally keep the text caret. */
+html[data-cursor] body,
+html[data-cursor] button,
+html[data-cursor] a,
+html[data-cursor] select,
+html[data-cursor] label,
+html[data-cursor] [role="button"],
+html[data-cursor] .project-card,
+html[data-cursor] .calendar-event,
+html[data-cursor] .calendar-day-head,
+html[data-cursor] .calendar-nav-btn,
+html[data-cursor] .calendar-toggle button,
+html[data-cursor] .artist-filter button,
+html[data-cursor] .mini-add-btn,
+html[data-cursor] .todo-item,
+html[data-cursor] .request-card,
+html[data-cursor] .theme-choice{cursor:var(--tatnera-cursor)!important}
+
 html[data-cursor] input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]):not([type="color"]),
 html[data-cursor] textarea,
 html[data-cursor] [contenteditable="true"]{cursor:text!important}
