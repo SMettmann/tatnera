@@ -55,9 +55,11 @@
     const old=artist.name;artist.name=clean;
     (state.projects||[]).forEach(item=>{if(item.artist===old)item.artist=clean;});
     (state.calendarEvents||[]).forEach(item=>{if(item.artist===old)item.artist=clean;});
+    (state.appointmentHistory||[]).forEach(item=>{if(item.artist===old)item.artist=clean;});
     (state.requests||[]).forEach(item=>{if(item.artist===old)item.artist=clean;});
     try{persist();}catch(_error){}
     if(Array.isArray(state.requests))localStorage.setItem('tatnera_requests',JSON.stringify(state.requests));
+    if(Array.isArray(state.appointmentHistory))localStorage.setItem('tatnera_appointment_history',JSON.stringify(state.appointmentHistory));
     saveArtists();return true;
   }
 
@@ -68,7 +70,10 @@
 
   function completedTattooEvents(projectId){
     const today=typeof todayISO==='function'?todayISO():new Date().toISOString().slice(0,10);
-    return (state.calendarEvents||[]).filter(event=>event.projectId===projectId&&event.type==='tattoo'&&event.date<=today).sort((a,b)=>a.date.localeCompare(b.date)||String(a.start||'').localeCompare(String(b.start||'')));
+    const combined=[...(state.calendarEvents||[]),...(state.appointmentHistory||[])];
+    const unique=new Map();
+    combined.forEach(event=>{if(event?.id)unique.set(event.id,event);});
+    return [...unique.values()].filter(event=>event.projectId===projectId&&event.type==='tattoo'&&event.status==='Abgeschlossen'&&event.date<=today).sort((a,b)=>a.date.localeCompare(b.date)||String(a.start||'').localeCompare(String(b.start||'')));
   }
   function lastCompletedTattooDate(projectId){return completedTattooEvents(projectId).at(-1)?.date||'';}
 
