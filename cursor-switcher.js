@@ -37,8 +37,8 @@
           <strong>Normaler Mauszeiger</strong><small>Klassischer Pfeil ohne Wechsel über Buttons.</small>
         </button>
         <button type="button" class="theme-choice cursor-choice" data-cursor-choice="hand" aria-pressed="false">
-          <div class="cursor-choice-preview"><img src="rock-hand-cursor.svg?v=2" alt="Rock Hand Cursor"></div>
-          <strong>ROCK HAND</strong><small>Zeigefinger und kleiner Finger hoch, Daumen raus.</small>
+          <div class="cursor-choice-preview"><img src="rock-hand-cursor.svg?v=3" alt="Rock Hand Cursor"></div>
+          <strong>ROCK HAND</strong><small>Klare Rock-Hand im 🤘-Stil.</small>
         </button>
       </div>
       <div class="cursor-settings-note">Nur in Textfeldern bleibt der normale Text-Cursor, damit Eingaben eindeutig bleiben.</div>
