@@ -10,6 +10,9 @@
     if(!document.querySelector('link[href="theme-light-fixes.css"]')){
       const fixes=document.createElement('link');fixes.rel='stylesheet';fixes.href='theme-light-fixes.css';document.head.appendChild(fixes);
     }
+    if(!document.querySelector('link[href="calendar-light-theme.css"]')){
+      const calendar=document.createElement('link');calendar.rel='stylesheet';calendar.href='calendar-light-theme.css';document.head.appendChild(calendar);
+    }
   }
 
   function currentTheme(){
