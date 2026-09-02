@@ -4,8 +4,12 @@
   const THEMES=new Set(['dark','light','pink']);
 
   function installCss(){
-    if(document.querySelector('link[href="theme-switcher.css"]'))return;
-    const link=document.createElement('link');link.rel='stylesheet';link.href='theme-switcher.css';document.head.appendChild(link);
+    if(!document.querySelector('link[href="theme-switcher.css"]')){
+      const link=document.createElement('link');link.rel='stylesheet';link.href='theme-switcher.css';document.head.appendChild(link);
+    }
+    if(!document.querySelector('link[href="theme-light-fixes.css"]')){
+      const fixes=document.createElement('link');fixes.rel='stylesheet';fixes.href='theme-light-fixes.css';document.head.appendChild(fixes);
+    }
   }
 
   function currentTheme(){
