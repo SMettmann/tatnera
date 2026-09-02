@@ -20,3 +20,5 @@ jobs:
             echo "Checking $file"
             node --check "$file"
           done
+      - name: Check TATNERA structure
+        run: node .github/scripts/smoke-check.mjs
