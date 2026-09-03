@@ -46,7 +46,26 @@
 
   function openPayment(id,mode=''){activeProjectId=id;const p=Core.getProject(id),form=document.getElementById('paymentForm');if(!p||!form)return;form.reset();form.elements.date.value=today();form.elements.method.value='Bar';if(mode==='deposit'){form.elements.type.value='Anzahlung';form.elements.amount.value=depositRemaining(p).toFixed(2);}else{const due=remaining(p);form.elements.type.value=due>0&&paid(p)>0?'Restzahlung':'Anzahlung';form.elements.amount.value=due>0?due.toFixed(2):'';}document.getElementById('paymentDialogMeta').textContent=`${customerName(p.customerId)} · ${p.title}`;document.getElementById('paymentDialogHint').textContent=`Bezahlt: ${euro(paid(p))} · Rest: ${euro(remaining(p))} · Anzahlung offen: ${euro(depositRemaining(p))}`;document.getElementById('paymentDialog').showModal();}
 
-  function savePayment(event){event.preventDefault();const p=Core.getProject(activeProjectId);if(!p)return;const d=Object.fromEntries(new FormData(event.currentTarget).entries()),amount=Math.abs(Number(d.amount)||0);if(amount<=0)return;if(d.type==='Erstattung'&&amount>paid(p)){alert('Die Erstattung kann nicht höher als der bisher bezahlte Betrag sein.');return;}if(d.type!=='Erstattung'&&amount>remaining(p)&&remaining(p)>0&&!confirm(`Der Betrag ist höher als der offene Restbetrag von ${euro(remaining(p))}. Trotzdem buchen?`))return;p.payments.push({id:'pay'+Date.now(),type:d.type,amount,date:d.date,method:d.method,note:String(d.note||'').trim(),createdAt:new Date().toISOString()});persist();document.getElementById('paymentDialog').close();inject();document.dispatchEvent(new CustomEvent('tatnera:data-changed',{detail:{type:'payment',projectId:p.id}}));}
+  function hasActiveInvoice(projectId){
+    return (state.invoices||[]).some(invoice=>invoice.projectId===projectId&&invoice.type==='invoice'&&invoice.status!=='cancelled');
+  }
+  function offerInvoiceAfterFinalPayment(project){
+    if(!project||remaining(project)>0||price(project)<=0||hasActiveInvoice(project.id))return;
+    setTimeout(()=>{
+      if(!window.TatneraInvoices?.openCreate)return;
+      if(confirm(`Zahlung vollständig (${euro(paid(project))}). Jetzt Rechnung für ${project.title} erstellen?`))window.TatneraInvoices.openCreate(project.id);
+    },80);
+  }
+
+  function savePayment(event){
+    event.preventDefault();const p=Core.getProject(activeProjectId);if(!p)return;
+    const d=Object.fromEntries(new FormData(event.currentTarget).entries()),amount=Math.abs(Number(d.amount)||0);if(amount<=0)return;
+    if(d.type==='Erstattung'&&amount>paid(p)){alert('Die Erstattung kann nicht höher als der bisher bezahlte Betrag sein.');return;}
+    if(d.type!=='Erstattung'&&amount>remaining(p)&&remaining(p)>0&&!confirm(`Der Betrag ist höher als der offene Restbetrag von ${euro(remaining(p))}. Trotzdem buchen?`))return;
+    p.payments.push({id:'pay'+Date.now(),type:d.type,amount,date:d.date,method:d.method,note:String(d.note||'').trim(),createdAt:new Date().toISOString()});
+    persist();document.getElementById('paymentDialog').close();inject();document.dispatchEvent(new CustomEvent('tatnera:data-changed',{detail:{type:'payment',projectId:p.id}}));
+    if(d.type!=='Erstattung')offerInvoiceAfterFinalPayment(p);
+  }
   function savePrice(event){event.preventDefault();const p=Core.getProject(activeProjectId);if(!p)return;const nextPrice=Math.max(0,Number(event.currentTarget.elements.price.value)||0),nextDeposit=Math.max(0,Number(event.currentTarget.elements.deposit.value)||0);if(nextDeposit>nextPrice&&nextPrice>0&&!confirm('Die Anzahlung ist höher als der Gesamtpreis. Trotzdem speichern?'))return;if(nextPrice<paid(p)&&!confirm(`Es wurden bereits ${euro(paid(p))} bezahlt. Der neue Gesamtpreis liegt darunter. Trotzdem speichern?`))return;p.price=nextPrice;p.deposit=nextDeposit;persist();document.getElementById('priceDialog').close();inject();document.dispatchEvent(new CustomEvent('tatnera:data-changed',{detail:{type:'payment',projectId:p.id}}));}
 
   document.addEventListener('click',event=>{const add=event.target.closest('[data-add-payment]');if(add){event.preventDefault();openPayment(add.dataset.addPayment);return;}const quick=event.target.closest('[data-pay-deposit]');if(quick){event.preventDefault();openPayment(quick.dataset.payDeposit,'deposit');return;}const edit=event.target.closest('[data-edit-price]');if(edit){event.preventDefault();activeProjectId=edit.dataset.editPrice;const p=Core.getProject(activeProjectId),form=document.getElementById('priceForm');if(p&&form){form.elements.price.value=price(p);form.elements.deposit.value=deposit(p);document.getElementById('priceDialogMeta').textContent=`${customerName(p.customerId)} · ${p.title}`;document.getElementById('priceDialog').showModal();}return;}const del=event.target.closest('[data-delete-payment]');if(del){event.preventDefault();const id=Core.projectIdFromDetail(),p=Core.getProject(id),tx=p?.payments?.find(item=>item.id===del.dataset.deletePayment);if(!p||!tx)return;if(confirm(`${tx.type} über ${euro(tx.amount)} wirklich löschen?`)){p.payments=p.payments.filter(item=>item.id!==tx.id);persist();inject();document.dispatchEvent(new CustomEvent('tatnera:data-changed',{detail:{type:'payment',projectId:p.id}}));}}});
