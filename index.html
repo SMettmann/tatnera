@@ -6,8 +6,9 @@
   <title>TATNERA — Studio Software for Tattoo Artists</title>
   <meta name="description" content="TATNERA MVP Prototype" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="supabase-auth.css" />
 </head>
-<body>
+<body class="tatnera-auth-locked">
   <div class="app-shell">
     <aside class="sidebar">
       <div class="brand-wrap"><div class="brand-mark">T</div><div><div class="brand">TATNERA</div><div class="brand-sub">Studio Software</div></div></div>
@@ -46,6 +47,7 @@
   <dialog id="customerDialog" class="dialog"><form method="dialog" id="customerForm"><div class="dialog-head"><div><span class="eyebrow">Kundenakte</span><h2>Neuen Kunden anlegen</h2></div><button type="button" class="close-btn" onclick="document.getElementById('customerDialog').close()">×</button></div><div class="form-grid"><label>Vorname<input required name="firstName" /></label><label>Nachname<input required name="lastName" /></label><label>E-Mail<input type="email" name="email" /></label><label>Telefon<input name="phone" /></label><label class="full">Notizen<textarea name="notes" rows="3" placeholder="Wichtige Hinweise, Stilwünsche …"></textarea></label></div><div class="dialog-actions"><button type="button" class="btn ghost" onclick="document.getElementById('customerDialog').close()">Abbrechen</button><button type="submit" class="btn primary" value="default">Kunde speichern</button></div></form></dialog>
   <dialog id="projectDialog" class="dialog wide-dialog"><form method="dialog" id="projectForm"><div class="dialog-head"><div><span class="eyebrow">Tattoo-Akte</span><h2>Neues Tattoo-Projekt</h2></div><button type="button" class="close-btn" onclick="document.getElementById('projectDialog').close()">×</button></div><div class="form-grid three"><label class="full">Kunde<select required name="customerId" id="projectCustomerSelect"></select></label><label>Motiv<input required name="title" /></label><label>Körperstelle<input required name="placement" /></label><label>Größe<input name="size" /></label><label>Artist<input name="artist" value="" /></label><label>Preis (€)<input name="price" type="number" min="0" step="10" /></label><label>Anzahlung (€)<input name="deposit" type="number" min="0" step="10" /></label><label class="full">Beschreibung<textarea name="description" rows="3"></textarea></label></div><div class="dialog-actions"><button type="button" class="btn ghost" onclick="document.getElementById('projectDialog').close()">Abbrechen</button><button type="submit" class="btn primary">Projekt anlegen</button></div></form></dialog>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="app.js"></script>
   <script src="core.js"></script>
   <script src="appointment-status.js"></script>
@@ -72,6 +74,7 @@
   <script src="accounting-integrity.js"></script>
   <script src="invoice-rules.js"></script>
   <script src="invoice-center.js"></script>
+  <script src="supabase-auth.js"></script>
   <script src="navigation-persistence.js"></script>
   <script src="project-tabs-runtime.js"></script>
 </body>
