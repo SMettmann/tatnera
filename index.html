@@ -17,6 +17,7 @@
         <button class="nav-item" data-view="projects"><span>✦</span> Tattoo-Akten</button>
         <button class="nav-item" data-view="calendar"><span>□</span> Kalender</button>
         <button class="nav-item" data-view="requests"><span>↗</span> Anfragen <b class="badge">4</b></button>
+        <button class="nav-item" data-view="invoices"><span>▤</span> Rechnungen</button>
       </nav>
       <div class="sidebar-bottom"><button class="nav-item" data-view="settings"><span>⚙</span> Einstellungen</button><div class="studio-card"><div class="avatar">ST</div><div><strong>Studio einrichten</strong><span>Name in Einstellungen festlegen</span></div></div></div>
     </aside>
@@ -37,6 +38,7 @@
       <section id="project-detail" class="view"><button class="back-btn" data-view-target="customers">← Zurück</button><div id="projectDetail"></div></section>
       <section id="calendar" class="view"><div class="placeholder-page"><span class="big-icon">□</span><h2>Kalender</h2><p>Kalender wird geladen.</p><button class="btn primary" id="calendarDemoBtn">Demo-Termin anlegen</button></div></section>
       <section id="requests" class="view"><div class="request-columns"></div></section>
+      <section id="invoices" class="view"><div id="invoiceCenter"></div></section>
       <section id="settings" class="view"><div class="placeholder-page"><span class="big-icon">⚙</span><h2>Studio-Einstellungen</h2><p>Studio, Erscheinungsbild, Artists und Chargen verwalten.</p></div></section>
     </main>
   </div>
@@ -66,6 +68,7 @@
   <script src="health-status.js"></script>
   <script src="studio-settings.js"></script>
   <script src="invoice-management.js"></script>
+  <script src="invoice-center.js"></script>
   <script src="project-tabs-runtime.js"></script>
 </body>
 </html>
