@@ -2,7 +2,7 @@
 (function(){
   'use strict';
 
-  ['pricing.css','tattoo-marketing.css'].forEach(href=>{
+  ['pricing.css?v=4','tattoo-marketing.css?v=7'].forEach(href=>{
     if(document.querySelector(`link[href="${href}"]`))return;
     const link=document.createElement('link');link.rel='stylesheet';link.href=href;document.head.appendChild(link);
   });
