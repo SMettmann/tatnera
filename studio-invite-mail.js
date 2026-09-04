@@ -2,6 +2,7 @@
 (function(){
   'use strict';
 
+  const PUBLIC_APP_URL='https://smettmann.github.io/tatnera/app.html';
   const auth=()=>window.TatneraAuth||null;
   const client=()=>auth()?.client||null;
   const studioId=()=>auth()?.studioId?.()||'';
@@ -9,13 +10,19 @@
   const currentRole=()=>window.TatneraTeam?.role?.()||auth()?.membership?.()?.role||'';
   const esc=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 
-  function allowedRoles(){return currentRole()==='owner'?['admin','artist','staff']:currentRole()==='admin'?['artist','staff']:[];}
+  function allowedRoles(){
+    return currentRole()==='owner'
+      ?['admin','artist','piercer','artist_piercer','staff']
+      :currentRole()==='admin'
+        ?['artist','piercer','artist_piercer','staff']
+        :[];
+  }
 
   function patchUi(){
     const form=document.getElementById('studioInviteForm');if(!form)return;
     const button=form.querySelector('[type="submit"]');if(button)button.textContent='Einladung senden';
     const note=form.nextElementSibling;
-    if(note?.classList.contains('studio-team-note'))note.textContent='TATNERA verschickt die Einladung per E-Mail. Der sichere Einladungslink bleibt zusätzlich 7 Tage gültig.';
+    if(note?.classList.contains('studio-team-note'))note.textContent='TATNERA verschickt die Einladung per E-Mail. Der Link führt immer zur veröffentlichten App und bleibt 7 Tage gültig.';
   }
 
   function showResult(email,url,mailSent,mailMessage=''){
@@ -52,7 +59,7 @@
       const {data:invite,error:inviteError}=await c.from('studio_invites').insert({studio_id:sid,email,role,created_by:user.id}).select('id,email,role,token,expires_at').single();
       if(inviteError)throw inviteError;
 
-      const inviteUrl=new URL(location.origin+location.pathname);inviteUrl.searchParams.set('invite',invite.token);
+      const inviteUrl=new URL(PUBLIC_APP_URL);inviteUrl.searchParams.set('invite',invite.token);
       let mailSent=false,mailMessage='';
       try{
         const {data:delivery,error:mailError}=await c.functions.invoke('send-studio-invite',{body:{inviteId:invite.id,redirectTo:inviteUrl.toString()}});
