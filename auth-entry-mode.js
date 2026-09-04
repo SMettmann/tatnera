@@ -4,7 +4,8 @@
 
   const authStyles=[
     {match:'auth-marketing.css',href:'auth-marketing.css?v=20260904-2'},
-    {match:'brand-entry-palette.css',href:'brand-entry-palette.css?v=20260904-1'}
+    {match:'brand-entry-palette.css',href:'brand-entry-palette.css?v=20260904-1'},
+    {match:'brand-logo.css',href:'brand-logo.css?v=20260904-1'}
   ];
   authStyles.forEach(item=>{
     if(document.querySelector(`link[href^="${item.match}"]`))return;
