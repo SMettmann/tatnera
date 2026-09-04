@@ -7,8 +7,22 @@
   let members=[],profiles=new Map(),invites=[],loading=false,acceptingInvite=false;
 
   const esc=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-  const roleLabel=role=>({owner:'Inhaber',admin:'Admin',artist:'Tätowierer',staff:'Mitarbeiter'})[role]||role||'—';
-  const roleDescription=role=>({owner:'Voller Studio-Zugriff',admin:'Studio verwalten',artist:'Tattoo-Arbeit & Termine',staff:'Organisation & Termine'})[role]||'';
+  const roleLabel=role=>({
+    owner:'Inhaber',
+    admin:'Admin',
+    artist:'Tätowierer',
+    piercer:'Piercer',
+    artist_piercer:'Tätowierer & Piercer',
+    staff:'Mitarbeiter'
+  })[role]||role||'—';
+  const roleDescription=role=>({
+    owner:'Voller Studio-Zugriff',
+    admin:'Studio verwalten',
+    artist:'Tattoo-Arbeit & Termine',
+    piercer:'Piercing-Arbeit & Termine',
+    artist_piercer:'Tattoo- & Piercing-Arbeit',
+    staff:'Organisation & Termine'
+  })[role]||'';
   const auth=()=>window.TatneraAuth||null;
   const client=()=>auth()?.client||null;
   const studioId=()=>auth()?.studioId?.()||'';
@@ -37,10 +51,16 @@
   function profileFor(userId){return profiles.get(userId)||{};}
   function displayName(member){const profile=profileFor(member.user_id);return String(profile.display_name||profile.email||'Teammitglied').trim();}
   function displayMeta(member){const profile=profileFor(member.user_id);return `${profile.email||'Keine E-Mail'} · ${roleLabel(member.role)}`;}
-  function allowedInviteRoles(){return isOwner()?['admin','artist','staff']:['artist','staff'];}
+  function allowedInviteRoles(){
+    return isOwner()
+      ?['admin','artist','piercer','artist_piercer','staff']
+      :['artist','piercer','artist_piercer','staff'];
+  }
   function allowedEditRoles(member){
     if(member.role==='owner')return ['owner'];
-    return isOwner()?['admin','artist','staff']:['artist','staff'];
+    return isOwner()
+      ?['admin','artist','piercer','artist_piercer','staff']
+      :['artist','piercer','artist_piercer','staff'];
   }
 
   async function loadTeam(){
@@ -67,7 +87,7 @@
   function syncArtists(){
     if(!Core)return;
     for(const member of members){
-      if(!member.is_active||!['owner','artist'].includes(member.role))continue;
+      if(!member.is_active||!['owner','artist','artist_piercer'].includes(member.role))continue;
       const name=String(profileFor(member.user_id).display_name||'').trim();if(name)Core.addArtist(name);
     }
     refreshArtistSelects();
