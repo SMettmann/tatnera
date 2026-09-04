@@ -1,7 +1,6 @@
-/* TATNERA — official logo everywhere, using the existing brand asset. */
+/* TATNERA — the original flyer logo everywhere, without recoloring or theme tint. */
 :root{
   --tatnera-logo-url:url('assets/tatnera-brand.png?v=20260904-1');
-  --tatnera-logo-gold-filter:sepia(.72) saturate(1.75) hue-rotate(350deg) brightness(.93) contrast(1.08) drop-shadow(0 8px 18px rgba(198,145,77,.16));
 }
 
 .tatnera-logo-img{
@@ -13,21 +12,10 @@
   object-position:left center!important;
   opacity:1!important;
   visibility:visible!important;
+  filter:none!important;
   mix-blend-mode:normal!important;
   transform:none!important;
   background:none!important;
-}
-
-/* The marketing site and the actual product use the same logo in the warm
-   brass/gold direction of the current dark TATNERA brand. The source image
-   itself stays untouched. */
-.navbar .tatnera-logo-img,
-.hero-brand-sign .tatnera-logo-img,
-.footer .tatnera-logo-img,
-.sidebar .brand-wrap .tatnera-logo-img,
-.tatnera-auth-brand .tatnera-logo-img,
-.tatnera-auth-boot-mark{
-  filter:var(--tatnera-logo-gold-filter)!important;
 }
 
 /* Landing navigation + footer. */
@@ -87,6 +75,7 @@
   border-radius:0!important;
   background:var(--tatnera-logo-url) center/contain no-repeat!important;
   color:transparent!important;
+  filter:none!important;
   box-shadow:none!important;
 }
 .tatnera-auth-boot-mark .tatnera-logo-img{width:220px!important}
