@@ -132,4 +132,5 @@
   load('archive-piercing.js','__tatneraArchivePiercingInstalled');
   load('cloud-files.js','TatneraFiles');
   load('record-attachments.js','__tatneraRecordAttachmentsInstalled');
+  load('dashboard-upcoming.js','__tatneraDashboardUpcomingInstalled');
 })();
