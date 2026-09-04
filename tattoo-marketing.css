@@ -1,0 +1,46 @@
+/* TATNERA — tattoo-studio marketing layer */
+body{background:radial-gradient(circle at 18% 12%,rgba(216,255,99,.035),transparent 28%),linear-gradient(rgba(255,255,255,.014) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.012) 1px,transparent 1px),var(--bg);background-size:auto,42px 42px,42px 42px,auto}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;background:repeating-linear-gradient(115deg,transparent 0 90px,rgba(255,255,255,.008) 91px 92px,transparent 93px 180px)}
+.announcement{text-transform:uppercase;letter-spacing:.08em;font-size:11px;border-bottom-color:#37373d}
+.navbar{border-bottom-color:#34343a;background:rgba(8,8,9,.9)}
+.logo{position:relative}.logo:after{content:"";position:absolute;left:49px;right:0;bottom:-8px;height:1px;background:linear-gradient(90deg,var(--accent),transparent);opacity:.45}
+.logo-mark{border-radius:2px;background:transparent;color:var(--accent);border:1px solid var(--accent);transform:rotate(-3deg);box-shadow:inset 0 0 0 1px rgba(216,255,99,.08);clip-path:polygon(7% 0,100% 0,93% 100%,0 100%)}
+.tatnera-wordmark{font-family:Impact,"Arial Black","Arial Narrow",sans-serif!important;letter-spacing:.14em!important;text-transform:uppercase;position:relative}
+.hero{padding-top:88px}
+.hero-grid{position:relative}
+.hero-copy{position:relative;z-index:2}
+.hero-copy:after{content:"✦";position:absolute;left:-42px;top:150px;color:var(--accent);font-size:24px;transform:rotate(12deg);opacity:.72}
+.hero-brand-sign{display:flex;align-items:center;gap:14px;margin-bottom:18px;max-width:660px}
+.hero-brand-sign .brand-flash{color:var(--accent);font-size:20px;transform:rotate(-12deg)}
+.hero-brand-sign>div{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.hero-brand-sign strong{font-family:Impact,"Arial Black",sans-serif;font-size:clamp(36px,5vw,66px);line-height:.8;letter-spacing:.12em;color:transparent;-webkit-text-stroke:1.5px #f2f2f2;text-transform:uppercase;filter:drop-shadow(5px 5px 0 rgba(216,255,99,.08));transform:skewX(-3deg)}
+.hero-brand-sign small{color:#77777f;font-size:9px;font-weight:900;letter-spacing:.22em;text-transform:uppercase;max-width:210px;line-height:1.5}
+.brand-needle{position:relative;width:78px;height:1px;background:#54545b;transform:rotate(-8deg);margin-left:auto;flex:0 0 auto}.brand-needle:before{content:"";position:absolute;right:-2px;top:-3px;width:8px;height:8px;border:1px solid var(--accent);transform:rotate(45deg)}.brand-needle:after{content:"";position:absolute;left:7px;top:-4px;width:20px;height:9px;border:1px solid #44444a;background:#111113}
+.kicker{border-radius:2px;background:#111113;text-transform:uppercase;letter-spacing:.08em;border-color:#3d3d43}
+h1{font-family:Impact,"Arial Black",Haettenschweiler,"Arial Narrow Bold",sans-serif;text-transform:uppercase;letter-spacing:-.025em;line-height:.91;max-width:760px;text-wrap:balance}
+h1:after{content:"";display:block;width:110px;height:3px;background:var(--accent);margin-top:20px;transform:skewX(-25deg)}
+.hero-copy>p{max-width:610px}
+.hero-ctas .btn,.nav-actions .btn{border-radius:2px;text-transform:uppercase;letter-spacing:.045em}
+.btn.primary{box-shadow:4px 4px 0 #2b2f17}.btn.primary:hover{transform:translate(-1px,-1px);box-shadow:6px 6px 0 #2b2f17}
+.trial-note{padding-top:12px;border-top:1px solid #2e2e33}
+.product-frame{border-radius:4px;border-color:#3a3a40;padding:7px;transform:perspective(1200px) rotateY(-2.5deg) rotateX(1deg);box-shadow:18px 18px 0 rgba(255,255,255,.018),var(--shadow)}
+.product-frame:before{content:"";position:absolute;width:170px;height:170px;right:-84px;top:-72px;background:url('tattoo-cursor.svg') center/contain no-repeat;filter:grayscale(1) brightness(2.7);opacity:.12;transform:rotate(20deg) scale(1.15);pointer-events:none}
+.product-frame:after{content:"TATNERA / STUDIO";position:absolute;left:18px;bottom:-31px;color:#67676e;font-size:8px;letter-spacing:.25em;font-weight:900;white-space:nowrap}
+.mini-app{border-radius:2px}
+.mini-card,.mini-metric,.screen-card,.showcase-screen,.showcase-tab,.feature,.trial-box,.pricing-card,.faq details{border-radius:3px!important}
+.logo-strip{padding-bottom:34px}.logo-strip-inner{justify-content:flex-start;border-color:#36363c;letter-spacing:.12em;gap:28px}.logo-strip-inner:before{content:"✦";color:var(--accent);font-size:16px}
+.section{position:relative}.section-head .eyebrow{letter-spacing:.22em}.section-head h2{font-family:Impact,"Arial Black",sans-serif;text-transform:uppercase;letter-spacing:-.015em}.section-head h2:after{content:"";display:block;width:72px;height:2px;background:#56565c;margin-top:14px;transform:skewX(-30deg)}
+.feature{position:relative;overflow:hidden;border-color:#313137;background:linear-gradient(145deg,#121214,#0f0f11);clip-path:polygon(0 0,100% 0,100% calc(100% - 9px),calc(100% - 9px) 100%,0 100%)}
+.feature:after{content:"";position:absolute;width:46px;height:1px;background:var(--accent);right:18px;top:20px;opacity:.55;transform:rotate(-10deg)}
+.feature-icon{border-radius:2px;background:transparent;border-color:#45454b}
+.feature h3{text-transform:uppercase;letter-spacing:.025em}
+.showcase{border-top:1px solid #34343a;padding-top:24px}.showcase-tab{border-left-width:3px}.showcase-tab.active{box-shadow:none;border-left-color:var(--accent)}
+.showcase-screen{position:relative}.showcase-screen:before{content:"STUDIO WORKSPACE";position:absolute;right:14px;top:-23px;color:#5f5f66;font-size:7px;letter-spacing:.23em;font-weight:900}
+.flow:before{border-top-color:#4a4a50}.flow-num{border-radius:2px;transform:rotate(45deg);background:#111113}.flow-step:nth-child(odd) .flow-num{border-color:#55555c}.flow-step:nth-child(even) .flow-num{border-color:var(--accent)}
+.ink-identity{position:relative;border-top:1px solid #2d2d32;border-bottom:1px solid #2d2d32;background:#0f0f11;overflow:hidden}.ink-identity:before{content:"";position:absolute;left:0;top:0;width:5px;height:100%;background:var(--accent);opacity:.7}.ink-identity:after{content:"TATNERA";position:absolute;right:-14px;top:50%;transform:translateY(-52%) skewX(-5deg);font-family:Impact,"Arial Black",sans-serif;font-size:clamp(70px,12vw,170px);color:rgba(255,255,255,.018);letter-spacing:.02em;pointer-events:none}
+.ink-identity-inner{position:relative;z-index:1;padding:38px 0;display:grid;grid-template-columns:1.1fr .9fr;align-items:center;gap:42px}.ink-identity-copy small{display:block;color:var(--accent);font-size:10px;font-weight:900;letter-spacing:.24em;text-transform:uppercase}.ink-identity-copy strong{display:block;font-family:Impact,"Arial Black",sans-serif;font-size:clamp(28px,4vw,52px);line-height:.95;text-transform:uppercase;margin-top:10px;max-width:700px;letter-spacing:.01em}.ink-identity-copy p{color:#98989f;line-height:1.65;margin:14px 0 0;max-width:650px}.ink-tools{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.ink-tool{border:1px solid #34343a;background:#151517;padding:16px 12px;min-height:104px;display:flex;flex-direction:column;justify-content:space-between;clip-path:polygon(0 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%)}.ink-tool b{font-size:13px;text-transform:uppercase}.ink-tool span{font-size:10px;color:#818188}.ink-tool em{font-style:normal;color:var(--accent);font-size:22px}
+.hero-price strong,.price-display strong{font-family:Impact,"Arial Black",sans-serif;letter-spacing:.02em}.pricing-card{border-left:4px solid var(--accent)!important}.price-display{position:relative}.price-display:before{content:"NO AUTO RENEW";position:absolute;right:0;top:-24px;color:#696970;font-size:7px;font-weight:900;letter-spacing:.2em}
+.faq details summary{text-transform:uppercase;letter-spacing:.025em}
+.footer{border-top-color:#39393f}.footer:before{content:"";display:block;width:100%;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.35}
+@media(max-width:900px){.ink-identity-inner{grid-template-columns:1fr}.ink-tools{max-width:560px}.hero-copy:after{display:none}.brand-needle{display:none}.hero-brand-sign>div{gap:8px}.hero-brand-sign strong{font-size:52px}}
+@media(max-width:600px){h1{font-size:45px}.ink-tools{grid-template-columns:1fr}.product-frame{transform:none}.hero-brand-sign{gap:8px}.hero-brand-sign strong{font-size:42px;-webkit-text-stroke:1px #f2f2f2}.hero-brand-sign small{font-size:8px}.logo:after{display:none}}
