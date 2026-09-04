@@ -22,17 +22,17 @@
     const form=document.getElementById('studioInviteForm');if(!form)return;
     const button=form.querySelector('[type="submit"]');if(button)button.textContent='Einladung senden';
     const note=form.nextElementSibling;
-    if(note?.classList.contains('studio-team-note'))note.textContent='TATNERA verschickt die Einladung automatisch per E-Mail. Der Empfänger öffnet den Link und legt anschließend sein eigenes Passwort fest.';
+    if(note?.classList.contains('studio-team-note'))note.textContent='TATNERA versucht die Einladung automatisch zu senden. Falls der Supabase-Testmaildienst limitiert ist, wird sofort ein sicherer Direktlink erzeugt.';
   }
 
   function friendlyMailError(error){
     const code=String(error?.code||'');
     const text=String(error?.message||error||'');
-    if(code==='smtp_required'||/not authou?ri[sz]ed/i.test(text))return 'Der Supabase-Testmaildienst darf diese Empfängeradresse nicht anschreiben. Für echte Mitarbeiter muss einmal ein eigener SMTP-Mailversand eingerichtet werden.';
-    if(code==='mail_rate_limited'||/rate limit/i.test(text))return 'Zu viele Einladungsmails in kurzer Zeit. Bitte etwa 60 Sekunden warten und dann auf „Erneut senden“ drücken.';
+    if(code==='mail_rate_limited'||/rate limit/i.test(text))return 'Der Supabase-Testmaildienst hat sein aktuelles Versandlimit erreicht. Die Einladung ist trotzdem gültig – unten steht ein sicherer Direktlink. Für den späteren Echtbetrieb richten wir eigenen SMTP-Versand ein.';
+    if(code==='smtp_required'||/not authou?ri[sz]ed/i.test(text))return 'Der Supabase-Testmaildienst kann diese Adresse nicht automatisch anschreiben. Die Einladung ist trotzdem gültig – nutze den sicheren Direktlink unten.';
     if(code==='invalid_email'||(/email/i.test(text)&&/invalid/i.test(text)))return 'Die E-Mail-Adresse wurde vom Maildienst abgelehnt. Bitte die Adresse prüfen.';
-    if(/session|jwt|unauth|401/i.test(text))return 'Die Anmeldung für den Mailversand ist abgelaufen. Bitte die Seite einmal neu laden und danach erneut senden.';
-    return 'Der automatische Mailversand ist fehlgeschlagen. Du kannst den Versand direkt erneut versuchen.';
+    if(/session|jwt|unauth|401/i.test(text))return 'Die Anmeldung für den Mailversand ist abgelaufen. Bitte die Seite neu laden und erneut senden.';
+    return 'Der automatische Mailversand konnte nicht bestätigt werden. Die Einladung selbst bleibt bestehen.';
   }
 
   async function deliverInvite(inviteId){
@@ -40,25 +40,48 @@
     const {data:delivery,error:mailError}=await c.functions.invoke('send-studio-invite',{body:{inviteId}});
     if(mailError)throw mailError;
     if(delivery?.ok!==true){
-      const error=new Error(delivery?.error||'Maildienst hat den Versand nicht bestätigt.');
+      const error=new Error(delivery?.error||delivery?.manualLinkError||'Einladungsdienst hat die Anfrage nicht bestätigt.');
       error.code=delivery?.code||'mail_send_failed';
       throw error;
     }
     return delivery;
   }
 
-  function showResult(email,url,mailSent,mailMessage='',inviteId=''){
+  function mailtoUrl(email,url){
+    const subject='Deine TATNERA Studio-Einladung';
+    const body=`Hallo,\n\ndu wurdest zu TATNERA eingeladen. Öffne diesen persönlichen Link und richte deinen Zugang ein:\n\n${url}\n\nDer Link ist nur für deine Einladung bestimmt.`;
+    return `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  }
+
+  function showResult(email,displayUrl,mailSent,mailMessage='',inviteId='',baseInviteUrl=''){
     const root=document.getElementById('studioInviteResult');if(!root)return;
-    root.innerHTML=`<div class="studio-invite-result"><strong>${mailSent?'Einladung per E-Mail gesendet ✓':'E-Mail konnte noch nicht gesendet werden'}</strong><div class="studio-team-note" data-invite-mail-message style="margin:0 0 8px">${esc(mailSent?`Die Einladung wurde an ${email} geschickt.`:(mailMessage||'Bitte erneut senden.'))}</div>${mailSent||!inviteId?'':`<button type="button" class="btn primary" style="margin:0 0 9px;width:100%" data-resend-studio-invite>Erneut senden</button>`}<div class="studio-invite-link"><input readonly value="${esc(url)}" aria-label="Einladungslink"><button type="button" class="btn ghost" data-copy-mail-invite>Kopieren</button></div></div>`;
+    const baseUrl=baseInviteUrl||displayUrl;
+    const hasSecureFallback=!mailSent&&displayUrl&&displayUrl!==baseUrl;
+    const title=mailSent?'Einladung per E-Mail gesendet ✓':hasSecureFallback?'Einladung bereit – Maildienst aktuell limitiert':'Einladung erstellt – Versand nicht bestätigt';
+    const message=mailSent?`Die Einladung wurde an ${email} geschickt.`:(mailMessage||'Die Einladung ist erstellt.');
+    const retryButton=!mailSent&&inviteId?'<button type="button" class="btn primary" style="width:100%" data-resend-studio-invite>Automatischen Versand erneut versuchen</button>':'';
+    const mailButton=hasSecureFallback?`<a class="btn ghost" style="text-decoration:none;text-align:center" href="${esc(mailtoUrl(email,displayUrl))}">In E-Mail öffnen</a>`:'';
+    root.innerHTML=`<div class="studio-invite-result"><strong>${esc(title)}</strong><div class="studio-team-note" data-invite-mail-message style="margin:0 0 10px">${esc(message)}</div>${retryButton}${hasSecureFallback?'<div class="studio-team-note" style="margin:9px 0 6px"><strong>Sicherer Zugangslink</strong> – damit kann der Empfänger direkt seinen Zugang einrichten.</div>':''}<div class="studio-invite-link"><input readonly value="${esc(displayUrl)}" aria-label="Einladungslink"><button type="button" class="btn ghost" data-copy-mail-invite>Kopieren</button></div>${mailButton?`<div style="margin-top:8px">${mailButton}</div>`:''}</div>`;
+
     root.querySelector('[data-copy-mail-invite]')?.addEventListener('click',async event=>{
-      try{await navigator.clipboard.writeText(url);const button=event.currentTarget,old=button.textContent;button.textContent='Kopiert ✓';setTimeout(()=>button.textContent=old,1400);}
-      catch(_error){prompt('Einladungslink kopieren:',url);}
+      try{await navigator.clipboard.writeText(displayUrl);const button=event.currentTarget,old=button.textContent;button.textContent='Kopiert ✓';setTimeout(()=>button.textContent=old,1400);}
+      catch(_error){prompt('Einladungslink kopieren:',displayUrl);}
     });
+
     root.querySelector('[data-resend-studio-invite]')?.addEventListener('click',async event=>{
-      const button=event.currentTarget,message=root.querySelector('[data-invite-mail-message]');
-      button.disabled=true;button.textContent='Wird gesendet …';if(message)message.textContent='Einladung wird erneut versendet …';
-      try{await deliverInvite(inviteId);showResult(email,url,true,'',inviteId);}
-      catch(error){console.error('TATNERA invitation retry failed',error);if(message)message.textContent=friendlyMailError(error);button.disabled=false;button.textContent='Erneut senden';}
+      const button=event.currentTarget,messageNode=root.querySelector('[data-invite-mail-message]');
+      button.disabled=true;button.textContent='Wird gesendet …';if(messageNode)messageNode.textContent='Einladung wird erneut versendet …';
+      try{
+        const delivery=await deliverInvite(inviteId);
+        const sent=delivery?.mailSent===true;
+        const nextUrl=sent?baseUrl:(String(delivery?.manualLink||'')||displayUrl||baseUrl);
+        const nextMessage=sent?'':friendlyMailError({code:delivery?.code,message:delivery?.error||''});
+        showResult(email,nextUrl,sent,nextMessage,inviteId,baseUrl);
+      }catch(error){
+        console.error('TATNERA invitation retry failed',error);
+        if(messageNode)messageNode.textContent=friendlyMailError(error);
+        button.disabled=false;button.textContent='Automatischen Versand erneut versuchen';
+      }
     });
   }
 
@@ -108,11 +131,18 @@
 
       const invite=await getOrCreateInvite(c,sid,user,email,role);
       const inviteUrl=new URL(PUBLIC_APP_URL);inviteUrl.searchParams.set('invite',invite.token);
-      let mailSent=false,mailMessage='';
-      try{await deliverInvite(invite.id);mailSent=true;}
-      catch(error){console.error('TATNERA invitation email failed',error);mailMessage=friendlyMailError(error);}
+      let mailSent=false,mailMessage='',displayUrl=inviteUrl.toString();
+      try{
+        const delivery=await deliverInvite(invite.id);
+        mailSent=delivery?.mailSent===true;
+        displayUrl=mailSent?inviteUrl.toString():(String(delivery?.manualLink||'')||inviteUrl.toString());
+        if(!mailSent)mailMessage=friendlyMailError({code:delivery?.code,message:delivery?.error||''});
+      }catch(error){
+        console.error('TATNERA invitation email failed',error);
+        mailMessage=friendlyMailError(error);
+      }
 
-      form.reset();showResult(email,inviteUrl.toString(),mailSent,mailMessage,invite.id);
+      form.reset();showResult(email,displayUrl,mailSent,mailMessage,invite.id,inviteUrl.toString());
       await window.TatneraTeam?.reload?.();
       requestAnimationFrame(patchUi);
     }catch(error){alert(String(error?.message||error));}
