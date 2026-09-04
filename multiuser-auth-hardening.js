@@ -30,10 +30,17 @@
     return url.toString();
   }
 
+  function saveMetadataInviteToken(user){
+    const token=String(user?.user_metadata?.tatnera_invite_token||'');
+    if(!isUuid(token))return '';
+    sessionStorage.setItem(GATE_TOKEN_KEY,token);
+    localStorage.removeItem(PENDING_INVITE_KEY);
+    return token;
+  }
+
   /* Studio invitation callbacks can arrive as a new-user invite, a password
      recovery for an already existing account, or an older magic-login mail.
-     In all three cases we keep the studio token and force the same password
-     setup screen before the membership is created. */
+     Query-token and metadata-token flows both end in the same password setup. */
   (function gateDirectInviteCallback(){
     const type=hashParams().get('type')||new URLSearchParams(location.search).get('type')||'';
     const token=new URLSearchParams(location.search).get('invite')||'';
@@ -97,7 +104,7 @@
     if(password!==password2){gateMessage('Die beiden Passwörter stimmen nicht überein.','error');return;}
     button.disabled=true;gateMessage('Zugang wird eingerichtet …');
     try{
-      const {error:passwordError}=await client.auth.updateUser({password,data:{display_name:name}});if(passwordError)throw passwordError;
+      const {error:passwordError}=await client.auth.updateUser({password,data:{display_name:name,tatnera_invite_token:null,tatnera_invite_role:null}});if(passwordError)throw passwordError;
       const {error:profileError}=await client.from('profiles').update({display_name:name,email:user.email||''}).eq('id',user.id);if(profileError)throw profileError;
       const {data:invite,error:inviteError}=await client.from('studio_invites').select('id,studio_id,email,role,expires_at').eq('token',token).maybeSingle();if(inviteError)throw inviteError;
       if(!invite)throw new Error('Diese Einladung ist abgelaufen, wurde bereits verwendet oder gehört zu einer anderen E-Mail-Adresse.');
@@ -110,10 +117,12 @@
   }
 
   async function maybeShowInviteGate(){
-    const token=sessionStorage.getItem(GATE_TOKEN_KEY)||'';if(!isUuid(token))return;
     const auth=window.TatneraAuth,client=auth?.client;if(!client)return;
     try{
       const {data:{session}}=await client.auth.getSession();const user=session?.user;if(!user)return;
+      let token=sessionStorage.getItem(GATE_TOKEN_KEY)||'';
+      if(!isUuid(token))token=saveMetadataInviteToken(user);
+      if(!isUuid(token))return;
       const root=ensureGate();root.hidden=false;
       const name=root.querySelector('[name="displayName"]');if(name&&!name.value)name.value=String(user.user_metadata?.display_name||'');
     }catch(_error){}
