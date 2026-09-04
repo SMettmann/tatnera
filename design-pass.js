@@ -6,7 +6,7 @@
     {id:'tatneraTattooIdentityCss',href:'tattoo-identity.css?v=20260904-1'},
     {id:'tatneraSidebarFullheightCss',href:'sidebar-fullheight.css?v=20260904-1'},
     {id:'tatneraTattooPaletteCss',href:'tattoo-palette.css?v=20260904-1'},
-    {id:'tatneraBrandLogoCss',href:'brand-logo.css?v=20260904-1'}
+    {id:'tatneraBrandLogoCss',href:'brand-logo.css?v=20260904-3'}
   ];
 
   function ensureStyle(item){
