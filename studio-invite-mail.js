@@ -8,7 +8,7 @@
   const studioId=()=>auth()?.studioId?.()||'';
   const currentUser=()=>auth()?.user?.()||null;
   const currentRole=()=>window.TatneraTeam?.role?.()||auth()?.membership?.()?.role||'';
-  const esc=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[ch]));
+  const esc=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 
   function allowedRoles(){
     return currentRole()==='owner'
@@ -27,25 +27,33 @@
 
   function friendlyMailError(error){
     const text=String(error?.message||error||'');
-    if(/rate limit/i.test(text))return 'Der E-Mail-Versand wurde vom Maildienst kurzzeitig begrenzt. Bitte in einigen Minuten erneut senden.';
-    if(/redirect/i.test(text))return 'Der Einladungslink konnte vom Maildienst nicht verarbeitet werden. TATNERA hat den Ziel-Link bereits korrigiert – bitte erneut senden.';
+    if(/rate limit/i.test(text))return 'Der E-Mail-Versand wurde vom Maildienst kurzzeitig begrenzt. Bitte in einigen Minuten auf „Erneut senden“ drücken.';
+    if(/redirect/i.test(text))return 'Der Einladungslink konnte vom Maildienst nicht verarbeitet werden. TATNERA hat den Ziel-Link bereits korrigiert – bitte „Erneut senden“ drücken.';
     if(/email/i.test(text)&&/invalid/i.test(text))return 'Die E-Mail-Adresse wurde vom Maildienst abgelehnt. Bitte die Adresse prüfen.';
-    return 'Der automatische Mailversand ist fehlgeschlagen. Bitte erneut senden; der Einladungslink bleibt zusätzlich als Reserve verfügbar.';
+    return 'Der automatische Mailversand ist fehlgeschlagen. Du kannst den Versand direkt erneut versuchen.';
   }
 
-  function showResult(email,url,mailSent,mailMessage=''){
+  async function deliverInvite(inviteId){
+    const c=client();if(!c)throw new Error('Studio-Verbindung ist noch nicht bereit.');
+    const {data:delivery,error:mailError}=await c.functions.invoke('send-studio-invite',{body:{inviteId}});
+    if(mailError)throw mailError;
+    if(delivery?.error)throw new Error(delivery.error);
+    if(delivery?.ok!==true)throw new Error('Maildienst hat den Versand nicht bestätigt.');
+    return delivery;
+  }
+
+  function showResult(email,url,mailSent,mailMessage='',inviteId=''){
     const root=document.getElementById('studioInviteResult');if(!root)return;
-    root.innerHTML=`<div class="studio-invite-result"><strong>${mailSent?'Einladung per E-Mail gesendet ✓':'E-Mail konnte noch nicht gesendet werden'}</strong><div class="studio-team-note" style="margin:0 0 8px">${esc(mailSent?`Die Einladung wurde an ${email} geschickt.`:(mailMessage||'Bitte erneut senden.'))}</div>${mailSent?'':`<button type="button" class="btn primary" style="margin:0 0 9px;width:100%" data-resend-studio-invite>Erneut senden</button>`}<div class="studio-invite-link"><input readonly value="${esc(url)}" aria-label="Einladungslink"><button type="button" class="btn ghost" data-copy-mail-invite>Kopieren</button></div></div>`;
+    root.innerHTML=`<div class="studio-invite-result"><strong>${mailSent?'Einladung per E-Mail gesendet ✓':'E-Mail konnte noch nicht gesendet werden'}</strong><div class="studio-team-note" data-invite-mail-message style="margin:0 0 8px">${esc(mailSent?`Die Einladung wurde an ${email} geschickt.`:(mailMessage||'Bitte erneut senden.'))}</div>${mailSent||!inviteId?'':`<button type="button" class="btn primary" style="margin:0 0 9px;width:100%" data-resend-studio-invite>Erneut senden</button>`}<div class="studio-invite-link"><input readonly value="${esc(url)}" aria-label="Einladungslink"><button type="button" class="btn ghost" data-copy-mail-invite>Kopieren</button></div></div>`;
     root.querySelector('[data-copy-mail-invite]')?.addEventListener('click',async event=>{
       try{await navigator.clipboard.writeText(url);const button=event.currentTarget,old=button.textContent;button.textContent='Kopiert ✓';setTimeout(()=>button.textContent=old,1400);}
       catch(_error){prompt('Einladungslink kopieren:',url);}
     });
-    root.querySelector('[data-resend-studio-invite]')?.addEventListener('click',()=>{
-      const form=document.getElementById('studioInviteForm');if(!form)return;
-      try{form.elements.email.value=email;const invite=new URL(url);const token=invite.searchParams.get('invite')||'';const pending=[...document.querySelectorAll('.studio-pending-row')].find(row=>row.textContent.includes(email));if(pending)pending.querySelector('[data-invite-cancel]')?.click();void token;}catch(_error){}
-      form.elements.email.value=email;
-      form.querySelector('[type="submit"]')?.focus();
-      alert('E-Mail-Adresse ist wieder eingetragen. Bitte Rolle wählen und „Einladung senden“ drücken.');
+    root.querySelector('[data-resend-studio-invite]')?.addEventListener('click',async event=>{
+      const button=event.currentTarget,message=root.querySelector('[data-invite-mail-message]');
+      button.disabled=true;button.textContent='Wird gesendet …';if(message)message.textContent='Einladung wird erneut versendet …';
+      try{await deliverInvite(inviteId);showResult(email,url,true,'',inviteId);}
+      catch(error){console.error('TATNERA invitation retry failed',error);if(message)message.textContent=friendlyMailError(error);button.disabled=false;button.textContent='Erneut senden';}
     });
   }
 
@@ -76,18 +84,10 @@
 
       const inviteUrl=new URL(PUBLIC_APP_URL);inviteUrl.searchParams.set('invite',invite.token);
       let mailSent=false,mailMessage='';
-      try{
-        const {data:delivery,error:mailError}=await c.functions.invoke('send-studio-invite',{body:{inviteId:invite.id}});
-        if(mailError)throw mailError;
-        if(delivery?.error)throw new Error(delivery.error);
-        mailSent=delivery?.ok===true;
-        if(!mailSent)throw new Error('Maildienst hat den Versand nicht bestätigt.');
-      }catch(error){
-        console.error('TATNERA invitation email failed',error);
-        mailMessage=friendlyMailError(error);
-      }
+      try{await deliverInvite(invite.id);mailSent=true;}
+      catch(error){console.error('TATNERA invitation email failed',error);mailMessage=friendlyMailError(error);}
 
-      form.reset();showResult(email,inviteUrl.toString(),mailSent,mailMessage);
+      form.reset();showResult(email,inviteUrl.toString(),mailSent,mailMessage,invite.id);
       await window.TatneraTeam?.reload?.();
       requestAnimationFrame(patchUi);
     }catch(error){alert(String(error?.message||error));}
