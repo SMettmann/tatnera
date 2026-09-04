@@ -2,10 +2,10 @@
 (function(){
   'use strict';
 
-  const pricingCss=document.createElement('link');
-  pricingCss.rel='stylesheet';
-  pricingCss.href='pricing.css';
-  document.head.appendChild(pricingCss);
+  ['pricing.css','tattoo-marketing.css'].forEach(href=>{
+    if(document.querySelector(`link[href="${href}"]`))return;
+    const link=document.createElement('link');link.rel='stylesheet';link.href=href;document.head.appendChild(link);
+  });
 
   const nav=document.querySelector('.nav-links');
   if(nav&&!nav.querySelector('a[href="#preise"]')){
@@ -20,8 +20,27 @@
   if(trialNote&&!document.querySelector('.hero-price')){
     const heroPrice=document.createElement('div');
     heroPrice.className='hero-price';
-    heroPrice.innerHTML='<span>Nach dem Test:</span><strong>ab 19,99 € / Monat</strong><span>· je nach Studio-Größe bis 29,99 €</span>';
+    heroPrice.innerHTML='<span>Nach dem Test:</span><strong>19,99 € / Monat</strong><span>· nur bei aktiver Buchung</span>';
     trialNote.parentNode.insertBefore(heroPrice,trialNote);
+  }
+
+  const logoStrip=document.querySelector('.logo-strip');
+  if(logoStrip&&!document.querySelector('.ink-identity')){
+    const identity=document.createElement('section');
+    identity.className='ink-identity';
+    identity.innerHTML=`<div class="wrap ink-identity-inner">
+      <div class="ink-identity-copy">
+        <small>Studio Software mit Charakter</small>
+        <strong>Nicht irgendeine Verwaltungssoftware.</strong>
+        <p>TATNERA ist für Tattoo- und Piercing-Studios gebaut – vom Look bis zum Ablauf. Klar genug für den Alltag, aber mit genug Persönlichkeit, dass es sich nicht wie Buchhaltungssoftware anfühlt.</p>
+      </div>
+      <div class="ink-tools" aria-label="TATNERA Personalisierung">
+        <div class="ink-tool"><em>◐</em><b>Layout wählen</b><span>Dunkel · Hell · Pink</span></div>
+        <div class="ink-tool"><em>↖</em><b>Cursor wählen</b><span>Nadel · Standard · Rock Hand</span></div>
+        <div class="ink-tool"><em>✦</em><b>Studio-Look</b><span>Persönlich statt austauschbar</span></div>
+      </div>
+    </div>`;
+    logoStrip.insertAdjacentElement('afterend',identity);
   }
 
   const trialSection=document.querySelector('.trial-box')?.closest('.section');
@@ -34,8 +53,8 @@
         <div class="pricing-card reveal">
           <div>
             <span class="eyebrow">Klare Kosten nach dem Test</span>
-            <h2>Erst 14 Tage kostenlos. Danach ab 19,99 € im Monat.</h2>
-            <p>Wenn TATNERA zu deinem Studio passt, entscheidest du dich nach der Testphase aktiv für die weitere Nutzung. Der monatliche Preis liegt – abhängig von der Studio-Größe – zwischen 19,99 € und 29,99 €.</p>
+            <h2>Erst 14 Tage kostenlos. Danach 19,99 € im Monat.</h2>
+            <p>Wenn TATNERA zu deinem Studio passt, entscheidest du dich nach der Testphase aktiv für die weitere Nutzung. Ohne automatische Verlängerung und ohne versteckte Preisstaffelung.</p>
             <div class="price-facts">
               <span>14 Tage kostenlos testen</span>
               <span>keine Zahlungsdaten zum Start</span>
@@ -43,13 +62,13 @@
             </div>
             <div class="pricing-action">
               <a class="btn primary large" href="app.html?mode=signup">14 Tage kostenlos testen →</a>
-              <span class="price-hint">Nach dem Test nur bei aktiver Entscheidung kostenpflichtig.</span>
+              <span class="price-hint">Kostenpflichtig erst nach deiner aktiven Entscheidung.</span>
             </div>
           </div>
           <div class="price-display">
-            <span class="price-label">Monatlich</span>
-            <strong>19,99–29,99 €</strong>
-            <small>abhängig von der Studio-Größe</small>
+            <span class="price-label">Danach monatlich</span>
+            <strong>19,99 €</strong>
+            <small>pro Studio</small>
           </div>
         </div>
       </div>`;
@@ -60,7 +79,7 @@
   if(faq&&!faq.querySelector('[data-price-faq]')){
     const item=document.createElement('details');
     item.dataset.priceFaq='true';
-    item.innerHTML='<summary>Was kostet TATNERA nach den 14 Tagen?</summary><p>Je nach Studio-Größe kostet TATNERA nach der kostenlosen Testphase zwischen 19,99 € und 29,99 € pro Monat. Eine kostenpflichtige Nutzung startet nur, wenn du dich aktiv dafür entscheidest.</p>';
+    item.innerHTML='<summary>Was kostet TATNERA nach den 14 Tagen?</summary><p>Nach der kostenlosen Testphase kostet TATNERA 19,99 € pro Monat. Eine kostenpflichtige Nutzung startet nur, wenn du dich aktiv dafür entscheidest.</p>';
     const second=faq.children[1];
     faq.insertBefore(item,second?second.nextSibling:null);
   }
