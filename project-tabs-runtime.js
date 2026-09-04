@@ -137,4 +137,5 @@
   load('piercing-procedure.js','__tatneraPiercingProcedureInstalled');
   load('service-consent.js','__tatneraServiceConsentInstalled');
   load('role-permissions.js','__tatneraRolePermissionsInstalled');
+  load('team-role-ui-fix.js','__tatneraTeamRoleUiFixInstalled');
 })();
