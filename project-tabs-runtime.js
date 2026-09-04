@@ -129,4 +129,5 @@
   load('calendar-month-view.js','__tatneraMonthCalendarInstalled');
   load('calendar-appointment-ux.js','__tatneraCalendarAppointmentUxInstalled');
   load('customer-service-tabs.js','__tatneraCustomerServiceTabsInstalled');
+  load('archive-piercing.js','__tatneraArchivePiercingInstalled');
 })();
