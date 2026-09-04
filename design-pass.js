@@ -54,7 +54,4 @@
   document.addEventListener('DOMContentLoaded',load,{once:true});
   document.addEventListener('tatnera:runtime-refresh',load);
   document.addEventListener('tatnera:auth-ready',installLogos);
-
-  const observer=new MutationObserver(()=>installLogos());
-  observer.observe(document.documentElement,{childList:true,subtree:true});
 })();
