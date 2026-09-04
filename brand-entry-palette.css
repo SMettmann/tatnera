@@ -1,0 +1,149 @@
+/* TATNERA — public + auth brand palette
+   Keep landing, login and app in one tattoo-studio color language. */
+:root{
+  --tatnera-brass:#c79a5b;
+  --tatnera-brass-light:#d8b477;
+  --tatnera-bronze:#8b5e3c;
+  --tatnera-bronze-deep:#4d3425;
+  --tatnera-ink:#0b0c0d;
+  --tatnera-paper:#f3eee6;
+  --tatnera-success:#7fb388;
+  --tatnera-success-bg:#18251c;
+  --accent:var(--tatnera-brass)!important;
+  --accent-ink:#15100b!important;
+  --warm:#b87345!important;
+}
+
+/* ---------- Public landing page ---------- */
+body{
+  background:
+    radial-gradient(circle at 18% 12%,rgba(199,154,91,.045),transparent 28%),
+    linear-gradient(rgba(255,255,255,.014) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.012) 1px,transparent 1px),
+    var(--bg)!important;
+  background-size:auto,42px 42px,42px 42px,auto!important;
+}
+.announcement strong,.eyebrow,.hero-price strong,.price-display strong,.ink-identity-copy small,.ink-tool em{color:var(--tatnera-brass)!important}
+.logo-mark{
+  color:var(--tatnera-brass)!important;
+  border-color:var(--tatnera-brass)!important;
+  box-shadow:inset 0 0 0 1px rgba(199,154,91,.10)!important;
+}
+.logo:after{background:linear-gradient(90deg,var(--tatnera-brass),transparent)!important}
+.hero:before{
+  background:radial-gradient(circle,rgba(199,154,91,.12),rgba(199,154,91,0) 67%)!important;
+}
+.hero-copy:after,.hero-brand-sign .brand-flash{color:var(--tatnera-brass)!important}
+.hero-brand-sign strong{filter:drop-shadow(5px 5px 0 rgba(199,154,91,.10))!important}
+.brand-needle:before{border-color:var(--tatnera-brass)!important}
+.kicker-dot{
+  background:var(--tatnera-brass)!important;
+  box-shadow:0 0 18px rgba(199,154,91,.48)!important;
+}
+h1:after,.feature:after,.ink-identity:before{background:var(--tatnera-brass)!important}
+.trial-note span:before,.trial-points span:before,.price-facts span:before{color:var(--tatnera-brass)!important}
+
+.btn.primary,
+.mini-add,
+.screen-action{
+  background:linear-gradient(135deg,var(--tatnera-brass-light) 0%,var(--tatnera-brass) 56%,var(--tatnera-bronze) 100%)!important;
+  color:#17100a!important;
+  border-color:rgba(216,180,119,.48)!important;
+  box-shadow:4px 4px 0 #3a281d!important;
+}
+.btn.primary:hover{
+  filter:brightness(1.04);
+  box-shadow:6px 6px 0 #3a281d!important;
+}
+.btn.secondary{
+  background:#151517!important;
+  border-color:rgba(199,154,91,.30)!important;
+  color:var(--tatnera-paper)!important;
+}
+.btn.secondary:hover{border-color:rgba(216,180,119,.58)!important;background:#1a1816!important}
+
+.mini-brand b{
+  background:linear-gradient(145deg,var(--tatnera-brass-light),var(--tatnera-bronze))!important;
+  color:#17100a!important;
+}
+.mini-nav .active{box-shadow:inset 2px 0 0 var(--tatnera-brass)!important}
+.mini-card.accent,.payment-total{
+  background:linear-gradient(145deg,var(--tatnera-brass-light),var(--tatnera-brass) 60%,var(--tatnera-bronze))!important;
+  color:#17100a!important;
+}
+.mini-card.accent small{color:#55402b!important}
+.mini-task i{background:var(--tatnera-brass)!important}
+.showcase-tab.active{border-left-color:var(--tatnera-brass)!important;box-shadow:inset 3px 0 0 var(--tatnera-brass)!important}
+.feature-icon,.flow-num{color:var(--tatnera-brass)!important}
+.flow-step:nth-child(even) .flow-num{border-color:var(--tatnera-brass)!important}
+.pricing-card{border-left-color:var(--tatnera-brass)!important}
+.pricing-section:before{
+  background:radial-gradient(circle,rgba(199,154,91,.09),transparent 68%)!important;
+}
+.trial-box:after{
+  background:radial-gradient(circle,rgba(199,154,91,.14),transparent 68%)!important;
+}
+.footer:before{background:linear-gradient(90deg,transparent,var(--tatnera-brass),transparent)!important}
+
+/* Green only means a genuine positive state. */
+.status.good{
+  background:var(--tatnera-success-bg)!important;
+  color:var(--tatnera-success)!important;
+  border-color:rgba(127,179,136,.24)!important;
+}
+.cal-event{border-left-color:var(--tatnera-brass)!important;background:#211b15!important;color:#efe7dc!important}
+
+/* ---------- Authentication / login / signup ---------- */
+body.tatnera-auth-locked{background:var(--tatnera-ink)!important}
+.tatnera-auth-shell{
+  background:
+    radial-gradient(circle at 15% 8%,rgba(199,154,91,.075),transparent 30%),
+    linear-gradient(rgba(255,255,255,.014) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.012) 1px,transparent 1px),
+    var(--tatnera-ink)!important;
+  background-size:auto,42px 42px,42px 42px,auto!important;
+}
+.tatnera-auth-home:hover{border-color:var(--tatnera-brass)!important;color:var(--tatnera-brass-light)!important}
+.tatnera-auth-card{border-left-color:var(--tatnera-brass)!important}
+.tatnera-auth-mark{
+  border-color:var(--tatnera-brass)!important;
+  color:var(--tatnera-brass-light)!important;
+  background:rgba(199,154,91,.035)!important;
+}
+.tatnera-auth-head h1:after{background:var(--tatnera-brass)!important}
+.tatnera-auth-tab.active{
+  background:#1b1815!important;
+  color:var(--tatnera-paper)!important;
+  box-shadow:inset 3px 0 0 var(--tatnera-brass)!important;
+}
+.tatnera-auth-shell .tatnera-auth-form input:focus{
+  border-color:var(--tatnera-brass)!important;
+  box-shadow:0 0 0 3px rgba(199,154,91,.11)!important;
+}
+.tatnera-auth-submit{
+  background:linear-gradient(135deg,var(--tatnera-brass-light),var(--tatnera-brass) 58%,var(--tatnera-bronze))!important;
+  color:#17100a!important;
+  box-shadow:4px 4px 0 #3a281d!important;
+}
+.tatnera-auth-submit:hover{box-shadow:6px 6px 0 #3a281d!important}
+.tatnera-auth-secondary{color:var(--tatnera-brass-light)!important}
+.tatnera-auth-message.success{
+  border-color:rgba(127,179,136,.38)!important;
+  background:var(--tatnera-success-bg)!important;
+  color:#a9d1b0!important;
+}
+
+/* Supabase loading screen shown before the auth card. */
+.tatnera-auth-boot{
+  background:radial-gradient(circle at 20% 10%,rgba(199,154,91,.10),transparent 34%),var(--tatnera-ink)!important;
+}
+.tatnera-auth-boot-mark{
+  background:linear-gradient(145deg,var(--tatnera-brass-light),var(--tatnera-bronze))!important;
+  color:#17100a!important;
+  border-radius:4px!important;
+}
+.tatnera-auth-boot-dot{background:var(--tatnera-brass)!important}
+
+@media(max-width:600px){
+  .btn.primary,.tatnera-auth-submit{box-shadow:3px 3px 0 #3a281d!important}
+}
