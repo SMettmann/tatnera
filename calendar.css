@@ -51,8 +51,84 @@ select { cursor: url('tattoo-cursor.svg') 4 3, auto; }
 .calendar-legend span { display:flex; align-items:center; gap:6px; }
 .legend-dot { width:8px; height:8px; border-radius:50%; background:var(--accent); }
 .legend-dot.consultation { background:#8db8ff; }.legend-dot.touchup{background:#ffb45f}.legend-dot.block{background:#7f7f86}
-.appointment-dialog-tools { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:18px; }
+
+/* Appointment dialog: responsive from phones through tablets to desktop. */
+#appointmentDialog {
+  width:min(860px,calc(100vw - 32px));
+  max-width:100%;
+  max-height:calc(100dvh - 24px);
+  overflow:hidden;
+  margin:auto;
+}
+#appointmentDialog > form {
+  width:100%;
+  max-height:calc(100dvh - 24px);
+  overflow-y:auto;
+  overflow-x:hidden;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+  padding:clamp(16px,2.4vw,24px);
+}
+#appointmentDialog .form-grid,
+#appointmentDialog .form-grid > label,
+#appointmentDialog input,
+#appointmentDialog select,
+#appointmentDialog textarea {
+  min-width:0;
+}
+#appointmentDialog input,
+#appointmentDialog select,
+#appointmentDialog textarea {
+  width:100%;
+  max-width:100%;
+}
+#appointmentDialog textarea { resize:vertical; }
+
+/* The communication panel is injected next to the bottom actions. Give it its
+   own full row so it never gets squeezed between delete/cancel/save buttons. */
+.appointment-dialog-tools {
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:center;
+  gap:12px;
+  margin-top:18px;
+  min-width:0;
+}
+.appointment-dialog-tools > .appointment-communication-panel {
+  grid-column:1 / -1;
+  grid-row:1;
+  width:100%;
+  min-width:0;
+  margin:0 0 2px;
+}
+.appointment-dialog-tools > .danger-btn {
+  grid-column:1;
+  grid-row:2;
+  justify-self:start;
+}
+.appointment-dialog-tools > .dialog-actions {
+  grid-column:3;
+  grid-row:2;
+  justify-self:end;
+  margin-top:0 !important;
+  min-width:0;
+}
+.appointment-dialog-tools .appointment-communication-head p,
+.appointment-dialog-tools .appointment-communication-item,
+.appointment-dialog-tools .appointment-communication-item strong,
+.appointment-dialog-tools .appointment-communication-item small {
+  min-width:0;
+  overflow-wrap:anywhere;
+}
 .danger-btn { border:1px solid #583535; background:#241717; color:#ff9d9d; border-radius:10px; padding:10px 13px; font-weight:800; }
+
+/* Tablet: the base stylesheet already changes the 3-column form to 2 columns.
+   Keep comfortable margins and make the actions flexible in portrait mode. */
+@media (min-width:761px) and (max-width:1100px){
+  #appointmentDialog { width:min(820px,calc(100vw - 28px)); }
+  .appointment-dialog-tools { grid-template-columns:auto 1fr auto; }
+  .appointment-dialog-tools > .dialog-actions { flex-wrap:wrap; }
+}
 
 @media (max-width:760px){
   .calendar-toolbar { align-items:stretch; }
@@ -63,4 +139,75 @@ select { cursor: url('tattoo-cursor.svg') 4 3, auto; }
   .day-time-rail { display:none; }
   .day-event-row { grid-template-columns:70px 1fr; }
   .day-event-actions { display:none; }
+
+  #appointmentDialog {
+    width:calc(100vw - 16px);
+    max-height:calc(100dvh - 16px);
+    border-radius:16px;
+  }
+  #appointmentDialog > form {
+    max-height:calc(100dvh - 16px);
+    padding:16px 14px 18px;
+  }
+  #appointmentDialog .dialog-head {
+    gap:12px;
+    margin-bottom:14px;
+  }
+  #appointmentDialog .dialog-head h2 { font-size:21px; }
+  #appointmentDialog input,
+  #appointmentDialog select,
+  #appointmentDialog textarea {
+    font-size:16px;
+  }
+  #appointmentDialog input,
+  #appointmentDialog select {
+    min-height:46px;
+  }
+  #appointmentDialog textarea { min-height:104px; }
+
+  .appointment-dialog-tools {
+    grid-template-columns:1fr;
+    gap:10px;
+    margin-top:14px;
+  }
+  .appointment-dialog-tools > .appointment-communication-panel,
+  .appointment-dialog-tools > .danger-btn,
+  .appointment-dialog-tools > .dialog-actions {
+    grid-column:1;
+    width:100%;
+  }
+  .appointment-dialog-tools > .appointment-communication-panel { grid-row:1; }
+  .appointment-dialog-tools > .danger-btn {
+    grid-row:2;
+    justify-self:stretch;
+    min-height:44px;
+  }
+  .appointment-dialog-tools > .dialog-actions {
+    grid-row:3;
+    justify-self:stretch;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+  .appointment-dialog-tools > .dialog-actions .btn {
+    width:100%;
+    min-width:0;
+    min-height:44px;
+    padding:11px 10px;
+  }
+  .appointment-dialog-tools .appointment-communication-panel { padding:12px; }
+  .appointment-dialog-tools .appointment-communication-actions { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .appointment-dialog-tools .appointment-communication-actions .btn {
+    width:100%;
+    min-width:0;
+    min-height:42px;
+    white-space:normal;
+  }
+}
+
+@media (max-width:420px){
+  #appointmentDialog { width:calc(100vw - 10px); max-height:calc(100dvh - 10px); }
+  #appointmentDialog > form { max-height:calc(100dvh - 10px); padding:14px 12px 16px; }
+  .appointment-dialog-tools > .dialog-actions,
+  .appointment-dialog-tools .appointment-communication-actions { grid-template-columns:1fr; }
 }
