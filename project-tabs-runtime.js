@@ -117,3 +117,11 @@
 
   window.TatneraProjectTabs={activate,restoreCurrent};
 })();
+
+/* Calendar extensions are loaded last so they can safely wrap the base calendar runtime. */
+(function(){
+  if(window.__tatneraMonthCalendarInstalled||document.querySelector('script[src="calendar-month-view.js"]'))return;
+  const script=document.createElement('script');
+  script.src='calendar-month-view.js';
+  document.body.appendChild(script);
+})();
