@@ -22,14 +22,16 @@
     const form=document.getElementById('studioInviteForm');if(!form)return;
     const button=form.querySelector('[type="submit"]');if(button)button.textContent='Einladung senden';
     const note=form.nextElementSibling;
-    if(note?.classList.contains('studio-team-note'))note.textContent='TATNERA verschickt die Einladung automatisch per E-Mail. Der Empfänger legt über den Link sein eigenes Passwort fest.';
+    if(note?.classList.contains('studio-team-note'))note.textContent='TATNERA verschickt die Einladung automatisch per E-Mail. Der Empfänger öffnet den Link und legt anschließend sein eigenes Passwort fest.';
   }
 
   function friendlyMailError(error){
+    const code=String(error?.code||'');
     const text=String(error?.message||error||'');
-    if(/rate limit/i.test(text))return 'Der E-Mail-Versand wurde vom Maildienst kurzzeitig begrenzt. Bitte in einigen Minuten auf „Erneut senden“ drücken.';
-    if(/redirect/i.test(text))return 'Der Einladungslink konnte vom Maildienst nicht verarbeitet werden. TATNERA hat den Ziel-Link bereits korrigiert – bitte „Erneut senden“ drücken.';
-    if(/email/i.test(text)&&/invalid/i.test(text))return 'Die E-Mail-Adresse wurde vom Maildienst abgelehnt. Bitte die Adresse prüfen.';
+    if(code==='smtp_required'||/not authou?ri[sz]ed/i.test(text))return 'Der Supabase-Testmaildienst darf diese Empfängeradresse nicht anschreiben. Für echte Mitarbeiter muss einmal ein eigener SMTP-Mailversand eingerichtet werden.';
+    if(code==='mail_rate_limited'||/rate limit/i.test(text))return 'Zu viele Einladungsmails in kurzer Zeit. Bitte etwa 60 Sekunden warten und dann auf „Erneut senden“ drücken.';
+    if(code==='invalid_email'||(/email/i.test(text)&&/invalid/i.test(text)))return 'Die E-Mail-Adresse wurde vom Maildienst abgelehnt. Bitte die Adresse prüfen.';
+    if(/session|jwt|unauth|401/i.test(text))return 'Die Anmeldung für den Mailversand ist abgelaufen. Bitte die Seite einmal neu laden und danach erneut senden.';
     return 'Der automatische Mailversand ist fehlgeschlagen. Du kannst den Versand direkt erneut versuchen.';
   }
 
@@ -37,8 +39,11 @@
     const c=client();if(!c)throw new Error('Studio-Verbindung ist noch nicht bereit.');
     const {data:delivery,error:mailError}=await c.functions.invoke('send-studio-invite',{body:{inviteId}});
     if(mailError)throw mailError;
-    if(delivery?.error)throw new Error(delivery.error);
-    if(delivery?.ok!==true)throw new Error('Maildienst hat den Versand nicht bestätigt.');
+    if(delivery?.ok!==true){
+      const error=new Error(delivery?.error||'Maildienst hat den Versand nicht bestätigt.');
+      error.code=delivery?.code||'mail_send_failed';
+      throw error;
+    }
     return delivery;
   }
 
@@ -55,6 +60,30 @@
       try{await deliverInvite(inviteId);showResult(email,url,true,'',inviteId);}
       catch(error){console.error('TATNERA invitation retry failed',error);if(message)message.textContent=friendlyMailError(error);button.disabled=false;button.textContent='Erneut senden';}
     });
+  }
+
+  async function getOrCreateInvite(c,sid,user,email,role){
+    const {data:openInvites,error:lookupError}=await c.from('studio_invites')
+      .select('id,email,role,token,expires_at')
+      .eq('studio_id',sid).ilike('email',email).is('accepted_at',null)
+      .gt('expires_at',new Date().toISOString()).order('created_at',{ascending:false}).limit(1);
+    if(lookupError)throw lookupError;
+
+    let invite=(openInvites||[])[0]||null;
+    if(invite){
+      if(invite.role!==role){
+        const {data:updated,error:updateError}=await c.from('studio_invites').update({role}).eq('id',invite.id).select('id,email,role,token,expires_at').single();
+        if(updateError)throw updateError;
+        invite=updated;
+      }
+      return invite;
+    }
+
+    const {data:created,error:createError}=await c.from('studio_invites')
+      .insert({studio_id:sid,email,role,created_by:user.id})
+      .select('id,email,role,token,expires_at').single();
+    if(createError)throw createError;
+    return created;
   }
 
   async function sendInvite(event){
@@ -77,11 +106,7 @@
         if((existingMembers||[]).length)throw new Error('Diese E-Mail-Adresse gehört bereits zum Studio-Team.');
       }
 
-      const {error:deleteError}=await c.from('studio_invites').delete().eq('studio_id',sid).ilike('email',email).is('accepted_at',null);
-      if(deleteError)throw deleteError;
-      const {data:invite,error:inviteError}=await c.from('studio_invites').insert({studio_id:sid,email,role,created_by:user.id}).select('id,email,role,token,expires_at').single();
-      if(inviteError)throw inviteError;
-
+      const invite=await getOrCreateInvite(c,sid,user,email,role);
       const inviteUrl=new URL(PUBLIC_APP_URL);inviteUrl.searchParams.set('invite',invite.token);
       let mailSent=false,mailMessage='';
       try{await deliverInvite(invite.id);mailSent=true;}
