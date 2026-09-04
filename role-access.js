@@ -92,20 +92,29 @@
     if(meta&&currentRole())meta.textContent=roleLabel();
   }
 
+  function ensureObserver(){
+    if(observer)return;
+    observer=new MutationObserver(()=>requestAnimationFrame(apply));
+    observer.observe(document.body,{childList:true,subtree:true});
+  }
+
   function apply(){
     if(applying)return;
+    const resolved=currentRole();
+    if(!resolved)return;
     applying=true;
     try{
-      role=currentRole();
-      if(role)document.body.dataset.tatneraRole=role;
+      role=resolved;
+      document.body.dataset.tatneraRole=role;
       applyManagerVisibility();
       applyStudioSettings();
       syncRoleLabel();
+      ensureObserver();
     }finally{applying=false;}
   }
 
   function guardManagerAction(event){
-    if(isManager())return;
+    if(!currentRole()||isManager())return;
     const target=event.target?.closest?.(MANAGER_ONLY_SELECTORS.join(','));
     if(!target)return;
     event.preventDefault();
@@ -117,10 +126,6 @@
   document.addEventListener('tatnera:auth-ready',event=>{
     role=String(event.detail?.role||'');
     apply();
-    if(!observer){
-      observer=new MutationObserver(()=>requestAnimationFrame(apply));
-      observer.observe(document.body,{childList:true,subtree:true});
-    }
   });
   document.addEventListener('tatnera:runtime-refresh',()=>requestAnimationFrame(apply));
   document.addEventListener('tatnera:data-changed',()=>requestAnimationFrame(apply));
@@ -137,4 +142,15 @@
   };
 
   installStyle();
+
+  let tries=0;
+  const timer=setInterval(()=>{
+    tries+=1;
+    if(currentRole()){
+      apply();
+      clearInterval(timer);
+    }else if(tries>200){
+      clearInterval(timer);
+    }
+  },50);
 })();
