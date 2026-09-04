@@ -2,12 +2,17 @@
 (function(){
   'use strict';
 
-  if(!document.querySelector('link[href^="auth-marketing.css"]')){
-    const authCss=document.createElement('link');
-    authCss.rel='stylesheet';
-    authCss.href='auth-marketing.css?v=20260904-1';
-    document.head.appendChild(authCss);
-  }
+  const authStyles=[
+    {match:'auth-marketing.css',href:'auth-marketing.css?v=20260904-2'},
+    {match:'brand-entry-palette.css',href:'brand-entry-palette.css?v=20260904-1'}
+  ];
+  authStyles.forEach(item=>{
+    if(document.querySelector(`link[href^="${item.match}"]`))return;
+    const link=document.createElement('link');
+    link.rel='stylesheet';
+    link.href=item.href;
+    document.head.appendChild(link);
+  });
 
   if(!document.querySelector('script[src^="role-access.js"]')){
     const access=document.createElement('script');
