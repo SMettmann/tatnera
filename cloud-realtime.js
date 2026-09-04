@@ -7,9 +7,15 @@
   window.__tatneraRealtimeSyncInstalled=true;
 
   let channel=null,client=null,studioId='',userId='',pending=false,reloadTimer=null;
+  let localWriteUntil=0;
 
   function actor(payload){
     return payload?.new?.updated_by||payload?.old?.updated_by||payload?.new?.created_by||payload?.old?.created_by||'';
+  }
+  function markLocalWrite(){
+    /* Realtime echoes our own save back to this browser. Suppress only for a
+       short window. A second device using the same account still refreshes. */
+    localWriteUntil=Math.max(localWriteUntil,Date.now()+2500);
   }
   function unsafeToReload(){
     if(document.querySelector('dialog[open]'))return true;
@@ -38,7 +44,7 @@
   }
   function scheduleReload(payload){
     const changedBy=actor(payload);
-    if(changedBy&&changedBy===userId)return;
+    if(changedBy&&changedBy===userId&&Date.now()<localWriteUntil)return;
     pending=true;
     clearTimeout(reloadTimer);reloadTimer=setTimeout(tryReload,350);
   }
@@ -63,6 +69,9 @@
   }
 
   document.addEventListener('tatnera:auth-ready',subscribe);
+  document.addEventListener('tatnera:data-changed',markLocalWrite);
+  document.addEventListener('tatnera:studio-changed',markLocalWrite);
+  document.addEventListener('tatnera:studio-state-saved',markLocalWrite);
   document.addEventListener('close',()=>{if(pending)setTimeout(tryReload,50);},true);
   document.addEventListener('focusout',()=>{if(pending)setTimeout(tryReload,150);},true);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden&&pending)setTimeout(tryReload,100);});
