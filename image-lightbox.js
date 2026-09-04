@@ -6,6 +6,8 @@
 
   const EXCLUDED_SELECTOR=[
     '[data-no-lightbox]',
+    '.tatnera-logo-img',
+    '.brand-wrap img',
     '.brand-mark img',
     '.logo img',
     '.avatar img',
