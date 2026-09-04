@@ -67,52 +67,52 @@
   <dialog id="customerDialog" class="dialog"><form method="dialog" id="customerForm"><div class="dialog-head"><div><span class="eyebrow">Kundenakte</span><h2>Neuen Kunden anlegen</h2></div><button type="button" class="close-btn" onclick="document.getElementById('customerDialog').close()">×</button></div><div class="form-grid"><label>Vorname<input required name="firstName" /></label><label>Nachname<input required name="lastName" /></label><label>E-Mail<input type="email" name="email" /></label><label>Telefon<input name="phone" /></label><label class="full">Notizen<textarea name="notes" rows="3" placeholder="Wichtige Hinweise, Stilwünsche …"></textarea></label></div><div class="dialog-actions"><button type="button" class="btn ghost" onclick="document.getElementById('customerDialog').close()">Abbrechen</button><button type="submit" class="btn primary" value="default">Kunde speichern</button></div></form></dialog>
   <dialog id="projectDialog" class="dialog wide-dialog"><form method="dialog" id="projectForm"><div class="dialog-head"><div><span class="eyebrow">Tattoo-Akte</span><h2>Neues Tattoo-Projekt</h2></div><button type="button" class="close-btn" onclick="document.getElementById('projectDialog').close()">×</button></div><div class="form-grid three"><label class="full">Kunde<select required name="customerId" id="projectCustomerSelect"></select></label><label>Motiv<input required name="title" /></label><label>Körperstelle<input required name="placement" /></label><label>Größe<input name="size" /></label><label>Artist<input name="artist" value="" /></label><label>Preis (€)<input name="price" type="number" min="0" step="10" /></label><label>Anzahlung (€)<input name="deposit" type="number" min="0" step="10" /></label><label class="full">Beschreibung<textarea name="description" rows="3"></textarea></label></div><div class="dialog-actions"><button type="button" class="btn ghost" onclick="document.getElementById('projectDialog').close()">Abbrechen</button><button type="submit" class="btn primary">Projekt anlegen</button></div></form></dialog>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="invite-account-setup.js?v=20260904-2"></script>
-  <script src="app.js"></script>
-  <script src="production-empty-state.js?v=20260904-1"></script>
-  <script src="core.js"></script>
-  <script src="appointment-status.js"></script>
-  <script src="consent-v2.js"></script>
-  <script src="ink-v2.js"></script>
-  <script src="payments-v2.js"></script>
-  <script src="aftercare-v2.js"></script>
-  <script src="session-preflight-inline.js?v=20260904-1"></script>
-  <script src="requests.js"></script>
-  <script src="request-production-flow.js?v=20260904-1"></script>
-  <script src="calendar-conflicts.js"></script>
-  <script src="ui-shell.js"></script>
-  <script src="design-storage.js"></script>
-  <script src="theme-switcher.js?v=20260904-2"></script>
-  <script src="tatnera-runtime.js"></script>
-  <script src="artist-delete.js"></script>
-  <script src="customer-detail.js"></script>
-  <script src="records-management.js"></script>
-  <script src="appointment-management.js"></script>
-  <script src="record-delete.js"></script>
-  <script src="session-management.js"></script>
-  <script src="camera-capture.js?v=20260904-1"></script>
-  <script src="session-payment-flow.js"></script>
-  <script src="session-document-flow.js"></script>
-  <script src="health-status.js"></script>
-  <script src="studio-settings.js?v=20260904-2"></script>
-  <script src="invoice-management.js"></script>
-  <script src="accounting-integrity.js"></script>
-  <script src="invoice-rules.js"></script>
-  <script src="invoice-center.js"></script>
-  <script src="multiuser-auth-hardening.js?v=20260904-4"></script>
-  <script src="studio-team.js?v=20260904-3"></script>
-  <script src="studio-invite-mail.js?v=20260904-6"></script>
-  <script src="tenant-local-guard.js?v=20260904-1"></script>
-  <script src="supabase-data.js?v=20260904-2"></script>
-  <script src="supabase-state.js"></script>
-  <script src="cloud-realtime.js?v=20260904-1"></script>
-  <script src="supabase-auth.js"></script>
-  <script src="auth-entry-mode.js"></script>
-  <script src="piercing-support.js"></script>
-  <script src="service-create-ui.js"></script>
-  <script src="image-lightbox.js?v=20260904-1"></script>
-  <script src="mobile-more-menu.js?v=20260904-1"></script>
-  <script src="project-tabs-runtime.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="invite-account-setup.js?v=20260904-2"></script>
+  <script defer src="app.js"></script>
+  <script defer src="production-empty-state.js?v=20260904-1"></script>
+  <script defer src="core.js"></script>
+  <script defer src="appointment-status.js"></script>
+  <script defer src="consent-v2.js"></script>
+  <script defer src="ink-v2.js"></script>
+  <script defer src="payments-v2.js"></script>
+  <script defer src="aftercare-v2.js"></script>
+  <script defer src="session-preflight-inline.js?v=20260904-1"></script>
+  <script defer src="requests.js"></script>
+  <script defer src="request-production-flow.js?v=20260904-1"></script>
+  <script defer src="calendar-conflicts.js"></script>
+  <script defer src="ui-shell.js"></script>
+  <script defer src="design-storage.js"></script>
+  <script defer src="theme-switcher.js?v=20260904-2"></script>
+  <script defer src="tatnera-runtime.js"></script>
+  <script defer src="artist-delete.js"></script>
+  <script defer src="customer-detail.js"></script>
+  <script defer src="records-management.js"></script>
+  <script defer src="appointment-management.js"></script>
+  <script defer src="record-delete.js"></script>
+  <script defer src="session-management.js"></script>
+  <script defer src="camera-capture.js?v=20260904-1"></script>
+  <script defer src="session-payment-flow.js"></script>
+  <script defer src="session-document-flow.js"></script>
+  <script defer src="health-status.js"></script>
+  <script defer src="studio-settings.js?v=20260904-2"></script>
+  <script defer src="invoice-management.js"></script>
+  <script defer src="accounting-integrity.js"></script>
+  <script defer src="invoice-rules.js"></script>
+  <script defer src="invoice-center.js"></script>
+  <script defer src="multiuser-auth-hardening.js?v=20260904-4"></script>
+  <script defer src="studio-team.js?v=20260904-3"></script>
+  <script defer src="studio-invite-mail.js?v=20260904-6"></script>
+  <script defer src="tenant-local-guard.js?v=20260904-1"></script>
+  <script defer src="supabase-data.js?v=20260904-2"></script>
+  <script defer src="supabase-state.js"></script>
+  <script defer src="cloud-realtime.js?v=20260904-1"></script>
+  <script defer src="supabase-auth.js"></script>
+  <script defer src="auth-entry-mode.js"></script>
+  <script defer src="piercing-support.js"></script>
+  <script defer src="service-create-ui.js"></script>
+  <script defer src="image-lightbox.js?v=20260904-1"></script>
+  <script defer src="mobile-more-menu.js?v=20260904-1"></script>
+  <script defer src="project-tabs-runtime.js"></script>
 </body>
 </html>
