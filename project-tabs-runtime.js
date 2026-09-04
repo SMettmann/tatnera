@@ -141,4 +141,5 @@
   load('role-policy-v2.js','__tatneraRolePolicyV2Installed');
   load('calendar-full-service-flow.js','__tatneraCalendarFullServiceFlowInstalled');
   load('appointment-communication.js','__tatneraAppointmentCommunicationInstalled');
+  load('customer-contact-history.js','__tatneraCustomerContactHistoryInstalled');
 })();
