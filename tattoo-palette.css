@@ -1,0 +1,148 @@
+/* TATNERA — coordinated tattoo studio palette
+   Warm brass / bronze replaces the SaaS-lime accent in the dark studio theme.
+   Green is reserved for genuinely positive/success states. */
+
+:root[data-theme="dark"]{
+  --accent:#c79a5b!important;
+  --accent-ink:#17110a!important;
+  --dp-copper:#c79a5b!important;
+  --dp-copper-soft:rgba(199,154,91,.13)!important;
+  --dp-olive:#c79a5b!important;
+  --warning:#c9753e!important;
+  --danger:#c85d61!important;
+  --tatnera-success:#7f9f70;
+  --tatnera-success-bg:#172019;
+  --tatnera-brass:#c79a5b;
+  --tatnera-brass-light:#ddb77d;
+  --tatnera-bronze:#8d623c;
+  --tatnera-ink:#0c0d0e;
+}
+
+/* Main actions: brass instead of fluorescent lime. */
+:root[data-theme="dark"] .btn.primary,
+:root[data-theme="dark"] button.btn.primary,
+:root[data-theme="dark"] .request-workflow button.primary-flow,
+:root[data-theme="dark"] .tatnera-subscription-actions .primary{
+  background:linear-gradient(135deg,#d1a565 0%,#b77f45 100%)!important;
+  color:#17110a!important;
+  border-color:#d0a25f!important;
+  box-shadow:0 10px 24px rgba(139,91,46,.18)!important;
+}
+:root[data-theme="dark"] .btn.primary:hover,
+:root[data-theme="dark"] button.btn.primary:hover{
+  background:linear-gradient(135deg,#ddb77d 0%,#c58b4e 100%)!important;
+  box-shadow:0 14px 30px rgba(139,91,46,.24)!important;
+}
+
+/* When two primary quick-actions sit next to each other, the second becomes
+   a quieter outlined studio action instead of a second fluorescent block. */
+:root[data-theme="dark"] .top-actions .btn.primary + .btn.primary{
+  background:#171512!important;
+  color:#e7c89a!important;
+  border:1px solid #7c5a37!important;
+  box-shadow:none!important;
+}
+:root[data-theme="dark"] .top-actions .btn.primary + .btn.primary:hover{
+  background:#211b15!important;
+  border-color:#b7864d!important;
+}
+
+/* Navigation / badges / links share one brass family. */
+:root[data-theme="dark"] .nav-item.active{
+  background:#211c16!important;
+  border-color:#4f3b28!important;
+}
+:root[data-theme="dark"] .nav-item.active::before{
+  background:linear-gradient(180deg,#e0b97f,#a86f39)!important;
+  box-shadow:0 0 14px rgba(199,154,91,.18)!important;
+}
+:root[data-theme="dark"] .nav-item.active>span:first-child{
+  color:#d9ad70!important;
+  border-color:#5b432c!important;
+  background:#211a14!important;
+}
+:root[data-theme="dark"] .nav-item .badge{
+  background:#241c14!important;
+  color:#dfbd8b!important;
+  border-color:#5d432b!important;
+}
+:root[data-theme="dark"] .text-btn,
+:root[data-theme="dark"] .back-btn,
+:root[data-theme="dark"] .request-card button,
+:root[data-theme="dark"] .project-meta span:last-child{
+  color:#d6aa70!important;
+}
+
+/* Dashboard accents become warm and coherent with the charge warning. */
+:root[data-theme="dark"] .metric-card.accent{
+  background:linear-gradient(180deg,rgba(199,154,91,.11),rgba(199,154,91,.045)),var(--panel)!important;
+  border-color:#4e3a28!important;
+}
+:root[data-theme="dark"] .metric-card.accent::before{background:#c79a5b!important}
+:root[data-theme="dark"] .metric-card.accent::after,
+:root[data-theme="dark"] .metric-card::after{color:rgba(211,166,104,.34)!important}
+:root[data-theme="dark"] .hero-card{
+  border-color:#4d3928!important;
+  background:linear-gradient(135deg,#191611 0%,#111312 58%,#1b140f 100%)!important;
+}
+:root[data-theme="dark"] .hero-card .eyebrow,
+:root[data-theme="dark"] .topbar .eyebrow,
+:root[data-theme="dark"] .panel-head .eyebrow,
+:root[data-theme="dark"] .section-toolbar .eyebrow,
+:root[data-theme="dark"] .request-toolbar .eyebrow,
+:root[data-theme="dark"] .dialog-head .eyebrow{
+  color:#cfa66d!important;
+}
+
+/* Generic active controls no longer default to lime. */
+:root[data-theme="dark"] .artist-filter button.active,
+:root[data-theme="dark"] .calendar-toggle button.active,
+:root[data-theme="dark"] .theme-choice.active,
+:root[data-theme="dark"] .customer-mode button.active,
+:root[data-theme="dark"] .request-filterbar button.active{
+  border-color:#8a623c!important;
+  box-shadow:inset 0 0 0 1px rgba(199,154,91,.22)!important;
+}
+
+/* Trial status belongs to the same palette, not fluorescent green. */
+:root[data-theme="dark"] .tatnera-trial-badge{
+  border-color:#5b4329!important;
+  background:#211a13!important;
+  color:#e1bd88!important;
+}
+:root[data-theme="dark"] .tatnera-trial-badge:before{
+  background:#c79a5b!important;
+  box-shadow:0 0 12px rgba(199,154,91,.42)!important;
+}
+:root[data-theme="dark"] .tatnera-subscription-mark{
+  background:#c79a5b!important;
+  color:#17110a!important;
+}
+
+/* Green survives only where it semantically means positive / ready / done. */
+:root[data-theme="dark"] .request-stage.ready,
+:root[data-theme="dark"] .project-focus-badge.good,
+:root[data-theme="dark"] .status-pill.success,
+:root[data-theme="dark"] .status-pill.completed,
+:root[data-theme="dark"] .status-pill.paid{
+  color:#a9c39c!important;
+  border-color:#40543c!important;
+  background:#172019!important;
+}
+
+/* Tattoo flash project art also follows brass/ink instead of olive. */
+:root[data-theme="dark"] .project-art{
+  background:radial-gradient(circle at 70% 40%,rgba(199,154,91,.14),transparent 33%),linear-gradient(140deg,#211d18,#111312)!important;
+}
+:root[data-theme="dark"] .project-art::after{color:#c89a5b!important}
+
+/* The theme preview must show what the dark theme now really looks like. */
+.theme-choice[data-theme-choice="dark"] .theme-preview-button{background:#c79a5b!important}
+.theme-choice[data-theme-choice="dark"] .theme-preview-card{background:#191715!important}
+
+/* Mobile keeps the same hierarchy. */
+@media(max-width:760px){
+  :root[data-theme="dark"] .top-actions .btn.primary + .btn.primary{
+    background:#171512!important;color:#e7c89a!important;border-color:#7c5a37!important;
+  }
+}
