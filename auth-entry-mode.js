@@ -2,6 +2,13 @@
 (function(){
   'use strict';
 
+  if(!document.querySelector('link[href^="auth-marketing.css"]')){
+    const authCss=document.createElement('link');
+    authCss.rel='stylesheet';
+    authCss.href='auth-marketing.css?v=20260904-1';
+    document.head.appendChild(authCss);
+  }
+
   if(!document.querySelector('script[src="subscription-guard.js"]')){
     const guard=document.createElement('script');
     guard.src='subscription-guard.js';
@@ -9,17 +16,63 @@
     document.head.appendChild(guard);
   }
 
+  function installHomeLink(){
+    const shell=document.getElementById('tatneraAuthShell');
+    if(!shell||shell.querySelector('.tatnera-auth-home'))return false;
+    const home=document.createElement('a');
+    home.className='tatnera-auth-home';
+    home.href='./';
+    home.textContent='← Zur Startseite';
+    home.setAttribute('aria-label','Zur TATNERA Startseite');
+    shell.prepend(home);
+    return true;
+  }
+
+  function authIsVisible(){
+    const shell=document.getElementById('tatneraAuthShell');
+    return !!shell&&!shell.hidden&&document.body.classList.contains('tatnera-auth-locked');
+  }
+
+  let backBoundaryInstalled=false;
+  function installBackBoundary(){
+    if(backBoundaryInstalled)return;
+    backBoundaryInstalled=true;
+
+    let sameSiteReferrer=false;
+    try{
+      sameSiteReferrer=!!document.referrer&&new URL(document.referrer).origin===window.location.origin;
+    }catch(_error){}
+
+    if(!sameSiteReferrer){
+      try{
+        const state=window.history.state||{};
+        if(!state.tatneraAuthBoundary){
+          window.history.replaceState({...state,tatneraAuthBoundary:true},document.title,window.location.href);
+          window.history.pushState({tatneraAuthScreen:true},document.title,window.location.href);
+        }
+      }catch(_error){}
+    }
+
+    window.addEventListener('popstate',()=>{
+      if(authIsVisible())window.location.replace('./');
+    });
+  }
+
+  installBackBoundary();
+
   const params=new URLSearchParams(window.location.search);
   const mode=params.get('mode');
-  if(mode!=='signup'&&mode!=='login')return;
 
   function applyMode(){
+    installHomeLink();
+    if(mode!=='signup'&&mode!=='login')return !!document.getElementById('tatneraAuthShell');
     const button=document.querySelector(`[data-auth-mode="${mode}"]`);
     if(!button)return false;
     button.click();
     try{
       const cleanUrl=window.location.pathname+window.location.hash;
-      window.history.replaceState({},document.title,cleanUrl);
+      const state=window.history.state||{};
+      window.history.replaceState(state,document.title,cleanUrl);
     }catch(_error){}
     return true;
   }
@@ -27,6 +80,6 @@
   let attempts=0;
   const timer=window.setInterval(()=>{
     attempts+=1;
-    if(applyMode()||attempts>30)window.clearInterval(timer);
+    if(applyMode()||attempts>40)window.clearInterval(timer);
   },50);
 })();
