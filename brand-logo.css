@@ -1,5 +1,5 @@
 /* TATNERA — official logo applied consistently across marketing, auth and app */
-:root{--tatnera-logo:url('assets/tatnera-logo.png?v=20260904-1')}
+:root{--tatnera-logo:url('assets/tatnera-logo.png?v=20260904-3')}
 
 /* Public landing page: navigation + footer */
 .logo{min-width:190px;min-height:72px;background:var(--tatnera-logo) left center/contain no-repeat!important;display:block!important}
