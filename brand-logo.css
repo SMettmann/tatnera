@@ -1,5 +1,8 @@
-/* TATNERA — one real logo everywhere. No generated wordmark, no theme tint. */
-:root{--tatnera-logo-url:url('assets/tatnera-brand.png?v=20260904-1')}
+/* TATNERA — official logo everywhere, using the existing brand asset. */
+:root{
+  --tatnera-logo-url:url('assets/tatnera-brand.png?v=20260904-1');
+  --tatnera-logo-gold-filter:sepia(.72) saturate(1.75) hue-rotate(350deg) brightness(.93) contrast(1.08) drop-shadow(0 8px 18px rgba(198,145,77,.16));
+}
 
 .tatnera-logo-img{
   display:block!important;
@@ -10,13 +13,24 @@
   object-position:left center!important;
   opacity:1!important;
   visibility:visible!important;
-  filter:none!important;
   mix-blend-mode:normal!important;
   transform:none!important;
-  background:var(--tatnera-logo-url) left center/contain no-repeat!important;
+  background:none!important;
 }
 
-/* Landing navigation + footer. The image itself is the brand. */
+/* The marketing site and the actual product use the same logo in the warm
+   brass/gold direction of the current dark TATNERA brand. The source image
+   itself stays untouched. */
+.navbar .tatnera-logo-img,
+.hero-brand-sign .tatnera-logo-img,
+.footer .tatnera-logo-img,
+.sidebar .brand-wrap .tatnera-logo-img,
+.tatnera-auth-brand .tatnera-logo-img,
+.tatnera-auth-boot-mark{
+  filter:var(--tatnera-logo-gold-filter)!important;
+}
+
+/* Landing navigation + footer. */
 .logo{
   display:flex!important;
   align-items:center!important;
@@ -94,7 +108,11 @@
 }
 .sidebar .brand-wrap>*{visibility:visible!important}
 .sidebar .brand-wrap>*:not(.tatnera-logo-img){display:none!important}
-.sidebar .brand-wrap .tatnera-logo-img{width:190px!important;max-height:96px!important;object-position:center center!important;background-position:center center!important}
+.sidebar .brand-wrap .tatnera-logo-img{
+  width:190px!important;
+  max-height:96px!important;
+  object-position:center center!important;
+}
 .sidebar .brand-wrap:after,.sidebar .brand-wrap:before{display:none!important}
 
 @media(max-width:900px){
