@@ -16,6 +16,17 @@
     nav.insertBefore(priceLink,faqLink||null);
   }
 
+  document.querySelectorAll('.logo-copy span').forEach(wordmark=>wordmark.classList.add('tatnera-wordmark'));
+
+  const heroCopy=document.querySelector('.hero-copy');
+  if(heroCopy&&!heroCopy.querySelector('.hero-brand-sign')){
+    const sign=document.createElement('div');
+    sign.className='hero-brand-sign';
+    sign.innerHTML='<span class="brand-flash">✦</span><div><strong>TATNERA</strong><small>TATTOO · PIERCING · STUDIO SOFTWARE</small></div><span class="brand-needle" aria-hidden="true"></span>';
+    const kicker=heroCopy.querySelector('.kicker');
+    heroCopy.insertBefore(sign,kicker||heroCopy.firstChild);
+  }
+
   const trialNote=document.querySelector('.hero-copy .trial-note');
   if(trialNote&&!document.querySelector('.hero-price')){
     const heroPrice=document.createElement('div');
