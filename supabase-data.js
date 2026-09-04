@@ -4,7 +4,9 @@
 
   const LOCAL_KEYS=['tatnera_customers','tatnera_projects','tatnera_calendar'];
   const ARCHIVE_KEY='tatnera_archive_v1';
-  let client=null,studioId='',userId='',cloudReady=false,syncTimer=null,syncRunning=false,syncAgain=false;
+  const CLOUD_LOAD_TIMEOUT_MS=12000;
+  const LOADER_FAILSAFE_MS=15000;
+  let client=null,studioId='',userId='',cloudReady=false,syncTimer=null,syncRunning=false,syncAgain=false,loaderFailsafe=null;
   let rows={customers:new Map(),projects:new Map(),appointments:new Map()};
   const localPersist=typeof persist==='function'?persist:null;
 
@@ -25,6 +27,11 @@
   function payloadOf(row){return row?.payload&&typeof row.payload==='object'&&!Array.isArray(row.payload)?row.payload:{};}
   function hasSavedLocalData(){return LOCAL_KEYS.some(key=>localStorage.getItem(key)!==null);}
   function importDecisionKey(){return `tatnera_cloud_import_v1_${studioId}`;}
+  function withTimeout(promise,ms,message){
+    let timer;
+    const timeout=new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error(message||'Cloud-Zeitüberschreitung')),ms);});
+    return Promise.race([promise,timeout]).finally(()=>clearTimeout(timer));
+  }
 
   function installStyle(){
     if(document.getElementById('tatneraCloudStyle'))return;
@@ -37,7 +44,18 @@
     let node=document.getElementById('tatneraCloudLoader');if(node)return node;
     node=document.createElement('div');node.id='tatneraCloudLoader';node.className='tatnera-cloud-loader';node.hidden=true;node.innerHTML='<div>Studio-Daten werden geladen …</div>';document.body.appendChild(node);return node;
   }
-  function showLoader(show){ensureLoader().hidden=!show;}
+  function showLoader(show){
+    const node=ensureLoader();
+    clearTimeout(loaderFailsafe);loaderFailsafe=null;
+    node.hidden=!show;
+    if(show){
+      loaderFailsafe=setTimeout(()=>{
+        node.hidden=true;
+        setCloudState('Cloud lädt zu lange – lokale Ansicht freigegeben',true);
+        console.warn('TATNERA cloud loader failsafe released the UI');
+      },LOADER_FAILSAFE_MS);
+    }
+  }
   function setCloudState(text,error=false){
     const bottom=document.querySelector('.sidebar-bottom');if(!bottom)return;
     let node=bottom.querySelector('[data-cloud-state]');if(!node){node=document.createElement('div');node.dataset.cloudState='true';node.className='tatnera-cloud-state';bottom.appendChild(node);}
@@ -70,11 +88,11 @@
       projects:'id,studio_id,client_id,customer_id,artist_user_id,title,placement,size,description,status,price_cents,deposit_cents,created_by,created_at,updated_at,payload,archived_at',
       appointments:'id,studio_id,client_id,project_id,customer_id,artist_user_id,appointment_type,status,starts_at,ends_at,notes,created_by,created_at,updated_at,payload,archived_at'
     };
-    const [customerResult,projectResult,appointmentResult]=await Promise.all([
+    const [customerResult,projectResult,appointmentResult]=await withTimeout(Promise.all([
       client.from('customers').select(selections.customers).eq('studio_id',studioId),
       client.from('tattoo_projects').select(selections.projects).eq('studio_id',studioId),
       client.from('appointments').select(selections.appointments).eq('studio_id',studioId)
-    ]);
+    ]),CLOUD_LOAD_TIMEOUT_MS,'Cloud-Verbindung hat zu lange gebraucht.');
     if(customerResult.error)throw customerResult.error;if(projectResult.error)throw projectResult.error;if(appointmentResult.error)throw appointmentResult.error;
     rows.customers=new Map((customerResult.data||[]).map(row=>[row.client_id,row]));
     rows.projects=new Map((projectResult.data||[]).map(row=>[row.client_id,row]));
@@ -127,7 +145,6 @@
     const known=rows.appointments.get(event.id);
     return {studio_id:studioId,client_id:String(event.id),project_id:event.projectId?projectMap.get(event.projectId)||null:null,customer_id:event.customerId?customerMap.get(event.customerId)||null:null,artist_user_id:known?.artist_user_id||null,appointment_type:String(event.type||'tattoo'),status:String(event.status||'Bestätigt'),starts_at:startsAt(event),ends_at:endsAt(event),notes:String(event.notes||''),created_by:known?.created_by||userId,payload:clone(event),archived_at:null};
   }
-
   async function upsertCustomers(){
     const values=(state.customers||[]).map(customerDbRow);if(!values.length)return;
     const {data,error}=await client.from('customers').upsert(values,{onConflict:'studio_id,client_id'}).select('*');if(error)throw error;
@@ -217,8 +234,8 @@
       setCloudState('Cloud verbunden');
       document.dispatchEvent(new CustomEvent('tatnera:cloud-ready',{detail:{studioId}}));
     }catch(error){
-      console.error('TATNERA cloud load failed',error);setCloudState('Cloud-Verbindung fehlgeschlagen',true);
-      alert('Die Studio-Daten konnten nicht aus der Cloud geladen werden. Deine lokale Arbeitskopie bleibt erhalten.');
+      console.error('TATNERA cloud load failed',error);setCloudState('Cloud-Verbindung fehlgeschlagen – lokale Ansicht aktiv',true);
+      cloudReady=false;
     }finally{showLoader(false);}
   }
 
