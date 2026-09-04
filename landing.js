@@ -2,6 +2,42 @@
 (function(){
   'use strict';
 
+  const LOGO_SRC='assets/tatnera-logo.png?v=20260904-4';
+
+  function makeLogo(className='tatnera-logo-img'){
+    const img=document.createElement('img');
+    img.className=className;
+    img.src=LOGO_SRC;
+    img.alt='TATNERA Studio Software';
+    img.width=220;
+    img.height=101;
+    img.loading='eager';
+    img.decoding='sync';
+    try{img.fetchPriority='high';}catch(_error){}
+    return img;
+  }
+
+  function installLogos(){
+    document.querySelectorAll('.navbar .logo, .footer .logo').forEach(holder=>{
+      if(holder.querySelector('.tatnera-logo-img'))return;
+      holder.replaceChildren(makeLogo());
+    });
+
+    const heroCopy=document.querySelector('.hero-copy');
+    if(heroCopy){
+      let sign=heroCopy.querySelector('.hero-brand-sign');
+      if(!sign){
+        sign=document.createElement('div');
+        sign.className='hero-brand-sign';
+        const kicker=heroCopy.querySelector('.kicker');
+        heroCopy.insertBefore(sign,kicker||heroCopy.firstChild);
+      }
+      if(!sign.querySelector('.tatnera-logo-img'))sign.replaceChildren(makeLogo());
+    }
+  }
+
+  installLogos();
+
   const nav=document.querySelector('.nav-links');
   if(nav&&!nav.querySelector('a[href="#preise"]')){
     const priceLink=document.createElement('a');
@@ -9,17 +45,6 @@
     priceLink.textContent='Preise';
     const faqLink=nav.querySelector('a[href="#faq"]');
     nav.insertBefore(priceLink,faqLink||null);
-  }
-
-  document.querySelectorAll('.logo-copy span').forEach(wordmark=>wordmark.classList.add('tatnera-wordmark'));
-
-  const heroCopy=document.querySelector('.hero-copy');
-  if(heroCopy&&!heroCopy.querySelector('.hero-brand-sign')){
-    const sign=document.createElement('div');
-    sign.className='hero-brand-sign';
-    sign.innerHTML='<span class="brand-flash">✦</span><div><strong>TATNERA</strong><small>TATTOO · PIERCING · STUDIO SOFTWARE</small></div><span class="brand-needle" aria-hidden="true"></span>';
-    const kicker=heroCopy.querySelector('.kicker');
-    heroCopy.insertBefore(sign,kicker||heroCopy.firstChild);
   }
 
   const trialNote=document.querySelector('.hero-copy .trial-note');
