@@ -3,86 +3,214 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>TATNERA — Studio Software for Tattoo Artists</title>
-  <meta name="description" content="TATNERA MVP Prototype" />
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="supabase-auth.css" />
+  <title>TATNERA — Studio Software für Tattoo-Studios</title>
+  <meta name="description" content="TATNERA bündelt Kunden, Termine, Tattoo-Akten, Einwilligungen, Anzahlungen, Rechnungen und Teamorganisation in einer klaren Studio-Software. 14 Tage kostenlos testen – ohne automatische Verlängerung." />
+  <meta name="theme-color" content="#0b0b0c" />
+  <link rel="stylesheet" href="landing.css" />
 </head>
-<body class="tatnera-auth-locked">
-  <div class="app-shell">
-    <aside class="sidebar">
-      <div class="brand-wrap"><div class="brand-mark">T</div><div><div class="brand">TATNERA</div><div class="brand-sub">Studio Software</div></div></div>
-      <nav class="nav" aria-label="Hauptnavigation">
-        <button class="nav-item active" data-view="dashboard"><span>⌂</span> Dashboard</button>
-        <button class="nav-item" data-view="customers"><span>◎</span> Kunden</button>
-        <button class="nav-item" data-view="projects"><span>✦</span> Tattoo-Akten</button>
-        <button class="nav-item" data-view="calendar"><span>□</span> Kalender</button>
-        <button class="nav-item" data-view="requests"><span>↗</span> Anfragen <b class="badge">4</b></button>
-        <button class="nav-item" data-view="invoices"><span>▤</span> Rechnungen</button>
+<body>
+  <div class="announcement"><strong>14 Tage kostenlos testen</strong> · ohne automatische Verlängerung · keine Zahlungsdaten für den Test erforderlich</div>
+
+  <header class="navbar">
+    <div class="wrap nav-inner">
+      <a class="logo" href="#top" aria-label="TATNERA Startseite">
+        <span class="logo-mark">T</span>
+        <span class="logo-copy"><span>TATNERA</span><small>STUDIO SOFTWARE</small></span>
+      </a>
+      <nav class="nav-links" aria-label="Seitennavigation">
+        <a href="#funktionen">Funktionen</a>
+        <a href="#software">Software ansehen</a>
+        <a href="#ablauf">Studio-Alltag</a>
+        <a href="#faq">FAQ</a>
       </nav>
-      <div class="sidebar-bottom"><button class="nav-item" data-view="settings"><span>⚙</span> Einstellungen</button><div class="studio-card"><div class="avatar">ST</div><div><strong>Studio einrichten</strong><span>Name in Einstellungen festlegen</span></div></div></div>
-    </aside>
+      <div class="nav-actions">
+        <a class="btn secondary" href="app.html?mode=login">Anmelden</a>
+        <a class="btn primary" href="app.html?mode=signup">14 Tage testen</a>
+      </div>
+    </div>
+  </header>
 
-    <main class="main">
-      <header class="topbar"><div><div class="eyebrow">Dienstag, 1. September</div><h1 id="pageTitle">Dashboard</h1></div><div class="top-actions"><button class="icon-btn" title="Benachrichtigungen">●</button><button class="btn ghost" id="quickCustomerBtn">+ Kunde</button><button class="btn primary" id="quickProjectBtn">+ Tattoo-Projekt</button></div></header>
+  <main id="top">
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div class="hero-copy reveal">
+          <span class="kicker"><span class="kicker-dot"></span> Für Tattoo- & Piercing-Studios</span>
+          <h1>Weniger Verwaltung. Mehr Zeit fürs Studio.</h1>
+          <p>TATNERA bringt Kunden, Termine, Tattoo-Akten, Einwilligungen, Anzahlungen, Rechnungen und dein Team an einen Ort – klar aufgebaut und ohne unnötigen Ballast.</p>
+          <div class="hero-ctas">
+            <a class="btn primary large" href="app.html?mode=signup">14 Tage kostenlos testen →</a>
+            <a class="btn secondary large" href="#software">Software ansehen</a>
+          </div>
+          <div class="trial-note">
+            <span>Keine Zahlungsdaten nötig</span>
+            <span>Keine automatische Verlängerung</span>
+            <span>Direkt im eigenen Studio starten</span>
+          </div>
+        </div>
 
-      <section id="dashboard" class="view active-view">
-        <div class="hero-grid"><div class="hero-card"><div><span class="eyebrow">Heute im Studio</span><h2>Guten Morgen 👋</h2><p>3 Termine, 4 offene Anfragen und 2 Einwilligungen fehlen noch.</p></div><button class="btn light" data-view-target="calendar">Tagesplan öffnen</button></div><div class="metric-card accent"><span>Monatsumsatz</span><strong>8.640 €</strong><small>↑ 12 % zum Vormonat</small></div></div>
-        <div class="metrics-grid"><article class="metric-card"><span>Heutige Termine</span><strong>3</strong><small>Nächster um 11:30</small></article><article class="metric-card"><span>Offene Anfragen</span><strong>4</strong><small>2 seit gestern neu</small></article><article class="metric-card warning"><span>Einwilligungen fehlen</span><strong>2</strong><small>Vor Termin nachfassen</small></article><article class="metric-card"><span>Offene Anzahlungen</span><strong>350 €</strong><small>3 Kunden</small></article></div>
-        <div class="content-grid"><section class="panel"><div class="panel-head"><div><span class="eyebrow">Tagesplan</span><h3>Heute</h3></div><button class="text-btn" data-view-target="calendar">Alle Termine →</button></div><div id="todayAppointments" class="timeline"></div></section><section class="panel"><div class="panel-head"><div><span class="eyebrow">To-do</span><h3>Aufmerksamkeit nötig</h3></div></div><div class="todo-list"><button class="todo-item"><span class="dot warning-dot"></span><div><strong>Einwilligung fehlt</strong><small>Lea Wagner · 14:00 Uhr</small></div><span>→</span></button><button class="todo-item"><span class="dot"></span><div><strong>Anzahlung offen</strong><small>Jonas Fischer · 150 €</small></div><span>→</span></button><button class="todo-item"><span class="dot"></span><div><strong>Neue Tattoo-Anfrage</strong><small>Fine Line · Unterarm</small></div><span>→</span></button></div></section></div>
-        <section class="panel space-top"><div class="panel-head"><div><span class="eyebrow">Aktuelle Arbeit</span><h3>Letzte Tattoo-Projekte</h3></div><button class="text-btn" data-view-target="projects">Alle Projekte →</button></div><div id="recentProjects" class="project-grid"></div></section>
-      </section>
+        <div class="product-frame reveal" aria-label="Vorschau des TATNERA Dashboards">
+          <div class="mini-app">
+            <aside class="mini-sidebar">
+              <div class="mini-brand"><b>T</b> TATNERA</div>
+              <div class="mini-nav">
+                <span class="active">⌂ Dashboard</span>
+                <span>◎ Kunden</span>
+                <span>✦ Tattoo-Akten</span>
+                <span>□ Kalender</span>
+                <span>↗ Anfragen</span>
+                <span>▤ Rechnungen</span>
+              </div>
+            </aside>
+            <div class="mini-main">
+              <div class="mini-top"><div><small>Heute im Studio</small><strong>Dashboard</strong></div><span class="mini-add">+ Tattoo-Projekt</span></div>
+              <div class="mini-hero-row">
+                <div class="mini-card hero-card"><small>Tagesübersicht</small><h3>Guten Morgen 👋</h3><p>3 Termine, 4 offene Anfragen und 2 Einwilligungen brauchen deine Aufmerksamkeit.</p></div>
+                <div class="mini-card accent"><small>Monatsumsatz</small><strong>8.640 €</strong></div>
+              </div>
+              <div class="mini-metrics">
+                <div class="mini-metric"><span>Termine heute</span><strong>3</strong><em>Nächster 11:30</em></div>
+                <div class="mini-metric"><span>Anfragen</span><strong>4</strong><em>2 neu</em></div>
+                <div class="mini-metric"><span>Einwilligungen</span><strong>2</strong><em>offen</em></div>
+                <div class="mini-metric"><span>Anzahlungen</span><strong>350 €</strong><em>offen</em></div>
+              </div>
+              <div class="mini-bottom">
+                <div class="mini-card"><small>Tagesplan</small><div class="mini-list-row"><b>11:30</b><span>Jonas · Unterarm</span><span class="mini-pill">Tattoo</span></div><div class="mini-list-row"><b>14:00</b><span>Lea · Fine Line</span><span class="mini-pill">Tattoo</span></div><div class="mini-list-row"><b>16:30</b><span>Mira · Piercing</span><span class="mini-pill">Piercing</span></div></div>
+                <div class="mini-card"><small>Aufmerksamkeit nötig</small><div class="mini-task"><i></i>Einwilligung fehlt</div><div class="mini-task"><i></i>Anzahlung offen</div><div class="mini-task"><i></i>Neue Anfrage</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-      <section id="customers" class="view"><div class="section-toolbar"><div class="searchbox"><span>⌕</span><input id="customerSearch" placeholder="Kunden suchen …" /></div><button class="btn primary" id="addCustomerBtn">+ Neuer Kunde</button></div><div class="panel table-panel"><table><thead><tr><th>Kunde</th><th>Kontakt</th><th>Letztes Projekt</th><th>Nächster Termin</th><th>Status</th><th></th></tr></thead><tbody id="customerTableBody"></tbody></table></div></section>
-      <section id="customer-detail" class="view"><button class="back-btn" data-view-target="customers">← Zurück zu Kunden</button><div id="customerDetail"></div></section>
-      <section id="projects" class="view"><div class="section-toolbar"><div><span class="eyebrow">Tattoo-Akten</span><p class="muted">Vom ersten Entwurf bis zur Nachsorge.</p></div><button class="btn primary" id="addProjectBtn">+ Neues Tattoo-Projekt</button></div><div id="projectList" class="project-grid larger"></div></section>
-      <section id="project-detail" class="view"><button class="back-btn" data-view-target="customers">← Zurück</button><div id="projectDetail"></div></section>
-      <section id="calendar" class="view"><div class="placeholder-page"><span class="big-icon">□</span><h2>Kalender</h2><p>Kalender wird geladen.</p><button class="btn primary" id="calendarDemoBtn">Demo-Termin anlegen</button></div></section>
-      <section id="requests" class="view"><div class="request-columns"></div></section>
-      <section id="invoices" class="view"><div id="invoiceCenter"></div></section>
-      <section id="settings" class="view"><div class="placeholder-page"><span class="big-icon">⚙</span><h2>Studio-Einstellungen</h2><p>Studio, Erscheinungsbild, Artists und Chargen verwalten.</p></div></section>
-    </main>
-  </div>
+    <section class="logo-strip">
+      <div class="wrap logo-strip-inner"><span>Ein System für</span><b>Kunden</b><b>Termine</b><b>Dokumente</b><b>Zahlungen</b><b>Team</b><b>Tattoo & Piercing</b></div>
+    </section>
 
-  <dialog id="customerDialog" class="dialog"><form method="dialog" id="customerForm"><div class="dialog-head"><div><span class="eyebrow">Kundenakte</span><h2>Neuen Kunden anlegen</h2></div><button type="button" class="close-btn" onclick="document.getElementById('customerDialog').close()">×</button></div><div class="form-grid"><label>Vorname<input required name="firstName" /></label><label>Nachname<input required name="lastName" /></label><label>E-Mail<input type="email" name="email" /></label><label>Telefon<input name="phone" /></label><label class="full">Notizen<textarea name="notes" rows="3" placeholder="Wichtige Hinweise, Stilwünsche …"></textarea></label></div><div class="dialog-actions"><button type="button" class="btn ghost" onclick="document.getElementById('customerDialog').close()">Abbrechen</button><button type="submit" class="btn primary" value="default">Kunde speichern</button></div></form></dialog>
-  <dialog id="projectDialog" class="dialog wide-dialog"><form method="dialog" id="projectForm"><div class="dialog-head"><div><span class="eyebrow">Tattoo-Akte</span><h2>Neues Tattoo-Projekt</h2></div><button type="button" class="close-btn" onclick="document.getElementById('projectDialog').close()">×</button></div><div class="form-grid three"><label class="full">Kunde<select required name="customerId" id="projectCustomerSelect"></select></label><label>Motiv<input required name="title" /></label><label>Körperstelle<input required name="placement" /></label><label>Größe<input name="size" /></label><label>Artist<input name="artist" value="" /></label><label>Preis (€)<input name="price" type="number" min="0" step="10" /></label><label>Anzahlung (€)<input name="deposit" type="number" min="0" step="10" /></label><label class="full">Beschreibung<textarea name="description" rows="3"></textarea></label></div><div class="dialog-actions"><button type="button" class="btn ghost" onclick="document.getElementById('projectDialog').close()">Abbrechen</button><button type="submit" class="btn primary">Projekt anlegen</button></div></form></dialog>
+    <section class="section" id="funktionen">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <span class="eyebrow">Alles an einem Ort</span>
+          <h2>Gebaut für den echten Studio-Alltag.</h2>
+          <p>Keine überladene Allzwecksoftware. TATNERA konzentriert sich auf genau die Abläufe, die in Tattoo- und Piercing-Studios jeden Tag Zeit kosten.</p>
+        </div>
+        <div class="features">
+          <article class="feature reveal"><div class="feature-icon">◎</div><h3>Kunden & Historie</h3><p>Kontaktdaten, frühere Arbeiten, Notizen, Termine und Vorgänge direkt in einer <strong>zentralen Kundenakte</strong>.</p></article>
+          <article class="feature reveal"><div class="feature-icon">□</div><h3>Kalender & Termine</h3><p>Studio-Termine übersichtlich planen, Artists zuordnen und sehen, was heute oder als Nächstes ansteht.</p></article>
+          <article class="feature reveal"><div class="feature-icon">✦</div><h3>Tattoo-Akten</h3><p>Motiv, Körperstelle, Preis, Anzahlung, Entwürfe, Sitzungen und Verlauf sauber je Projekt zusammenhalten.</p></article>
+          <article class="feature reveal"><div class="feature-icon">✓</div><h3>Einwilligungen</h3><p>Offene Einwilligungen sofort erkennen und Dokumentation direkt dem richtigen Kunden und Vorgang zuordnen.</p></article>
+          <article class="feature reveal"><div class="feature-icon">€</div><h3>Anzahlungen & Rechnungen</h3><p>Offene Zahlungen im Blick behalten, Vorgänge nachvollziehen und Rechnungen zentral im Studio verwalten.</p></article>
+          <article class="feature reveal"><div class="feature-icon">↗</div><h3>Anfragen & Team</h3><p>Neue Anfragen strukturiert bearbeiten und Zugänge sowie Rollen für Artists und Mitarbeiter getrennt organisieren.</p></article>
+        </div>
+      </div>
+    </section>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="app.js"></script>
-  <script src="core.js"></script>
-  <script src="appointment-status.js"></script>
-  <script src="consent-v2.js"></script>
-  <script src="ink-v2.js"></script>
-  <script src="payments-v2.js"></script>
-  <script src="aftercare-v2.js"></script>
-  <script src="requests.js"></script>
-  <script src="calendar-conflicts.js"></script>
-  <script src="ui-shell.js"></script>
-  <script src="design-storage.js"></script>
-  <script src="theme-switcher.js"></script>
-  <script src="tatnera-runtime.js"></script>
-  <script src="artist-delete.js"></script>
-  <script src="customer-detail.js"></script>
-  <script src="records-management.js"></script>
-  <script src="appointment-management.js"></script>
-  <script src="record-delete.js"></script>
-  <script src="session-management.js"></script>
-  <script src="session-payment-flow.js"></script>
-  <script src="session-document-flow.js"></script>
-  <script src="health-status.js"></script>
-  <script src="studio-settings.js"></script>
-  <script src="invoice-management.js"></script>
-  <script src="accounting-integrity.js"></script>
-  <script src="invoice-rules.js"></script>
-  <script src="invoice-center.js"></script>
-  <script src="studio-team.js"></script>
-  <script src="studio-invite-mail.js"></script>
-  <script src="supabase-data.js"></script>
-  <script src="supabase-state.js"></script>
-  <script src="supabase-auth.js"></script>
-  <script src="navigation-persistence.js"></script>
-  <script src="piercing-support.js"></script>
-  <script src="service-create-ui.js"></script>
-  <script src="project-tabs-runtime.js"></script>
+    <section class="section soft" id="software">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <span class="eyebrow">Nicht erklären. Zeigen.</span>
+          <h2>So fühlt sich TATNERA im Alltag an.</h2>
+          <p>Die Oberfläche ist bewusst ruhig gehalten. Du siehst, was wichtig ist, und kommst mit wenigen Klicks dorthin, wo du arbeiten willst.</p>
+        </div>
+
+        <div class="showcase reveal">
+          <div class="showcase-nav" role="tablist" aria-label="TATNERA Ansichten">
+            <button class="showcase-tab active" data-showcase-tab="dashboard" type="button"><strong>Dashboard</strong><span>Heute, offene Punkte und Studio-Kennzahlen.</span></button>
+            <button class="showcase-tab" data-showcase-tab="customers" type="button"><strong>Kunden</strong><span>Kontakte und Historie auf einen Blick.</span></button>
+            <button class="showcase-tab" data-showcase-tab="calendar" type="button"><strong>Kalender</strong><span>Termine klar über Woche und Team verteilt.</span></button>
+            <button class="showcase-tab" data-showcase-tab="documents" type="button"><strong>Einwilligungen</strong><span>Dokumente dort, wo sie hingehören.</span></button>
+            <button class="showcase-tab" data-showcase-tab="payments" type="button"><strong>Zahlungen</strong><span>Anzahlungen und offene Beträge im Blick.</span></button>
+          </div>
+
+          <div class="showcase-screen">
+            <section class="screen-content active" data-showcase-screen="dashboard">
+              <div class="screen-bar"><div class="screen-title"><small>Heute im Studio</small><strong>Dashboard</strong></div><span class="screen-action">+ Tattoo-Projekt</span></div>
+              <div class="screen-grid"><div class="screen-card"><span>Heutige Termine</span><strong>3</strong></div><div class="screen-card"><span>Offene Anfragen</span><strong>4</strong></div><div class="screen-card"><span>Einwilligungen fehlen</span><strong>2</strong></div><div class="screen-card"><span>Offene Anzahlungen</span><strong>350 €</strong></div></div>
+              <div class="screen-table"><div class="screen-row header"><span>Kunde / Termin</span><span>Projekt</span><span>Artist</span><span>Status</span></div><div class="screen-row"><span class="avatar-name"><span class="tiny-avatar">JF</span><b>Jonas Fischer · 11:30</b></span><span>Blackwork · Unterarm</span><span>Alex</span><span class="status good">bereit</span></div><div class="screen-row"><span class="avatar-name"><span class="tiny-avatar">LW</span><b>Lea Wagner · 14:00</b></span><span>Fine Line · Rippe</span><span>Nina</span><span class="status">Einwilligung offen</span></div><div class="screen-row"><span class="avatar-name"><span class="tiny-avatar">MK</span><b>Mira Klein · 16:30</b></span><span>Helix Piercing</span><span>Sami</span><span class="status good">bereit</span></div></div>
+            </section>
+
+            <section class="screen-content" data-showcase-screen="customers">
+              <div class="screen-bar"><div class="screen-title"><small>Kundenverwaltung</small><strong>Alle Kunden</strong></div><span class="screen-action">+ Neuer Kunde</span></div>
+              <div class="screen-table"><div class="screen-row header"><span>Kunde</span><span>Kontakt</span><span>Letztes Projekt</span><span>Status</span></div><div class="screen-row"><span class="avatar-name"><span class="tiny-avatar">JF</span><b>Jonas Fischer</b></span><span>jonas@example.de</span><span>Blackwork · Unterarm</span><span class="status good">aktiv</span></div><div class="screen-row"><span class="avatar-name"><span class="tiny-avatar">LW</span><b>Lea Wagner</b></span><span>lea@example.de</span><span>Fine Line · Rippe</span><span class="status">Termin offen</span></div><div class="screen-row"><span class="avatar-name"><span class="tiny-avatar">MK</span><b>Mira Klein</b></span><span>mira@example.de</span><span>Helix Piercing</span><span class="status good">aktiv</span></div><div class="screen-row"><span class="avatar-name"><span class="tiny-avatar">TS</span><b>Tom Schuster</b></span><span>tom@example.de</span><span>Lettering · Brust</span><span class="status">Anfrage</span></div></div>
+            </section>
+
+            <section class="screen-content" data-showcase-screen="calendar">
+              <div class="screen-bar"><div class="screen-title"><small>Wochenansicht</small><strong>Kalender</strong></div><span class="screen-action">+ Termin</span></div>
+              <div class="calendar-grid"><div class="cal-cell head"></div><div class="cal-cell head">Mo</div><div class="cal-cell head">Di</div><div class="cal-cell head">Mi</div><div class="cal-cell head">Do</div><div class="cal-cell head">Fr</div><div class="cal-cell">10:00</div><div class="cal-cell"><div class="cal-event">Beratung<br>Jonas</div></div><div class="cal-cell"></div><div class="cal-cell"><div class="cal-event">Tattoo<br>Lea</div></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell">12:00</div><div class="cal-cell"></div><div class="cal-cell"><div class="cal-event">Tattoo<br>Jonas</div></div><div class="cal-cell"></div><div class="cal-cell"><div class="cal-event">Piercing<br>Mira</div></div><div class="cal-cell"></div><div class="cal-cell">14:00</div><div class="cal-cell"><div class="cal-event">Tattoo<br>Tom</div></div><div class="cal-cell"></div><div class="cal-cell"><div class="cal-event">Kontrolle<br>Eva</div></div><div class="cal-cell"></div><div class="cal-cell"><div class="cal-event">Tattoo<br>Chris</div></div><div class="cal-cell">16:00</div><div class="cal-cell"></div><div class="cal-cell"><div class="cal-event">Beratung<br>Nina</div></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div></div>
+            </section>
+
+            <section class="screen-content" data-showcase-screen="documents">
+              <div class="screen-bar"><div class="screen-title"><small>Kundenakte · Lea Wagner</small><strong>Einwilligungen & Dokumente</strong></div><span class="screen-action">Dokument anlegen</span></div>
+              <div class="document-cards"><div class="doc-card"><small>Einwilligung Tattoo</small><h4>Fine Line · Rippe</h4><div class="doc-line"></div><div class="doc-line"></div><div class="doc-line short"></div><span class="status">Unterschrift offen</span></div><div class="doc-card"><small>Gesundheitsangaben</small><h4>Vor Termin prüfen</h4><div class="doc-line"></div><div class="doc-line short"></div><div class="doc-line"></div><span class="status good">vollständig</span></div><div class="doc-card"><small>Nachsorge</small><h4>Pflegehinweise</h4><div class="doc-line short"></div><div class="doc-line"></div><div class="doc-line"></div><span class="status good">hinterlegt</span></div><div class="doc-card"><small>Projektdateien</small><h4>Entwurf & Referenzen</h4><div class="doc-line"></div><div class="doc-line short"></div><div class="doc-line"></div><span class="status good">3 Dateien</span></div></div>
+            </section>
+
+            <section class="screen-content" data-showcase-screen="payments">
+              <div class="screen-bar"><div class="screen-title"><small>Studio-Finanzen</small><strong>Anzahlungen & offene Beträge</strong></div><span class="screen-action">Zahlung erfassen</span></div>
+              <div class="payment-wrap"><div class="payment-total"><span>Offene Anzahlungen</span><strong>350 €</strong><small>3 Kunden · direkt aus den Projekten</small></div><div class="payment-list"><div class="payment-item"><span>Jonas Fischer</span><strong>150 €</strong></div><div class="payment-item"><span>Lea Wagner</span><strong>100 €</strong></div><div class="payment-item"><span>Tom Schuster</span><strong>100 €</strong></div></div></div>
+              <div class="screen-table"><div class="screen-row header"><span>Kunde</span><span>Projekt</span><span>Betrag</span><span>Status</span></div><div class="screen-row"><span><b>Jonas Fischer</b></span><span>Blackwork · Unterarm</span><span>150 €</span><span class="status">offen</span></div><div class="screen-row"><span><b>Mira Klein</b></span><span>Helix Piercing</span><span>50 €</span><span class="status good">bezahlt</span></div><div class="screen-row"><span><b>Lea Wagner</b></span><span>Fine Line · Rippe</span><span>100 €</span><span class="status">offen</span></div></div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="ablauf">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <span class="eyebrow">Ein durchgängiger Ablauf</span>
+          <h2>Vom ersten Kontakt bis zur Nachsorge.</h2>
+          <p>Statt Informationen über Notizen, Kalender, Chats und Papier zu verteilen, bleibt der Vorgang in TATNERA zusammen.</p>
+        </div>
+        <div class="flow reveal">
+          <div class="flow-step"><div class="flow-num">1</div><div><h3>Anfrage</h3><p>Neue Anfrage erfassen und zuordnen.</p></div></div>
+          <div class="flow-step"><div class="flow-num">2</div><div><h3>Kunde & Projekt</h3><p>Kundenakte und Tattoo- oder Piercing-Vorgang anlegen.</p></div></div>
+          <div class="flow-step"><div class="flow-num">3</div><div><h3>Termin</h3><p>Artist, Zeit und Studio-Ablauf planen.</p></div></div>
+          <div class="flow-step"><div class="flow-num">4</div><div><h3>Dokumente & Zahlung</h3><p>Einwilligung, Anzahlung und Status prüfen.</p></div></div>
+          <div class="flow-step"><div class="flow-num">5</div><div><h3>Historie</h3><p>Arbeit, Sitzungen und Nachsorge nachvollziehbar behalten.</p></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section soft">
+      <div class="wrap">
+        <div class="trial-box reveal">
+          <div>
+            <span class="eyebrow">Erst testen. Dann entscheiden.</span>
+            <h2>14 Tage TATNERA in deinem eigenen Studio ausprobieren.</h2>
+            <p>Lege dein Studio an, teste die Oberfläche mit echten Abläufen und entscheide danach selbst, ob TATNERA zu dir passt. Der Test wird nicht automatisch kostenpflichtig verlängert.</p>
+            <div class="trial-points"><span>14 Tage kostenlos</span><span>keine Zahlungsdaten</span><span>keine automatische Verlängerung</span></div>
+          </div>
+          <a class="btn primary large" href="app.html?mode=signup">Kostenlos starten →</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="faq">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <span class="eyebrow">Kurz beantwortet</span>
+          <h2>Fragen vor dem Start.</h2>
+        </div>
+        <div class="faq reveal">
+          <details><summary>Muss ich für den Test Zahlungsdaten hinterlegen?</summary><p>Nein. Du kannst dein TATNERA-Konto und dein Studio für den Test ohne Kreditkarte oder andere Zahlungsdaten anlegen.</p></details>
+          <details><summary>Verlängert sich der Test automatisch?</summary><p>Nein. Aus dem kostenlosen Test entsteht nicht automatisch ein kostenpflichtiges Abo. Wenn du später weitermachen möchtest, entscheidest du dich aktiv dafür.</p></details>
+          <details><summary>Ist TATNERA nur für große Studios gedacht?</summary><p>Nein. Die Oberfläche ist bewusst so aufgebaut, dass sowohl einzelne Artists als auch Studios mit mehreren Mitarbeitern damit arbeiten können.</p></details>
+          <details><summary>Kann jeder Artist einen eigenen Zugang bekommen?</summary><p>TATNERA unterstützt Studio-Mitglieder und unterschiedliche Rollen. So können Zugänge sauber dem jeweiligen Studio zugeordnet werden.</p></details>
+          <details><summary>Funktioniert TATNERA auch für Piercing?</summary><p>Ja. Neben Tattoo-Vorgängen sind auch Piercing-Abläufe im System vorgesehen und können in Kundenakte, Dokumentation und Studioorganisation eingebunden werden.</p></details>
+          <details><summary>Wo logge ich mich später ein?</summary><p>Direkt über diese Seite. Oben rechts führt „Anmelden“ in den geschützten TATNERA-Bereich und von dort in dein Studio-Dashboard.</p></details>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <div class="logo"><span class="logo-mark">T</span><span class="logo-copy"><span>TATNERA</span><small>STUDIO SOFTWARE</small></span></div>
+      <div>Studio Software für Tattoo- & Piercing-Studios.</div>
+      <div class="footer-links"><a href="app.html?mode=login">Anmelden</a><a href="app.html?mode=signup">14 Tage testen</a></div>
+    </div>
+  </footer>
+
+  <script src="landing.js"></script>
 </body>
 </html>
