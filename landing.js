@@ -2,6 +2,69 @@
 (function(){
   'use strict';
 
+  const pricingCss=document.createElement('link');
+  pricingCss.rel='stylesheet';
+  pricingCss.href='pricing.css';
+  document.head.appendChild(pricingCss);
+
+  const nav=document.querySelector('.nav-links');
+  if(nav&&!nav.querySelector('a[href="#preise"]')){
+    const priceLink=document.createElement('a');
+    priceLink.href='#preise';
+    priceLink.textContent='Preise';
+    const faqLink=nav.querySelector('a[href="#faq"]');
+    nav.insertBefore(priceLink,faqLink||null);
+  }
+
+  const trialNote=document.querySelector('.hero-copy .trial-note');
+  if(trialNote&&!document.querySelector('.hero-price')){
+    const heroPrice=document.createElement('div');
+    heroPrice.className='hero-price';
+    heroPrice.innerHTML='<span>Nach dem Test:</span><strong>ab 19,99 € / Monat</strong><span>· je nach Studio-Größe bis 29,99 €</span>';
+    trialNote.parentNode.insertBefore(heroPrice,trialNote);
+  }
+
+  const trialSection=document.querySelector('.trial-box')?.closest('.section');
+  if(trialSection&&!document.getElementById('preise')){
+    const pricing=document.createElement('section');
+    pricing.className='section pricing-section';
+    pricing.id='preise';
+    pricing.innerHTML=`
+      <div class="wrap">
+        <div class="pricing-card reveal">
+          <div>
+            <span class="eyebrow">Klare Kosten nach dem Test</span>
+            <h2>Erst 14 Tage kostenlos. Danach ab 19,99 € im Monat.</h2>
+            <p>Wenn TATNERA zu deinem Studio passt, entscheidest du dich nach der Testphase aktiv für die weitere Nutzung. Der monatliche Preis liegt – abhängig von der Studio-Größe – zwischen 19,99 € und 29,99 €.</p>
+            <div class="price-facts">
+              <span>14 Tage kostenlos testen</span>
+              <span>keine Zahlungsdaten zum Start</span>
+              <span>keine automatische Verlängerung</span>
+            </div>
+            <div class="pricing-action">
+              <a class="btn primary large" href="app.html?mode=signup">14 Tage kostenlos testen →</a>
+              <span class="price-hint">Nach dem Test nur bei aktiver Entscheidung kostenpflichtig.</span>
+            </div>
+          </div>
+          <div class="price-display">
+            <span class="price-label">Monatlich</span>
+            <strong>19,99–29,99 €</strong>
+            <small>abhängig von der Studio-Größe</small>
+          </div>
+        </div>
+      </div>`;
+    trialSection.parentNode.insertBefore(pricing,trialSection);
+  }
+
+  const faq=document.querySelector('.faq');
+  if(faq&&!faq.querySelector('[data-price-faq]')){
+    const item=document.createElement('details');
+    item.dataset.priceFaq='true';
+    item.innerHTML='<summary>Was kostet TATNERA nach den 14 Tagen?</summary><p>Je nach Studio-Größe kostet TATNERA nach der kostenlosen Testphase zwischen 19,99 € und 29,99 € pro Monat. Eine kostenpflichtige Nutzung startet nur, wenn du dich aktiv dafür entscheidest.</p>';
+    const second=faq.children[1];
+    faq.insertBefore(item,second?second.nextSibling:null);
+  }
+
   const tabs=[...document.querySelectorAll('[data-showcase-tab]')];
   const screens=[...document.querySelectorAll('[data-showcase-screen]')];
 
