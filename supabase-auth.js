@@ -4,6 +4,7 @@
 
   const SUPABASE_URL='https://ayxvspeufbsoxtccaqap.supabase.co';
   const SUPABASE_KEY='sb_publishable_g8Z9qVH3GSJHHkbuT-ne5A_0IfhKJz1';
+  const NAV_KEY='tatnera_navigation_v1';
   let client=null,currentUser=null,currentStudio=null,currentMembership=null,authBusy=false;
 
   const esc=value=>String(value??'').replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
@@ -21,10 +22,43 @@
     return map.find(([needle])=>text.includes(needle))?.[1]||text;
   }
 
+  function installAuthBoot(){
+    if(!document.getElementById('tatneraAuthBootStyle')){
+      const style=document.createElement('style');
+      style.id='tatneraAuthBootStyle';
+      style.textContent=`
+        .tatnera-auth-boot{position:fixed;inset:0;z-index:100001;display:grid;place-items:center;background:radial-gradient(circle at 20% 10%,rgba(122,83,255,.12),transparent 34%),#111115;color:#f7f7f8;font-family:inherit}
+        .tatnera-auth-boot-inner{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+        .tatnera-auth-boot-mark{display:grid;place-items:center;width:52px;height:52px;border-radius:16px;background:#f4f1ff;color:#17131f;font-size:23px;font-weight:900;box-shadow:0 12px 34px rgba(0,0,0,.25)}
+        .tatnera-auth-boot strong{font-size:15px;letter-spacing:.14em}
+        .tatnera-auth-boot span{font-size:12px;color:#92929d}
+        .tatnera-auth-boot-dot{width:5px;height:5px;border-radius:50%;background:#f4f1ff;animation:tatneraAuthPulse .9s ease-in-out infinite alternate}
+        @keyframes tatneraAuthPulse{from{opacity:.25;transform:scale(.8)}to{opacity:1;transform:scale(1.2)}}
+      `;
+      document.head.appendChild(style);
+    }
+    if(document.getElementById('tatneraAuthBoot'))return;
+    const boot=document.createElement('div');
+    boot.id='tatneraAuthBoot';boot.className='tatnera-auth-boot';boot.setAttribute('aria-label','TATNERA wird geladen');
+    boot.innerHTML='<div class="tatnera-auth-boot-inner"><div class="tatnera-auth-boot-mark">T</div><strong>TATNERA</strong><span>Studio wird geladen</span><i class="tatnera-auth-boot-dot"></i></div>';
+    document.body.appendChild(boot);
+  }
+
+  function finishAuthCheck(){
+    document.getElementById('tatneraAuthBoot')?.remove();
+  }
+
+  function resetNavigationToDashboard(navigateNow=true){
+    try{localStorage.setItem(NAV_KEY,JSON.stringify({view:'dashboard'}));}catch(_error){}
+    if(navigateNow&&typeof window.navigate==='function'){
+      try{window.navigate('dashboard');}catch(_error){}
+    }
+  }
+
   function buildAuthShell(){
     if(document.getElementById('tatneraAuthShell'))return;
     const root=document.createElement('div');
-    root.id='tatneraAuthShell';root.className='tatnera-auth-shell';
+    root.id='tatneraAuthShell';root.className='tatnera-auth-shell';root.hidden=true;
     root.innerHTML=`<section class="tatnera-auth-card" aria-live="polite">
       <div class="tatnera-auth-brand"><div class="tatnera-auth-mark">T</div><div><strong>TATNERA</strong><span>Studio Software</span></div></div>
       <div data-auth-login-area>
@@ -89,6 +123,7 @@
   }
 
   function showAuth(){
+    finishAuthCheck();
     document.body.classList.add('tatnera-auth-locked');
     const shell=document.getElementById('tatneraAuthShell');if(shell)shell.hidden=false;
     document.querySelector('[data-auth-login-area]')?.removeAttribute('hidden');
@@ -98,6 +133,7 @@
   }
 
   function showStudioOnboarding(user){
+    finishAuthCheck();
     document.body.classList.add('tatnera-auth-locked');
     const shell=document.getElementById('tatneraAuthShell');if(shell)shell.hidden=false;
     document.querySelector('[data-auth-login-area]')?.setAttribute('hidden','');
@@ -109,6 +145,7 @@
   }
 
   function showRecovery(){
+    finishAuthCheck();
     document.body.classList.add('tatnera-auth-locked');
     const shell=document.getElementById('tatneraAuthShell');if(shell)shell.hidden=false;
     document.querySelector('[data-auth-login-area]')?.setAttribute('hidden','');
@@ -117,10 +154,12 @@
     setMessage('Der Link wurde bestätigt. Du kannst jetzt dein neues Passwort setzen.','success');
   }
 
-  function unlockApp(){
+  function unlockApp(forceDashboard=false){
+    finishAuthCheck();
     document.getElementById('tatneraAuthShell')?.setAttribute('hidden','');
     document.body.classList.remove('tatnera-auth-locked');
     syncStudioUi();injectLogout();
+    if(forceDashboard)resetNavigationToDashboard(true);
     document.dispatchEvent(new CustomEvent('tatnera:auth-ready',{detail:{userId:currentUser?.id||'',studioId:currentStudio?.id||'',role:currentMembership?.role||''}}));
   }
 
@@ -129,7 +168,7 @@
     try{
       const data=Object.fromEntries(new FormData(form).entries());
       const {data:result,error}=await client.auth.signInWithPassword({email:String(data.email||'').trim(),password:String(data.password||'')});
-      if(error)throw error;if(result?.user)await enterUser(result.user);
+      if(error)throw error;if(result?.user)await enterUser(result.user,{forceDashboard:true});
     }catch(error){setMessage(friendlyError(error),'error');}finally{setBusy(form,false);}
   }
 
@@ -141,7 +180,7 @@
       const redirectTo=location.origin+location.pathname;
       const {data:result,error}=await client.auth.signUp({email,password,options:{data:{display_name:displayName},emailRedirectTo:redirectTo}});
       if(error)throw error;
-      if(result?.session&&result?.user){await enterUser(result.user);return;}
+      if(result?.session&&result?.user){await enterUser(result.user,{forceDashboard:true});return;}
       switchMode('login');
       document.getElementById('tatneraLoginForm').elements.email.value=email;
       setMessage('Konto angelegt. Bitte bestätige jetzt die E-Mail von TATNERA und logge dich danach ein.','success');
@@ -163,7 +202,7 @@
       const password=String(form.elements.password.value||'');if(password.length<8)throw new Error('Bitte mindestens 8 Zeichen verwenden.');
       const {error}=await client.auth.updateUser({password});if(error)throw error;
       setMessage('Passwort gespeichert.','success');
-      const {data:{user}}=await client.auth.getUser();if(user)setTimeout(()=>enterUser(user),350);
+      const {data:{user}}=await client.auth.getUser();if(user)setTimeout(()=>enterUser(user,{forceDashboard:true}),350);
     }catch(error){setMessage(friendlyError(error),'error');}finally{setBusy(form,false);}
   }
 
@@ -175,11 +214,12 @@
       await new Promise(resolve=>setTimeout(resolve,80));
       const found=await loadStudio(currentUser.id);
       if(!found){currentStudio=studio;currentMembership={studio_id:studio.id,user_id:currentUser.id,role:'owner',is_active:true};}
-      unlockApp();
+      unlockApp(true);
     }catch(error){setMessage(friendlyError(error),'error');}finally{setBusy(form,false);}
   }
 
   async function logout(){
+    resetNavigationToDashboard(false);
     try{await client.auth.signOut();}catch(_error){}
     currentUser=null;currentStudio=null;currentMembership=null;showAuth();
   }
@@ -195,10 +235,10 @@
     currentMembership=data;currentStudio=studio;return true;
   }
 
-  async function enterUser(user){
+  async function enterUser(user,{forceDashboard=false}={}){
     currentUser=user;clearMessage();
     try{
-      if(await loadStudio(user.id)){unlockApp();return;}
+      if(await loadStudio(user.id)){unlockApp(forceDashboard);return;}
       showStudioOnboarding(user);
     }catch(error){
       showAuth();setMessage('Dein Konto ist angemeldet, aber das Studio konnte nicht geladen werden: '+friendlyError(error),'error');
@@ -219,6 +259,7 @@
   }
 
   async function init(){
+    installAuthBoot();
     buildAuthShell();
     if(!window.supabase?.createClient){showAuth();setMessage('Die Verbindung zu Supabase konnte nicht geladen werden. Bitte die Seite neu laden.','error');return;}
     client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
