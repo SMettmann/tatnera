@@ -135,4 +135,5 @@
   load('dashboard-upcoming.js','__tatneraDashboardUpcomingInstalled');
   load('dashboard-fixes.js','__tatneraDashboardFixesInstalled');
   load('piercing-procedure.js','__tatneraPiercingProcedureInstalled');
+  load('service-consent.js','__tatneraServiceConsentInstalled');
 })();
