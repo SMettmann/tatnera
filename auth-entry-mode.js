@@ -2,6 +2,13 @@
 (function(){
   'use strict';
 
+  if(!document.querySelector('script[src="subscription-guard.js"]')){
+    const guard=document.createElement('script');
+    guard.src='subscription-guard.js';
+    guard.defer=true;
+    document.head.appendChild(guard);
+  }
+
   const params=new URLSearchParams(window.location.search);
   const mode=params.get('mode');
   if(mode!=='signup'&&mode!=='login')return;
