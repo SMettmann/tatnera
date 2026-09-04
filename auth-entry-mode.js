@@ -9,6 +9,13 @@
     document.head.appendChild(authCss);
   }
 
+  if(!document.querySelector('script[src^="role-access.js"]')){
+    const access=document.createElement('script');
+    access.src='role-access.js?v=20260904-1';
+    access.defer=true;
+    document.head.appendChild(access);
+  }
+
   if(!document.querySelector('script[src="subscription-guard.js"]')){
     const guard=document.createElement('script');
     guard.src='subscription-guard.js';
