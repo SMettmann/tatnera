@@ -2,11 +2,11 @@
 (function(){
   'use strict';
 
-  const LOGO_SRC='assets/tatnera-logo.png?v=20260904-4';
+  const LOGO_SRC='assets/tatnera-brand.png?v=20260904-1';
   const authStyles=[
     {match:'auth-marketing.css',href:'auth-marketing.css?v=20260904-2'},
     {match:'brand-entry-palette.css',href:'brand-entry-palette.css?v=20260904-1'},
-    {match:'brand-logo.css',href:'brand-logo.css?v=20260904-4'}
+    {match:'brand-logo.css',href:'brand-logo.css?v=20260904-5'}
   ];
   authStyles.forEach(item=>{
     if(document.querySelector(`link[href^="${item.match}"]`))return;
@@ -32,17 +32,20 @@
 
   function ensureAuthLogo(){
     const brand=document.querySelector('.tatnera-auth-brand');
-    if(!brand||brand.querySelector('.tatnera-logo-img'))return !!brand;
-    const img=document.createElement('img');
-    img.className='tatnera-logo-img';
-    img.src=LOGO_SRC;
-    img.alt='TATNERA Studio Software';
-    img.width=220;
-    img.height=101;
-    img.loading='eager';
-    img.decoding='sync';
-    try{img.fetchPriority='high';}catch(_error){}
-    brand.replaceChildren(img);
+    if(!brand)return false;
+    let img=brand.querySelector('.tatnera-logo-img');
+    if(!img){
+      img=document.createElement('img');
+      img.className='tatnera-logo-img';
+      img.alt='TATNERA Studio Software';
+      img.width=220;
+      img.height=101;
+      img.loading='eager';
+      img.decoding='sync';
+      try{img.fetchPriority='high';}catch(_error){}
+      brand.replaceChildren(img);
+    }
+    if(img.getAttribute('src')!==LOGO_SRC)img.setAttribute('src',LOGO_SRC);
     return true;
   }
 
