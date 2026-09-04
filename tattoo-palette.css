@@ -1,6 +1,6 @@
 /* TATNERA — coordinated tattoo studio palette
-   Warm brass / bronze replaces the SaaS-lime accent in the dark studio theme.
-   Green is reserved for genuinely positive/success states. */
+   Warm brass / bronze belongs to the dark studio theme only.
+   Pink stays pink. Light stays neutral/ink. Green is reserved for positive states. */
 
 :root[data-theme="dark"]{
   --accent:#c79a5b!important;
@@ -18,7 +18,7 @@
   --tatnera-ink:#0c0d0e;
 }
 
-/* Main actions: brass instead of fluorescent lime. */
+/* Main actions: brass instead of fluorescent lime — DARK ONLY. */
 :root[data-theme="dark"] .btn.primary,
 :root[data-theme="dark"] button.btn.primary,
 :root[data-theme="dark"] .request-workflow button.primary-flow,
@@ -34,8 +34,6 @@
   box-shadow:0 14px 30px rgba(139,91,46,.24)!important;
 }
 
-/* When two primary quick-actions sit next to each other, the second becomes
-   a quieter outlined studio action instead of a second fluorescent block. */
 :root[data-theme="dark"] .top-actions .btn.primary + .btn.primary{
   background:#171512!important;
   color:#e7c89a!important;
@@ -47,7 +45,6 @@
   border-color:#b7864d!important;
 }
 
-/* Navigation / badges / links share one brass family. */
 :root[data-theme="dark"] .nav-item.active{
   background:#211c16!important;
   border-color:#4f3b28!important;
@@ -73,7 +70,6 @@
   color:#d6aa70!important;
 }
 
-/* Dashboard accents become warm and coherent with the charge warning. */
 :root[data-theme="dark"] .metric-card.accent{
   background:linear-gradient(180deg,rgba(199,154,91,.11),rgba(199,154,91,.045)),var(--panel)!important;
   border-color:#4e3a28!important;
@@ -94,7 +90,6 @@
   color:#cfa66d!important;
 }
 
-/* Generic active controls no longer default to lime. */
 :root[data-theme="dark"] .artist-filter button.active,
 :root[data-theme="dark"] .calendar-toggle button.active,
 :root[data-theme="dark"] .theme-choice.active,
@@ -104,7 +99,6 @@
   box-shadow:inset 0 0 0 1px rgba(199,154,91,.22)!important;
 }
 
-/* Trial status belongs to the same palette, not fluorescent green. */
 :root[data-theme="dark"] .tatnera-trial-badge{
   border-color:#5b4329!important;
   background:#211a13!important;
@@ -119,7 +113,6 @@
   color:#17110a!important;
 }
 
-/* Green survives only where it semantically means positive / ready / done. */
 :root[data-theme="dark"] .request-stage.ready,
 :root[data-theme="dark"] .project-focus-badge.good,
 :root[data-theme="dark"] .status-pill.success,
@@ -130,19 +123,81 @@
   background:#172019!important;
 }
 
-/* Tattoo flash project art also follows brass/ink instead of olive. */
 :root[data-theme="dark"] .project-art{
   background:radial-gradient(circle at 70% 40%,rgba(199,154,91,.14),transparent 33%),linear-gradient(140deg,#211d18,#111312)!important;
 }
 :root[data-theme="dark"] .project-art::after{color:#c89a5b!important}
 
-/* The theme preview must show what the dark theme now really looks like. */
 .theme-choice[data-theme-choice="dark"] .theme-preview-button{background:#c79a5b!important}
 .theme-choice[data-theme-choice="dark"] .theme-preview-card{background:#191715!important}
 
-/* Mobile keeps the same hierarchy. */
 @media(max-width:760px){
   :root[data-theme="dark"] .top-actions .btn.primary + .btn.primary{
     background:#171512!important;color:#e7c89a!important;border-color:#7c5a37!important;
   }
 }
+
+/* ---------- PINK: restore the original pink identity ---------- */
+:root[data-theme="pink"]{
+  --accent:#ff4fa3!important;
+  --accent-ink:#160710!important;
+  --dp-copper:#ff4fa3!important;
+  --dp-copper-soft:rgba(255,79,163,.12)!important;
+  --dp-olive:#ff4fa3!important;
+  --warning:#ffb35f!important;
+}
+:root[data-theme="pink"] body{
+  background-image:
+    radial-gradient(circle at 12% 0%,rgba(255,79,163,.07),transparent 28%),
+    radial-gradient(circle at 88% 8%,rgba(255,79,163,.04),transparent 25%),
+    repeating-linear-gradient(135deg,rgba(255,255,255,.010) 0 1px,transparent 1px 14px)!important;
+}
+:root[data-theme="pink"] .topbar .eyebrow,
+:root[data-theme="pink"] .panel-head .eyebrow,
+:root[data-theme="pink"] .section-toolbar .eyebrow,
+:root[data-theme="pink"] .request-toolbar .eyebrow,
+:root[data-theme="pink"] .dialog-head .eyebrow{color:#ff79b9!important}
+:root[data-theme="pink"] .nav-item.active::before{background:linear-gradient(180deg,#ff79b9,#ff4fa3)!important;box-shadow:0 0 14px rgba(255,79,163,.22)!important}
+:root[data-theme="pink"] .nav-item.active>span:first-child{color:#ff79b9!important;border-color:#5b2a43!important;background:#24131c!important}
+:root[data-theme="pink"] .sidebar::before{color:rgba(255,79,163,.07)!important;border-color:rgba(255,79,163,.09)!important;box-shadow:0 0 0 22px rgba(255,255,255,.008),0 0 0 44px rgba(255,79,163,.008)!important}
+:root[data-theme="pink"] .hero-card::before{color:rgba(255,105,177,.18)!important;border-color:rgba(255,79,163,.14)!important;background:repeating-conic-gradient(from 0deg,rgba(255,79,163,.05) 0 2deg,transparent 2deg 15deg)!important;box-shadow:0 0 0 18px rgba(255,79,163,.018),0 0 0 38px rgba(255,79,163,.010)!important}
+:root[data-theme="pink"] .hero-card::after{background:linear-gradient(180deg,transparent,rgba(255,79,163,.32),transparent)!important}
+:root[data-theme="pink"] .project-art::before{background:radial-gradient(circle at 72% 42%,transparent 0 23px,rgba(255,79,163,.12) 24px 25px,transparent 26px 38px,rgba(255,79,163,.055) 39px 40px,transparent 41px),repeating-conic-gradient(from 0deg at 72% 42%,rgba(255,79,163,.035) 0 2deg,transparent 2deg 16deg)!important}
+:root[data-theme="pink"] .btn.primary{background:#ff4fa3!important;color:#160710!important;border-color:#ff4fa3!important;box-shadow:0 8px 20px rgba(255,79,163,.16)!important}
+:root[data-theme="pink"] .text-btn,
+:root[data-theme="pink"] .back-btn{color:#ff79b9!important}
+:root[data-theme="pink"] .tatnera-trial-badge{border-color:#5b2a43!important;background:#24131c!important;color:#ff9aca!important}
+:root[data-theme="pink"] .tatnera-trial-badge:before{background:#ff4fa3!important;box-shadow:0 0 12px rgba(255,79,163,.42)!important}
+
+/* ---------- LIGHT: back to clean ink/neutral accents ---------- */
+:root[data-theme="light"]{
+  --accent:#232a24!important;
+  --accent-ink:#ffffff!important;
+  --dp-copper:#465349!important;
+  --dp-copper-soft:rgba(70,83,73,.10)!important;
+  --dp-olive:#465349!important;
+}
+:root[data-theme="light"] body{
+  background-image:
+    radial-gradient(circle at 10% 0%,rgba(35,42,36,.045),transparent 30%),
+    repeating-linear-gradient(135deg,rgba(31,40,33,.018) 0 1px,transparent 1px 16px)!important;
+}
+:root[data-theme="light"] .topbar .eyebrow,
+:root[data-theme="light"] .panel-head .eyebrow,
+:root[data-theme="light"] .section-toolbar .eyebrow,
+:root[data-theme="light"] .request-toolbar .eyebrow,
+:root[data-theme="light"] .dialog-head .eyebrow{color:#465349!important}
+:root[data-theme="light"] .nav-item.active::before{background:linear-gradient(180deg,#59675c,#344038)!important;box-shadow:none!important}
+:root[data-theme="light"] .nav-item.active>span:first-child{color:#dfe6df!important;border-color:#4a554d!important;background:#242a26!important}
+:root[data-theme="light"] .sidebar::before{color:rgba(223,230,223,.055)!important;border-color:rgba(223,230,223,.07)!important;box-shadow:0 0 0 22px rgba(255,255,255,.006),0 0 0 44px rgba(223,230,223,.006)!important}
+:root[data-theme="light"] .hero-card{background:linear-gradient(135deg,#222822 0%,#171c18 62%,#1b211c 100%)!important;border-color:#344039!important}
+:root[data-theme="light"] .hero-card::before{color:rgba(208,220,210,.15)!important;border-color:rgba(208,220,210,.10)!important;background:repeating-conic-gradient(from 0deg,rgba(208,220,210,.035) 0 2deg,transparent 2deg 15deg)!important;box-shadow:0 0 0 18px rgba(208,220,210,.012),0 0 0 38px rgba(208,220,210,.007)!important}
+:root[data-theme="light"] .hero-card::after{background:linear-gradient(180deg,transparent,rgba(208,220,210,.22),transparent)!important}
+:root[data-theme="light"] .project-art::before{background:radial-gradient(circle at 72% 42%,transparent 0 23px,rgba(70,83,73,.10) 24px 25px,transparent 26px 38px,rgba(70,83,73,.045) 39px 40px,transparent 41px),repeating-conic-gradient(from 0deg at 72% 42%,rgba(70,83,73,.025) 0 2deg,transparent 2deg 16deg)!important}
+:root[data-theme="light"] .project-body::before,
+:root[data-theme="light"] .table-panel tbody td:first-child::before{background:#465349!important}
+:root[data-theme="light"] .btn.primary{background:#232a24!important;color:#fff!important;border-color:#232a24!important;box-shadow:none!important}
+:root[data-theme="light"] .text-btn,
+:root[data-theme="light"] .back-btn{color:#39463c!important}
+:root[data-theme="light"] .tatnera-trial-badge{border-color:#ccd2cc!important;background:#f4f6f4!important;color:#39463c!important}
+:root[data-theme="light"] .tatnera-trial-badge:before{background:#465349!important;box-shadow:none!important}
