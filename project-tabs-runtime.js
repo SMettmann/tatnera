@@ -4,7 +4,7 @@
 (function(){
   'use strict';
 
-  const VALID=new Set(['overview','design','documents','payments','aftercare']);
+  const VALID=new Set(['overview','design','procedure','documents','payments','aftercare']);
   const STORAGE_KEY='tatnera_project_tabs_v1';
   let remembered={};
 
@@ -134,4 +134,5 @@
   load('record-attachments.js','__tatneraRecordAttachmentsInstalled');
   load('dashboard-upcoming.js','__tatneraDashboardUpcomingInstalled');
   load('dashboard-fixes.js','__tatneraDashboardFixesInstalled');
+  load('piercing-procedure.js','__tatneraPiercingProcedureInstalled');
 })();
