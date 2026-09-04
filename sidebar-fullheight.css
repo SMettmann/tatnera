@@ -1,0 +1,80 @@
+/* TATNERA — desktop/tablet sidebar always fills the complete viewport height.
+   Mobile keeps the existing bottom navigation. */
+
+@media (min-width:1101px){
+  .app-shell{
+    display:grid!important;
+    grid-template-columns:230px minmax(0,1fr)!important;
+    min-height:100vh!important;
+    min-height:100dvh!important;
+  }
+  .sidebar{
+    position:fixed!important;
+    inset:0 auto 0 0!important;
+    width:230px!important;
+    height:100vh!important;
+    height:100dvh!important;
+    min-height:100vh!important;
+    max-height:100dvh!important;
+    box-sizing:border-box!important;
+    display:flex!important;
+    flex-direction:column!important;
+    overflow:hidden!important;
+    z-index:40!important;
+  }
+  .main{
+    grid-column:2!important;
+    grid-row:1!important;
+    width:100%!important;
+    min-width:0!important;
+  }
+  .sidebar .nav{
+    flex:1 1 auto!important;
+    min-height:0!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+  }
+  .sidebar-bottom{
+    margin-top:auto!important;
+    flex:0 0 auto!important;
+  }
+}
+
+@media (min-width:761px) and (max-width:1100px){
+  .app-shell{
+    display:grid!important;
+    grid-template-columns:210px minmax(0,1fr)!important;
+    min-height:100vh!important;
+    min-height:100dvh!important;
+  }
+  .sidebar{
+    position:fixed!important;
+    inset:0 auto 0 0!important;
+    width:210px!important;
+    height:100vh!important;
+    height:100dvh!important;
+    min-height:100vh!important;
+    max-height:100dvh!important;
+    box-sizing:border-box!important;
+    display:flex!important;
+    flex-direction:column!important;
+    overflow:hidden!important;
+    z-index:40!important;
+  }
+  .main{
+    grid-column:2!important;
+    grid-row:1!important;
+    width:100%!important;
+    min-width:0!important;
+  }
+  .sidebar .nav{
+    flex:1 1 auto!important;
+    min-height:0!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+  }
+  .sidebar-bottom{
+    margin-top:auto!important;
+    flex:0 0 auto!important;
+  }
+}
