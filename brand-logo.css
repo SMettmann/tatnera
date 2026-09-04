@@ -1,32 +1,36 @@
-/* TATNERA — official logo rendered as real <img> elements everywhere */
-:root{--tatnera-logo-file:'assets/tatnera-logo.png?v=20260904-4'}
+/* TATNERA — one real logo everywhere. No generated wordmark, no theme tint. */
+:root{--tatnera-logo-url:url('assets/tatnera-brand.png?v=20260904-1')}
 
 .tatnera-logo-img{
   display:block!important;
-  max-width:100%;
+  width:auto;
   height:auto;
-  object-fit:contain;
-  object-position:left center;
+  max-width:100%;
+  object-fit:contain!important;
+  object-position:left center!important;
   opacity:1!important;
   visibility:visible!important;
   filter:none!important;
   mix-blend-mode:normal!important;
   transform:none!important;
+  background:var(--tatnera-logo-url) left center/contain no-repeat!important;
 }
 
-/* Landing: no generated/background logo leftovers */
+/* Landing navigation + footer. The image itself is the brand. */
 .logo{
   display:flex!important;
   align-items:center!important;
   min-width:0!important;
   min-height:0!important;
   background:none!important;
+  overflow:visible!important;
 }
 .logo>.logo-mark,.logo>.logo-copy{display:none!important}
 .logo:after,.logo:before{display:none!important}
-.navbar .logo .tatnera-logo-img{width:190px!important}
-.footer .logo .tatnera-logo-img{width:185px!important}
+.navbar .logo .tatnera-logo-img{width:190px!important;min-width:190px!important}
+.footer .logo .tatnera-logo-img{width:185px!important;min-width:185px!important}
 
+/* Landing hero. */
 .hero-brand-sign{
   display:block!important;
   width:min(100%,330px)!important;
@@ -39,41 +43,42 @@
   box-shadow:none!important;
   opacity:1!important;
   visibility:visible!important;
+  overflow:visible!important;
 }
 .hero-brand-sign>*:not(.tatnera-logo-img){display:none!important}
-.hero-brand-sign .tatnera-logo-img{width:330px!important}
+.hero-brand-sign .tatnera-logo-img{width:330px!important;min-width:0!important}
 .hero-brand-sign + .kicker{margin-top:0}
 
-/* Login / registration */
+/* Login / registration. */
 .tatnera-auth-brand{
   display:block!important;
   min-height:0!important;
   padding:0 0 18px!important;
   margin-bottom:26px!important;
   background:none!important;
-  border-bottom:1px solid #303036!important;
+  border-bottom:1px solid var(--line,#303036)!important;
   opacity:1!important;
   visibility:visible!important;
+  overflow:visible!important;
 }
 .tatnera-auth-brand>*:not(.tatnera-logo-img){display:none!important}
 .tatnera-auth-brand .tatnera-logo-img{width:220px!important}
 .tatnera-auth-card:after{display:none!important}
-
 .tatnera-auth-boot-mark{
   display:block!important;
   width:220px!important;
-  height:auto!important;
-  min-height:0!important;
+  height:101px!important;
+  min-height:101px!important;
   padding:0!important;
   border-radius:0!important;
-  background:none!important;
+  background:var(--tatnera-logo-url) center/contain no-repeat!important;
   color:transparent!important;
   box-shadow:none!important;
 }
 .tatnera-auth-boot-mark .tatnera-logo-img{width:220px!important}
 .tatnera-auth-boot strong,.tatnera-auth-boot span{display:none!important}
 
-/* Logged-in app sidebar */
+/* Logged-in app sidebar. */
 .sidebar .brand-wrap{
   display:flex!important;
   align-items:center!important;
@@ -82,13 +87,14 @@
   min-height:112px!important;
   padding:8px 10px!important;
   background:none!important;
-  border-bottom:1px solid rgba(199,154,91,.16)!important;
+  border-bottom:1px solid var(--line,#292d31)!important;
   opacity:1!important;
   visibility:visible!important;
+  overflow:visible!important;
 }
 .sidebar .brand-wrap>*{visibility:visible!important}
 .sidebar .brand-wrap>*:not(.tatnera-logo-img){display:none!important}
-.sidebar .brand-wrap .tatnera-logo-img{width:190px!important;max-height:96px!important;object-position:center center}
+.sidebar .brand-wrap .tatnera-logo-img{width:190px!important;max-height:96px!important;object-position:center center!important;background-position:center center!important}
 .sidebar .brand-wrap:after,.sidebar .brand-wrap:before{display:none!important}
 
 @media(max-width:900px){
@@ -96,7 +102,7 @@
   .hero-brand-sign .tatnera-logo-img{width:275px!important}
 }
 @media(max-width:600px){
-  .navbar .logo .tatnera-logo-img{width:150px!important}
+  .navbar .logo .tatnera-logo-img{width:150px!important;min-width:150px!important}
   .hero-brand-sign{width:245px!important}
   .hero-brand-sign .tatnera-logo-img{width:245px!important}
   .tatnera-auth-brand .tatnera-logo-img{width:190px!important}
