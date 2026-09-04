@@ -8,7 +8,7 @@
   function signed(tx){return tx?.type==='Erstattung'?-Math.abs(Number(tx?.amount)||0):Math.abs(Number(tx?.amount)||0);}
   function paid(project){return Math.max(0,(project?.payments||[]).reduce((sum,tx)=>sum+signed(tx),0));}
   function remaining(project){return Math.max(0,Math.round((Number(project?.price||0)-paid(project))*100)/100);}
-  function sessionById(id){return (window.state?.sessions||[]).find(item=>String(item.id)===String(id))||null;}
+  function sessionById(id){return (state.sessions||[]).find(item=>String(item.id)===String(id))||null;}
 
   function openFinalPayment(projectId){
     const project=Core.getProject(projectId);if(!project||project.status!=='Abgeschlossen')return;
