@@ -6,7 +6,7 @@
   const Core=window.TatneraCore;
   let members=[],profiles=new Map(),invites=[],loading=false,acceptingInvite=false;
 
-  const esc=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  const esc=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[ch]));
   const roleLabel=role=>({
     owner:'Inhaber',
     admin:'Admin',
@@ -112,7 +112,7 @@
   function renderTeam(error=''){
     const settings=document.getElementById('settings');if(!settings)return;
     let panel=document.getElementById('studioTeamPanel');if(!panel){panel=document.createElement('section');panel.id='studioTeamPanel';panel.className='theme-settings-panel studio-team-panel';const anchor=document.getElementById('studioSettingsPanel');anchor?.insertAdjacentElement('afterend',panel)||settings.appendChild(panel);}
-    panel.innerHTML=`<div class="studio-team-head"><div><span class="eyebrow">Team</span><h3>Studio-Mitarbeiter</h3><p>Jeder bekommt einen eigenen TATNERA-Login. Rollen und Studio-Zugriff werden zentral verwaltet.</p></div><span class="status-pill">${esc(roleLabel(currentMembership()?.role))}</span></div>${error?`<p class="studio-team-note" style="color:#d99">Team konnte nicht geladen werden: ${esc(error)}</p>`:''}<div class="studio-team-grid"><section class="studio-team-box"><h4>Aktive Benutzer</h4><div class="studio-team-list">${members.length?members.map(memberRow).join(''):'<div class="studio-team-empty">Noch keine Teammitglieder geladen.</div>'}</div></section><section class="studio-team-box">${canManage()?`<h4>Mitarbeiter einladen</h4><form class="studio-team-form" id="studioInviteForm"><label>E-Mail-Adresse<input required type="email" name="email" placeholder="artist@studio.de" autocomplete="email"></label><label>Rolle<select name="role">${inviteOptions()}</select></label><button type="submit" class="btn primary">Einladungslink erstellen</button></form><p class="studio-team-note">Der Link ist 7 Tage gültig und funktioniert nur mit der angegebenen E-Mail-Adresse.</p><div id="studioInviteResult"></div><div class="studio-pending"><h5>Offene Einladungen</h5>${pendingRows()}</div>`:`<h4>Dein Zugang</h4><p class="studio-team-note">Du bist als <strong>${esc(roleLabel(currentMembership()?.role))}</strong> in diesem Studio angemeldet. Einladungen und Rollen verwalten Inhaber oder Admins.</p>`}</section></div>`;
+    panel.innerHTML=`<div class="studio-team-head"><div><span class="eyebrow">Team</span><h3>Studio-Mitarbeiter</h3><p>Jeder bekommt einen eigenen TATNERA-Zugang. Rollen und Studio-Zugriff werden zentral verwaltet.</p></div><span class="status-pill">${esc(roleLabel(currentMembership()?.role))}</span></div>${error?`<p class="studio-team-note" style="color:#d99">Team konnte nicht geladen werden: ${esc(error)}</p>`:''}<div class="studio-team-grid"><section class="studio-team-box"><h4>Aktive Benutzer</h4><div class="studio-team-list">${members.length?members.map(memberRow).join(''):'<div class="studio-team-empty">Noch keine Teammitglieder geladen.</div>'}</div></section><section class="studio-team-box">${canManage()?`<h4>Mitarbeiter einladen</h4><form class="studio-team-form" id="studioInviteForm"><label>E-Mail-Adresse<input required type="email" name="email" placeholder="artist@studio.de" autocomplete="email"></label><label>Rolle<select name="role">${inviteOptions()}</select></label><button type="submit" class="btn primary">Einladungslink erstellen</button></form><p class="studio-team-note">Der Link ist 7 Tage gültig. Nach dem Klick legt der Mitarbeiter direkt seinen TATNERA-Zugang mit E-Mail-Adresse und Passwort an.</p><div id="studioInviteResult"></div><div class="studio-pending"><h5>Offene Einladungen</h5>${pendingRows()}</div>`:`<h4>Dein Zugang</h4><p class="studio-team-note">Du bist als <strong>${esc(roleLabel(currentMembership()?.role))}</strong> in diesem Studio angemeldet. Einladungen und Rollen verwalten Inhaber oder Admins.</p>`}</section></div>`;
     bindPanel(panel);
   }
 
@@ -174,13 +174,14 @@
   }
   function decorateInviteLogin(){
     if(!inviteToken())return;const node=document.getElementById('tatneraAuthMessage');if(!node||node.textContent)return;
-    node.textContent='Studio-Einladung erkannt. Bitte mit der eingeladenen E-Mail-Adresse einloggen oder registrieren.';node.className='tatnera-auth-message success';
+    node.textContent='Studio-Einladung erkannt. Dein persönlicher Zugang wird vorbereitet …';node.className='tatnera-auth-message success';
   }
   function clearInviteFromUrl(){
     localStorage.removeItem(PENDING_INVITE_KEY);const url=new URL(location.href);url.searchParams.delete('invite');history.replaceState(history.state,'',url.pathname+url.search+url.hash);
   }
 
   async function acceptPendingInvite(){
+    if(window.TatneraInviteSetup?.required?.())return false;
     const token=inviteToken(),a=auth(),user=currentUser();if(!token||!a?.client||!user||acceptingInvite)return false;
     if(a.membership?.())return false;
     acceptingInvite=true;
@@ -188,7 +189,7 @@
       const {data:invite,error}=await a.client.from('studio_invites').select('id,studio_id,email,role,token,expires_at').eq('token',token).maybeSingle();
       if(error)throw error;
       if(!invite){
-        const node=document.getElementById('tatneraAuthMessage');if(node){node.textContent='Diese Einladung passt nicht zu diesem Konto oder ist nicht mehr gültig. Bitte mit der eingeladenen E-Mail-Adresse anmelden.';node.className='tatnera-auth-message error';}
+        const node=document.getElementById('tatneraAuthMessage');if(node){node.textContent='Diese Einladung passt nicht zu diesem Konto oder ist nicht mehr gültig. Bitte den Einladungslink erneut öffnen.';node.className='tatnera-auth-message error';}
         return false;
       }
       const {error:joinError}=await a.client.from('studio_members').insert({studio_id:invite.studio_id,user_id:user.id,role:invite.role,is_active:true});if(joinError)throw joinError;
