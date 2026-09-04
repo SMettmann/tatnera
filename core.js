@@ -27,9 +27,15 @@
   function loadArtists(){
     let saved=null;
     try{saved=JSON.parse(localStorage.getItem(ARTIST_KEY)||'null');}catch(_error){}
-    const list=Array.isArray(saved)?saved.filter(item=>item&&String(item.name||'').trim()).map(item=>({id:String(item.id||('artist-'+Date.now()+Math.random().toString(36).slice(2,7))),name:String(item.name).trim(),active:item.active!==false})):[];
-    uniqueNames().forEach(name=>{if(!list.some(item=>item.name.toLowerCase()===name.toLowerCase()))list.push({id:'artist-'+slug(name),name,active:true});});
-    if(!list.length)list.push({id:'artist-default',name:'Studio Artist',active:true});
+    const list=Array.isArray(saved)?saved.filter(item=>item&&String(item.name||'').trim()).map(item=>({
+      id:String(item.id||('artist-'+Date.now()+Math.random().toString(36).slice(2,7))),
+      name:String(item.name).trim(),
+      active:item.active!==false,
+      deleted:item.deleted===true,
+      ...(item.deletedAt?{deletedAt:String(item.deletedAt)}:{})
+    })):[];
+    uniqueNames().forEach(name=>{if(!list.some(item=>item.name.toLowerCase()===name.toLowerCase()))list.push({id:'artist-'+slug(name),name,active:true,deleted:false});});
+    if(!list.length)list.push({id:'artist-default',name:'Studio Artist',active:true,deleted:false});
     localStorage.setItem(ARTIST_KEY,JSON.stringify(list));
     return list;
   }
@@ -37,7 +43,10 @@
   state.artists=loadArtists();
 
   function saveArtists(){localStorage.setItem(ARTIST_KEY,JSON.stringify(state.artists||[]));document.dispatchEvent(new CustomEvent('tatnera:artists-changed',{detail:{artists:getArtists(false)}}));}
-  function getArtists(activeOnly=true){const list=Array.isArray(state.artists)?state.artists:[];return (activeOnly?list.filter(item=>item.active!==false):list).map(item=>({...item}));}
+  function getArtists(activeOnly=true){
+    const list=Array.isArray(state.artists)?state.artists.filter(item=>item&&item.deleted!==true):[];
+    return (activeOnly?list.filter(item=>item.active!==false):list).map(item=>({...item}));
+  }
   function artistNameFallback(){return getArtists(true)[0]?.name||getArtists(false)[0]?.name||'Studio Artist';}
 
   function populateArtistSelect(select,selected=''){
@@ -48,10 +57,25 @@
     select.value=current&&artists.some(item=>item.name===current)?current:artistNameFallback();
   }
 
-  function addArtist(name){const clean=String(name||'').trim();if(!clean)return null;let existing=(state.artists||[]).find(item=>item.name.toLowerCase()===clean.toLowerCase());if(existing){existing.active=true;saveArtists();return existing;}const artist={id:'artist-'+Date.now(),name:clean,active:true};state.artists.push(artist);saveArtists();return artist;}
-  function setArtistActive(id,active){const artist=(state.artists||[]).find(item=>item.id===id);if(!artist)return false;artist.active=Boolean(active);saveArtists();return true;}
+  function addArtist(name,options={}){
+    const clean=String(name||'').trim();if(!clean)return null;
+    let existing=(state.artists||[]).find(item=>item.name.toLowerCase()===clean.toLowerCase());
+    if(existing){
+      if(existing.deleted===true&&options.restore!==true)return null;
+      existing.deleted=false;delete existing.deletedAt;existing.active=true;saveArtists();return existing;
+    }
+    const artist={id:'artist-'+Date.now(),name:clean,active:true,deleted:false};state.artists.push(artist);saveArtists();return artist;
+  }
+  function deleteArtist(id){
+    const artist=(state.artists||[]).find(item=>item.id===id&&item.deleted!==true);if(!artist)return false;
+    if(artist.active!==false&&getArtists(true).length<=1)return false;
+    artist.active=false;artist.deleted=true;artist.deletedAt=new Date().toISOString();
+    if(state.calendar?.artist===artist.name)state.calendar.artist='all';
+    saveArtists();return true;
+  }
+  function setArtistActive(id,active){const artist=(state.artists||[]).find(item=>item.id===id&&item.deleted!==true);if(!artist)return false;artist.active=Boolean(active);saveArtists();return true;}
   function renameArtist(id,name){
-    const artist=(state.artists||[]).find(item=>item.id===id),clean=String(name||'').trim();if(!artist||!clean)return false;
+    const artist=(state.artists||[]).find(item=>item.id===id&&item.deleted!==true),clean=String(name||'').trim();if(!artist||!clean)return false;
     const old=artist.name;artist.name=clean;
     (state.projects||[]).forEach(item=>{if(item.artist===old)item.artist=clean;});
     (state.calendarEvents||[]).forEach(item=>{if(item.artist===old)item.artist=clean;});
@@ -83,6 +107,6 @@
     return window.TatneraProjectTabs?.activate?.(name,options)??false;
   }
 
-  window.TatneraCore={esc,getArtists,saveArtists,addArtist,setArtistActive,renameArtist,artistNameFallback,populateArtistSelect,projectIdFromDetail,getProject,currentProject,getCustomer,completedTattooEvents,lastCompletedTattooDate,activateProjectTab,updateTopbarDate};
+  window.TatneraCore={esc,getArtists,saveArtists,addArtist,deleteArtist,setArtistActive,renameArtist,artistNameFallback,populateArtistSelect,projectIdFromDetail,getProject,currentProject,getCustomer,completedTattooEvents,lastCompletedTattooDate,activateProjectTab,updateTopbarDate};
   updateTopbarDate();
 })();
