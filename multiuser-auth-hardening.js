@@ -1,7 +1,7 @@
 /* TATNERA — multi-user auth hardening
    - Never sends real users back to localhost from auth mails.
    - Preserves studio invitation tokens through signup/reset flows.
-   - New Supabase-invited users must set a password before joining the studio. */
+   - Invited users always set a password before joining the studio. */
 (function(){
   'use strict';
   if(window.__tatneraMultiuserAuthHardeningInstalled)return;
@@ -30,12 +30,15 @@
     return url.toString();
   }
 
-  /* Supabase admin invite links return with type=invite. Hide the studio token
-     from the older automatic watcher until a password has been chosen. */
+  /* Studio invitation callbacks can arrive as a new-user invite, a password
+     recovery for an already existing account, or an older magic-login mail.
+     In all three cases we keep the studio token and force the same password
+     setup screen before the membership is created. */
   (function gateDirectInviteCallback(){
     const type=hashParams().get('type')||new URLSearchParams(location.search).get('type')||'';
     const token=new URLSearchParams(location.search).get('invite')||'';
-    if(type!=='invite'||!isUuid(token))return;
+    const studioEntryTypes=new Set(['invite','recovery','magiclink','signup']);
+    if(!studioEntryTypes.has(type)||!isUuid(token))return;
     sessionStorage.setItem(GATE_TOKEN_KEY,token);
     localStorage.removeItem(PENDING_INVITE_KEY);
     const url=new URL(location.href);url.searchParams.delete('invite');
