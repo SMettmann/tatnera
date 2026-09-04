@@ -1,8 +1,12 @@
-/* TATNERA — automatic studio invitation email delivery */
+/* TATNERA — studio invitation delivery
+   The invitation itself never depends on Supabase's built-in mail service.
+   A valid setup link is available immediately; email delivery is best-effort
+   until a production SMTP/provider is connected. */
 (function(){
   'use strict';
 
   const PUBLIC_APP_URL='https://smettmann.github.io/tatnera/app.html';
+  const DELIVERY_TIMEOUT_MS=6000;
   const auth=()=>window.TatneraAuth||null;
   const client=()=>auth()?.client||null;
   const studioId=()=>auth()?.studioId?.()||'';
@@ -20,68 +24,37 @@
 
   function patchUi(){
     const form=document.getElementById('studioInviteForm');if(!form)return;
-    const button=form.querySelector('[type="submit"]');if(button)button.textContent='Einladung senden';
+    const button=form.querySelector('[type="submit"]');if(button)button.textContent='Einladung erstellen';
     const note=form.nextElementSibling;
-    if(note?.classList.contains('studio-team-note'))note.textContent='Der Mitarbeiter öffnet den Link und legt direkt E-Mail-Adresse, Namen und Passwort für seinen TATNERA-Zugang fest.';
-  }
-
-  function friendlyMailError(error){
-    const code=String(error?.code||'');
-    const text=String(error?.message||error||'');
-    if(code==='mail_rate_limited'||/rate limit/i.test(text))return 'Der Supabase-Testmaildienst hat sein aktuelles Versandlimit erreicht. Die Einladung ist trotzdem gültig – unten steht ein sicherer Direktlink. Für den späteren Echtbetrieb richten wir eigenen SMTP-Versand ein.';
-    if(code==='smtp_required'||/not authou?ri[sz]ed/i.test(text))return 'Der Supabase-Testmaildienst kann diese Adresse nicht automatisch anschreiben. Die Einladung ist trotzdem gültig – nutze den sicheren Direktlink unten.';
-    if(code==='invalid_email'||(/email/i.test(text)&&/invalid/i.test(text)))return 'Die E-Mail-Adresse wurde vom Maildienst abgelehnt. Bitte die Adresse prüfen.';
-    if(/session|jwt|unauth|401/i.test(text))return 'Die Anmeldung für den Mailversand ist abgelaufen. Bitte die Seite neu laden und erneut senden.';
-    return 'Der automatische Mailversand konnte nicht bestätigt werden. Die Einladung selbst bleibt bestehen.';
+    if(note?.classList.contains('studio-team-note'))note.textContent='Der Mitarbeiter öffnet den persönlichen Link und legt direkt E-Mail-Adresse, Namen und Passwort für seinen TATNERA-Zugang fest.';
   }
 
   async function deliverInvite(inviteId){
     const c=client();if(!c)throw new Error('Studio-Verbindung ist noch nicht bereit.');
-    const {data:delivery,error:mailError}=await c.functions.invoke('send-studio-invite',{body:{inviteId}});
+    const task=c.functions.invoke('send-studio-invite',{body:{inviteId}});
+    const timeout=new Promise(resolve=>setTimeout(()=>resolve({data:{ok:true,mailSent:false,code:'delivery_timeout'},error:null}),DELIVERY_TIMEOUT_MS));
+    const {data:delivery,error:mailError}=await Promise.race([task,timeout]);
     if(mailError)throw mailError;
-    if(delivery?.ok!==true){
-      const error=new Error(delivery?.error||delivery?.manualLinkError||'Einladungsdienst hat die Anfrage nicht bestätigt.');
-      error.code=delivery?.code||'mail_send_failed';
-      throw error;
-    }
-    return delivery;
+    return delivery||{ok:true,mailSent:false};
   }
 
   function mailtoUrl(email,url){
     const subject='Deine TATNERA Studio-Einladung';
-    const body=`Hallo,\n\ndu wurdest zu TATNERA eingeladen. Öffne diesen persönlichen Link und lege direkt deine E-Mail-Adresse und dein Passwort für TATNERA fest:\n\n${url}\n\nDanach öffnet sich dein Studio automatisch. Der Link ist nur für deine Einladung bestimmt.`;
+    const body=`Hallo,\n\ndu wurdest zu TATNERA eingeladen. Öffne diesen persönlichen Link und lege dort direkt deine E-Mail-Adresse und dein Passwort an:\n\n${url}\n\nDanach wirst du automatisch dem Studio zugeordnet und kannst dich künftig normal mit E-Mail und Passwort anmelden.`;
     return `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   }
 
-  function showResult(email,displayUrl,mailSent,mailMessage='',inviteId='',baseInviteUrl=''){
+  function showResult(email,setupUrl,mailSent=false,mailInfo=''){
     const root=document.getElementById('studioInviteResult');if(!root)return;
-    const baseUrl=baseInviteUrl||displayUrl;
-    const hasSecureFallback=!mailSent&&displayUrl&&displayUrl!==baseUrl;
-    const title=mailSent?'Einladung per E-Mail gesendet ✓':hasSecureFallback?'Einladung bereit – Maildienst aktuell limitiert':'Einladung erstellt – Versand nicht bestätigt';
-    const message=mailSent?`Die Einladung wurde an ${email} geschickt. Der Link öffnet direkt die Einrichtung des persönlichen Zugangs.`:(mailMessage||'Die Einladung ist erstellt.');
-    const retryButton=!mailSent&&inviteId?'<button type="button" class="btn primary" style="width:100%" data-resend-studio-invite>Automatischen Versand erneut versuchen</button>':'';
-    const mailButton=hasSecureFallback?`<a class="btn ghost" style="text-decoration:none;text-align:center" href="${esc(mailtoUrl(email,displayUrl))}">In E-Mail öffnen</a>`:'';
-    root.innerHTML=`<div class="studio-invite-result"><strong>${esc(title)}</strong><div class="studio-team-note" data-invite-mail-message style="margin:0 0 10px">${esc(message)}</div>${retryButton}${hasSecureFallback?'<div class="studio-team-note" style="margin:9px 0 6px"><strong>Sicherer Zugangslink</strong> – damit kann der Empfänger direkt seinen Zugang einrichten.</div>':''}<div class="studio-invite-link"><input readonly value="${esc(displayUrl)}" aria-label="Einladungslink"><button type="button" class="btn ghost" data-copy-mail-invite>Kopieren</button></div>${mailButton?`<div style="margin-top:8px">${mailButton}</div>`:''}</div>`;
+    const title=mailSent?'Einladung gesendet ✓':'Einladungslink bereit ✓';
+    const message=mailSent
+      ?`Die Einladung wurde an ${email} gesendet. Der Link führt direkt zur Zugangserstellung.`
+      :'Der Zugang ist vorbereitet. Der Link führt direkt zu „E-Mail-Adresse + Passwort anlegen“. Der automatische Mailversand ist aktuell noch nicht über einen eigenen Mailanbieter eingerichtet.';
+    root.innerHTML=`<div class="studio-invite-result"><strong>${esc(title)}</strong><div class="studio-team-note" style="margin:0 0 10px">${esc(message)}</div><div class="studio-invite-link"><input readonly value="${esc(setupUrl)}" aria-label="Einladungslink"><button type="button" class="btn ghost" data-copy-mail-invite>Kopieren</button></div>${!mailSent?`<div style="display:grid;grid-template-columns:1fr;gap:8px;margin-top:8px"><a class="btn primary" style="text-decoration:none;text-align:center" href="${esc(mailtoUrl(email,setupUrl))}">Einladung jetzt per E-Mail senden</a></div>`:''}${mailInfo?`<div class="studio-team-note" style="margin-top:8px">${esc(mailInfo)}</div>`:''}</div>`;
 
     root.querySelector('[data-copy-mail-invite]')?.addEventListener('click',async event=>{
-      try{await navigator.clipboard.writeText(displayUrl);const button=event.currentTarget,old=button.textContent;button.textContent='Kopiert ✓';setTimeout(()=>button.textContent=old,1400);}
-      catch(_error){prompt('Einladungslink kopieren:',displayUrl);}
-    });
-
-    root.querySelector('[data-resend-studio-invite]')?.addEventListener('click',async event=>{
-      const button=event.currentTarget,messageNode=root.querySelector('[data-invite-mail-message]');
-      button.disabled=true;button.textContent='Wird gesendet …';if(messageNode)messageNode.textContent='Einladung wird erneut versendet …';
-      try{
-        const delivery=await deliverInvite(inviteId);
-        const sent=delivery?.mailSent===true;
-        const nextUrl=sent?baseUrl:(String(delivery?.manualLink||'')||displayUrl||baseUrl);
-        const nextMessage=sent?'':friendlyMailError({code:delivery?.code,message:delivery?.error||''});
-        showResult(email,nextUrl,sent,nextMessage,inviteId,baseUrl);
-      }catch(error){
-        console.error('TATNERA invitation retry failed',error);
-        if(messageNode)messageNode.textContent=friendlyMailError(error);
-        button.disabled=false;button.textContent='Automatischen Versand erneut versuchen';
-      }
+      try{await navigator.clipboard.writeText(setupUrl);const button=event.currentTarget,old=button.textContent;button.textContent='Kopiert ✓';setTimeout(()=>button.textContent=old,1400);}
+      catch(_error){prompt('Einladungslink kopieren:',setupUrl);}
     });
   }
 
@@ -114,7 +87,7 @@
     event.preventDefault();event.stopImmediatePropagation();
     const c=client(),sid=studioId(),user=currentUser(),button=form.querySelector('[type="submit"]');
     if(!c||!sid||!user){alert('Studio-Verbindung ist noch nicht bereit. Bitte die Seite kurz neu laden.');return;}
-    button.disabled=true;button.textContent='Einladung wird gesendet …';
+    button.disabled=true;button.textContent='Einladung wird erstellt …';
     try{
       const data=Object.fromEntries(new FormData(form).entries()),email=String(data.email||'').trim().toLowerCase(),role=String(data.role||'');
       if(!email)throw new Error('Bitte eine E-Mail-Adresse eingeben.');
@@ -130,23 +103,31 @@
       }
 
       const invite=await getOrCreateInvite(c,sid,user,email,role);
-      const inviteUrl=new URL(PUBLIC_APP_URL);inviteUrl.searchParams.set('invite',invite.token);inviteUrl.searchParams.set('email',email);
-      let mailSent=false,mailMessage='',displayUrl=inviteUrl.toString();
+      const inviteUrl=new URL(PUBLIC_APP_URL);
+      inviteUrl.searchParams.set('invite',invite.token);
+      inviteUrl.searchParams.set('email',email);
+      const setupUrl=inviteUrl.toString();
+
+      /* Show the working setup link immediately. Mail delivery must never block
+         or invalidate the invitation. */
+      showResult(email,setupUrl,false);
+      form.reset();
+
       try{
         const delivery=await deliverInvite(invite.id);
-        mailSent=delivery?.mailSent===true;
-        displayUrl=mailSent?inviteUrl.toString():(String(delivery?.manualLink||'')||inviteUrl.toString());
-        if(!mailSent)mailMessage=friendlyMailError({code:delivery?.code,message:delivery?.error||''});
+        if(delivery?.mailSent===true){
+          showResult(email,setupUrl,true);
+        }else if(delivery?.code&&delivery.code!=='delivery_timeout'){
+          showResult(email,setupUrl,false,'Hinweis: Der integrierte Test-Maildienst von Supabase hat den Versand nicht übernommen.');
+        }
       }catch(error){
-        console.error('TATNERA invitation email failed',error);
-        mailMessage=friendlyMailError(error);
+        console.warn('TATNERA invitation mail delivery unavailable',error);
       }
 
-      form.reset();showResult(email,displayUrl,mailSent,mailMessage,invite.id,inviteUrl.toString());
       await window.TatneraTeam?.reload?.();
       requestAnimationFrame(patchUi);
     }catch(error){alert(String(error?.message||error));}
-    finally{button.disabled=false;button.textContent='Einladung senden';}
+    finally{button.disabled=false;button.textContent='Einladung erstellen';}
   }
 
   document.addEventListener('submit',sendInvite,true);
