@@ -49,9 +49,11 @@
       .studio-settings-form input:focus,.studio-settings-form select:focus{outline:2px solid rgba(216,255,99,.35);outline-offset:1px;border-color:#899c51}
       .studio-settings-section{grid-column:1/-1;padding-top:4px;margin-top:5px;border-top:1px solid var(--line)}
       .studio-settings-section h4{margin:12px 0 2px;font-size:13px}.studio-settings-section p{margin:0;color:var(--muted);font-size:10px;line-height:1.5}
-      .studio-settings-actions{grid-column:1/-1;display:flex;justify-content:flex-end;margin-top:4px}
+      .studio-settings-actions{grid-column:1/-1;display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:4px}
+      .studio-settings-save-state{font-size:11px;color:var(--muted)}
+      .studio-settings-save-state.success{color:#79b889}.studio-settings-save-state.error{color:var(--danger)}
       .studio-settings-help{margin:9px 0 0;font-size:10px;color:var(--muted);line-height:1.5}
-      @media(max-width:720px){.studio-settings-form{grid-template-columns:1fr}.studio-settings-form label.full,.studio-settings-section,.studio-settings-actions{grid-column:1}.studio-settings-actions .btn{width:100%}}
+      @media(max-width:720px){.studio-settings-form{grid-template-columns:1fr}.studio-settings-form label.full,.studio-settings-section,.studio-settings-actions{grid-column:1}.studio-settings-actions{align-items:stretch;flex-direction:column}.studio-settings-actions .btn{width:100%}}
     `;document.head.appendChild(style);
   }
 
@@ -81,7 +83,7 @@
         <label>Steuernummer<input name="taxNumber" value="${escapeHtml(profile.taxNumber)}"></label>
         <label>USt-IdNr.<input name="vatId" placeholder="DE…" value="${escapeHtml(profile.vatId)}"></label>
 
-        <div class="studio-settings-actions"><button type="submit" class="btn primary">Studio speichern</button></div>
+        <div class="studio-settings-actions"><span class="studio-settings-save-state" aria-live="polite"></span><button type="submit" class="btn primary">Studio speichern</button></div>
       </form>
       <p class="studio-settings-help">Für eine Rechnung verlangt TATNERA vollständige Rechnungsstellerdaten. Bereits ausgestellte Rechnungen speichern einen unveränderlichen Snapshot dieser Angaben.</p>`;
     const firstPanel=settings.querySelector('.theme-settings-panel,.placeholder-page');
@@ -94,12 +96,41 @@
     return String(value??'').replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
   }
 
-  function save(event){
+  function setSaveState(form,text,type=''){
+    const node=form?.querySelector('.studio-settings-save-state');
+    if(node){node.textContent=text||'';node.className=`studio-settings-save-state${type?' '+type:''}`;}
+    const button=form?.querySelector('[type="submit"]');
+    if(button)button.disabled=text==='Wird gespeichert …';
+  }
+
+  async function persistStudioToCloud(nextProfile){
+    const auth=window.TatneraAuth;
+    const client=auth?.client,studioId=auth?.studioId?.();
+    if(!client||!studioId)return;
+
+    const cloudProfile={
+      name:nextProfile.name,
+      street:nextProfile.street||null,
+      postal_code:nextProfile.zip||null,
+      city:nextProfile.city||null,
+      country:nextProfile.country||'Deutschland',
+      email:nextProfile.email||null,
+      phone:nextProfile.phone||null
+    };
+    const {data,error}=await client.from('studios').update(cloudProfile).eq('id',studioId).select('id,name,street,postal_code,city,country,email,phone').single();
+    if(error)throw error;
+
+    const liveStudio=auth.studio?.();
+    if(liveStudio&&data)Object.assign(liveStudio,data);
+  }
+
+  async function save(event){
     event.preventDefault();
     const form=event.currentTarget,name=cleanName(form.elements.studioName.value);
     if(!name){form.elements.studioName.setCustomValidity('Bitte einen Studio-Namen eingeben.');form.elements.studioName.reportValidity();return;}
     form.elements.studioName.setCustomValidity('');
-    profile={
+
+    const nextProfile={
       ...profile,
       name,
       businessName:cleanName(form.elements.businessName.value),
@@ -116,9 +147,21 @@
       taxNumber:clean(form.elements.taxNumber.value),
       vatId:clean(form.elements.vatId.value).toUpperCase()
     };
-    localStorage.setItem(STORAGE_KEY,JSON.stringify(profile));
-    applySidebar();renderSettings();
-    document.dispatchEvent(new CustomEvent('tatnera:studio-changed',{detail:{profile:{...profile}}}));
+
+    setSaveState(form,'Wird gespeichert …');
+    try{
+      await persistStudioToCloud(nextProfile);
+      profile=nextProfile;
+      localStorage.setItem(STORAGE_KEY,JSON.stringify(profile));
+      applySidebar();
+      document.dispatchEvent(new CustomEvent('tatnera:studio-changed',{detail:{profile:{...profile}}}));
+      setSaveState(form,'Gespeichert ✓','success');
+      window.setTimeout(()=>renderSettings(),650);
+    }catch(error){
+      console.error('TATNERA studio profile could not be saved to cloud.',error);
+      setSaveState(form,'Speichern fehlgeschlagen','error');
+      const button=form?.querySelector('[type="submit"]');if(button)button.disabled=false;
+    }
   }
 
   function setProfile(next){
