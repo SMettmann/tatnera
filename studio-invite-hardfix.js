@@ -3,6 +3,7 @@
   'use strict';
 
   const PUBLIC_APP_URL='https://smettmann.github.io/tatnera/app.html';
+  const FORM_NOTE='TATNERA sendet die Einladung automatisch. Falls der Test-Maildienst blockiert, wird sofort ein sicherer Zugangslink bereitgestellt.';
   const auth=()=>window.TatneraAuth||null;
   const client=()=>auth()?.client||null;
   const studioId=()=>auth()?.studioId?.()||'';
@@ -23,11 +24,9 @@
     const form=document.getElementById('studioInviteForm');
     if(!form)return;
     const button=form.querySelector('[type="submit"]');
-    if(button)button.textContent='Einladung senden';
+    if(button&&!button.disabled&&button.textContent!=='Einladung senden')button.textContent='Einladung senden';
     const note=form.nextElementSibling;
-    if(note?.classList.contains('studio-team-note')){
-      note.textContent='TATNERA sendet die Einladung automatisch. Falls der Test-Maildienst blockiert, wird sofort ein sicherer Zugangslink bereitgestellt.';
-    }
+    if(note?.classList.contains('studio-team-note')&&note.textContent!==FORM_NOTE)note.textContent=FORM_NOTE;
   }
 
   async function getOrCreateInvite(c,sid,user,email,role){
@@ -147,9 +146,9 @@
   }
 
   document.addEventListener('submit',handleSubmit,true);
-  const observer=new MutationObserver(()=>patchForm());
-  observer.observe(document.documentElement,{childList:true,subtree:true});
-  document.addEventListener('tatnera:auth-ready',()=>setTimeout(patchForm,100));
+  document.addEventListener('tatnera:auth-ready',()=>{setTimeout(patchForm,100);setTimeout(patchForm,600);});
   document.addEventListener('tatnera:runtime-refresh',()=>setTimeout(patchForm,50));
-  patchForm();
+  document.addEventListener('click',event=>{if(event.target.closest('[data-view="settings"],[data-view-target="settings"]'))setTimeout(patchForm,250);});
+  setTimeout(patchForm,0);
+  setTimeout(patchForm,800);
 })();
