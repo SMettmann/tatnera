@@ -3,7 +3,9 @@
   'use strict';
 
   const DAY=24*60*60*1000;
+  const MIN_RECHECK_MS=60000;
   let running=false;
+  let lastCheck=0;
 
   function installStyles(){
     if(document.getElementById('tatneraSubscriptionStyles'))return;
@@ -73,13 +75,16 @@
     document.body.appendChild(overlay);
   }
 
-  async function checkSubscription(){
+  async function checkSubscription(force=false){
     if(running)return;
     const auth=window.TatneraAuth;
     const studioId=auth?.studioId?.();
     const client=auth?.client;
     if(!studioId||!client)return;
+    const now=Date.now();
+    if(!force&&now-lastCheck<MIN_RECHECK_MS)return;
     running=true;
+    lastCheck=now;
     try{
       installStyles();
       const {data,error}=await client.from('studios')
@@ -110,15 +115,9 @@
     }
   }
 
-  document.addEventListener('tatnera:auth-ready',()=>checkSubscription());
-  window.addEventListener('focus',()=>checkSubscription());
+  document.addEventListener('tatnera:auth-ready',()=>checkSubscription(true));
+  window.addEventListener('focus',()=>checkSubscription(false));
 
-  let attempts=0;
-  const timer=window.setInterval(()=>{
-    attempts+=1;
-    if(window.TatneraAuth?.studioId?.()){
-      window.clearInterval(timer);
-      checkSubscription();
-    }else if(attempts>80){window.clearInterval(timer);}
-  },100);
+  /* One lightweight fallback in case auth-ready happened before this script loaded. */
+  setTimeout(()=>checkSubscription(true),700);
 })();
