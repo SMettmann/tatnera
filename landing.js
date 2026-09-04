@@ -2,7 +2,7 @@
 (function(){
   'use strict';
 
-  const LOGO_SRC='assets/tatnera-logo.png?v=20260904-4';
+  const LOGO_SRC='assets/tatnera-brand.png?v=20260904-1';
 
   function makeLogo(className='tatnera-logo-img'){
     const img=document.createElement('img');
@@ -17,11 +17,15 @@
     return img;
   }
 
+  function syncHolder(holder){
+    if(!holder)return;
+    let img=holder.querySelector('.tatnera-logo-img');
+    if(!img){holder.replaceChildren(makeLogo());return;}
+    if(img.getAttribute('src')!==LOGO_SRC)img.setAttribute('src',LOGO_SRC);
+  }
+
   function installLogos(){
-    document.querySelectorAll('.navbar .logo, .footer .logo').forEach(holder=>{
-      if(holder.querySelector('.tatnera-logo-img'))return;
-      holder.replaceChildren(makeLogo());
-    });
+    document.querySelectorAll('.navbar .logo, .footer .logo').forEach(syncHolder);
 
     const heroCopy=document.querySelector('.hero-copy');
     if(heroCopy){
@@ -32,7 +36,7 @@
         const kicker=heroCopy.querySelector('.kicker');
         heroCopy.insertBefore(sign,kicker||heroCopy.firstChild);
       }
-      if(!sign.querySelector('.tatnera-logo-img'))sign.replaceChildren(makeLogo());
+      syncHolder(sign);
     }
   }
 
