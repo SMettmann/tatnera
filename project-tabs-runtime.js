@@ -120,8 +120,12 @@
 
 /* Calendar extensions are loaded last so they can safely wrap the base calendar runtime. */
 (function(){
-  if(window.__tatneraMonthCalendarInstalled||document.querySelector('script[src="calendar-month-view.js"]'))return;
-  const script=document.createElement('script');
-  script.src='calendar-month-view.js';
-  document.body.appendChild(script);
+  function load(src,guard){
+    if((guard&&window[guard])||document.querySelector(`script[src="${src}"]`))return;
+    const script=document.createElement('script');
+    script.src=src;
+    document.body.appendChild(script);
+  }
+  load('calendar-month-view.js','__tatneraMonthCalendarInstalled');
+  load('calendar-appointment-ux.js','__tatneraCalendarAppointmentUxInstalled');
 })();
