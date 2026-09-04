@@ -2,46 +2,6 @@
 (function(){
   'use strict';
 
-  const LOGO_SRC='assets/tatnera-brand.png?v=20260904-1';
-
-  function makeLogo(className='tatnera-logo-img'){
-    const img=document.createElement('img');
-    img.className=className;
-    img.src=LOGO_SRC;
-    img.alt='TATNERA Studio Software';
-    img.width=220;
-    img.height=101;
-    img.loading='eager';
-    img.decoding='sync';
-    try{img.fetchPriority='high';}catch(_error){}
-    return img;
-  }
-
-  function syncHolder(holder){
-    if(!holder)return;
-    let img=holder.querySelector('.tatnera-logo-img');
-    if(!img){holder.replaceChildren(makeLogo());return;}
-    if(img.getAttribute('src')!==LOGO_SRC)img.setAttribute('src',LOGO_SRC);
-  }
-
-  function installLogos(){
-    document.querySelectorAll('.navbar .logo, .footer .logo').forEach(syncHolder);
-
-    const heroCopy=document.querySelector('.hero-copy');
-    if(heroCopy){
-      let sign=heroCopy.querySelector('.hero-brand-sign');
-      if(!sign){
-        sign=document.createElement('div');
-        sign.className='hero-brand-sign';
-        const kicker=heroCopy.querySelector('.kicker');
-        heroCopy.insertBefore(sign,kicker||heroCopy.firstChild);
-      }
-      syncHolder(sign);
-    }
-  }
-
-  installLogos();
-
   const nav=document.querySelector('.nav-links');
   if(nav&&!nav.querySelector('a[href="#preise"]')){
     const priceLink=document.createElement('a');
