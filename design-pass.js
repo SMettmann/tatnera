@@ -2,13 +2,13 @@
 (function(){
   'use strict';
 
-  const LOGO_SRC='assets/tatnera-logo.png?v=20260904-4';
+  const LOGO_SRC='assets/tatnera-brand.png?v=20260904-1';
   const styles=[
     {id:'tatneraDesignPassCss',href:'design-pass.css?v=20260904-2'},
     {id:'tatneraTattooIdentityCss',href:'tattoo-identity.css?v=20260904-1'},
     {id:'tatneraSidebarFullheightCss',href:'sidebar-fullheight.css?v=20260904-1'},
-    {id:'tatneraTattooPaletteCss',href:'tattoo-palette.css?v=20260904-1'},
-    {id:'tatneraBrandLogoCss',href:'brand-logo.css?v=20260904-4'}
+    {id:'tatneraTattooPaletteCss',href:'tattoo-palette.css?v=20260904-2'},
+    {id:'tatneraBrandLogoCss',href:'brand-logo.css?v=20260904-5'}
   ];
 
   function ensureStyle(item){
@@ -36,8 +36,10 @@
   }
 
   function replaceWithLogo(node){
-    if(!node||node.querySelector('.tatnera-logo-img'))return;
-    node.replaceChildren(makeLogo());
+    if(!node)return;
+    let img=node.querySelector('.tatnera-logo-img');
+    if(!img){node.replaceChildren(makeLogo());return;}
+    if(img.getAttribute('src')!==LOGO_SRC)img.setAttribute('src',LOGO_SRC);
   }
 
   function installLogos(){
@@ -46,12 +48,10 @@
     replaceWithLogo(document.querySelector('.tatnera-auth-boot-mark'));
   }
 
-  function load(){
-    styles.forEach(ensureStyle);
-    installLogos();
-  }
+  function load(){styles.forEach(ensureStyle);installLogos();}
 
   load();
+  document.addEventListener('DOMContentLoaded',load,{once:true});
   document.addEventListener('tatnera:runtime-refresh',load);
   document.addEventListener('tatnera:auth-ready',installLogos);
 
