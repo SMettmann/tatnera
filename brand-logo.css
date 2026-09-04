@@ -1,6 +1,8 @@
-/* TATNERA — the original flyer logo everywhere, without recoloring or theme tint. */
+/* TATNERA — real flyer logo, forced visible on the dark website. */
 :root{
-  --tatnera-logo-url:url('assets/tatnera-brand.png?v=20260904-1');
+  --tatnera-logo-url:url('assets/tatnera-brand.png?v=20260904-2');
+  --tatnera-logo-filter:brightness(0) invert(1) contrast(1.08) drop-shadow(0 5px 14px rgba(0,0,0,.28));
+  --tatnera-logo-accent:#d8ff63;
 }
 
 .tatnera-logo-img{
@@ -12,33 +14,61 @@
   object-position:left center!important;
   opacity:1!important;
   visibility:visible!important;
-  filter:none!important;
+  filter:var(--tatnera-logo-filter)!important;
   mix-blend-mode:normal!important;
   transform:none!important;
   background:none!important;
 }
 
-/* Landing navigation + footer. */
+/* Public homepage: logo is visible at the far left of the header. */
 .logo{
+  position:relative!important;
   display:flex!important;
   align-items:center!important;
-  min-width:0!important;
-  min-height:0!important;
+  flex:0 0 auto!important;
+  width:190px!important;
+  min-width:190px!important;
+  height:74px!important;
+  min-height:74px!important;
   background:none!important;
   overflow:visible!important;
 }
 .logo>.logo-mark,.logo>.logo-copy{display:none!important}
-.logo:after,.logo:before{display:none!important}
-.navbar .logo .tatnera-logo-img{width:190px!important;min-width:190px!important}
+.logo:before{display:none!important}
+.logo:after{
+  content:""!important;
+  display:block!important;
+  position:absolute!important;
+  left:3px!important;
+  bottom:10px!important;
+  width:86px!important;
+  height:2px!important;
+  background:var(--tatnera-logo-accent)!important;
+  opacity:.9!important;
+  transform:skewX(-24deg)!important;
+}
+.navbar .logo .tatnera-logo-img{
+  display:block!important;
+  width:190px!important;
+  min-width:190px!important;
+  max-width:190px!important;
+  max-height:72px!important;
+}
+.footer .logo{
+  height:auto!important;
+  min-height:72px!important;
+}
 .footer .logo .tatnera-logo-img{width:185px!important;min-width:185px!important}
 
-/* Landing hero. */
+/* Public homepage hero: large flyer logo directly above the studio kicker. */
 .hero-brand-sign{
+  position:relative!important;
   display:block!important;
-  width:min(100%,330px)!important;
-  height:auto!important;
-  min-height:0!important;
-  margin:0 0 14px!important;
+  width:330px!important;
+  max-width:100%!important;
+  height:152px!important;
+  min-height:152px!important;
+  margin:0 0 18px!important;
   padding:0!important;
   background:none!important;
   border:0!important;
@@ -48,13 +78,31 @@
   overflow:visible!important;
 }
 .hero-brand-sign>*:not(.tatnera-logo-img){display:none!important}
-.hero-brand-sign .tatnera-logo-img{width:330px!important;min-width:0!important}
-.hero-brand-sign + .kicker{margin-top:0}
+.hero-brand-sign .tatnera-logo-img{
+  display:block!important;
+  width:330px!important;
+  min-width:0!important;
+  max-width:330px!important;
+  max-height:152px!important;
+}
+.hero-brand-sign:after{
+  content:""!important;
+  display:block!important;
+  position:absolute!important;
+  left:5px!important;
+  bottom:9px!important;
+  width:118px!important;
+  height:3px!important;
+  background:var(--tatnera-logo-accent)!important;
+  opacity:.95!important;
+  transform:skewX(-24deg)!important;
+}
+.hero-brand-sign + .kicker{margin-top:0!important}
 
 /* Login / registration. */
 .tatnera-auth-brand{
   display:block!important;
-  min-height:0!important;
+  min-height:110px!important;
   padding:0 0 18px!important;
   margin-bottom:26px!important;
   background:none!important;
@@ -64,7 +112,7 @@
   overflow:visible!important;
 }
 .tatnera-auth-brand>*:not(.tatnera-logo-img){display:none!important}
-.tatnera-auth-brand .tatnera-logo-img{width:220px!important}
+.tatnera-auth-brand .tatnera-logo-img{width:220px!important;max-height:101px!important}
 .tatnera-auth-card:after{display:none!important}
 .tatnera-auth-boot-mark{
   display:block!important;
@@ -75,7 +123,7 @@
   border-radius:0!important;
   background:var(--tatnera-logo-url) center/contain no-repeat!important;
   color:transparent!important;
-  filter:none!important;
+  filter:var(--tatnera-logo-filter)!important;
   box-shadow:none!important;
 }
 .tatnera-auth-boot-mark .tatnera-logo-img{width:220px!important}
@@ -98,19 +146,22 @@
 .sidebar .brand-wrap>*{visibility:visible!important}
 .sidebar .brand-wrap>*:not(.tatnera-logo-img){display:none!important}
 .sidebar .brand-wrap .tatnera-logo-img{
+  display:block!important;
   width:190px!important;
+  max-width:190px!important;
   max-height:96px!important;
   object-position:center center!important;
 }
 .sidebar .brand-wrap:after,.sidebar .brand-wrap:before{display:none!important}
 
 @media(max-width:900px){
-  .hero-brand-sign{width:275px!important}
-  .hero-brand-sign .tatnera-logo-img{width:275px!important}
+  .hero-brand-sign{width:275px!important;height:130px!important;min-height:130px!important}
+  .hero-brand-sign .tatnera-logo-img{width:275px!important;max-width:275px!important;max-height:130px!important}
 }
 @media(max-width:600px){
-  .navbar .logo .tatnera-logo-img{width:150px!important;min-width:150px!important}
-  .hero-brand-sign{width:245px!important}
-  .hero-brand-sign .tatnera-logo-img{width:245px!important}
+  .logo{width:150px!important;min-width:150px!important;height:64px!important;min-height:64px!important}
+  .navbar .logo .tatnera-logo-img{width:150px!important;min-width:150px!important;max-width:150px!important}
+  .hero-brand-sign{width:245px!important;height:118px!important;min-height:118px!important}
+  .hero-brand-sign .tatnera-logo-img{width:245px!important;max-width:245px!important;max-height:118px!important}
   .tatnera-auth-brand .tatnera-logo-img{width:190px!important}
 }
