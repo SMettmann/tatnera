@@ -1,0 +1,36 @@
+/* TATNERA — official logo applied consistently across marketing, auth and app */
+:root{--tatnera-logo:url('assets/tatnera-logo.png?v=20260904-1')}
+
+/* Public landing page: navigation + footer */
+.logo{min-width:190px;min-height:72px;background:var(--tatnera-logo) left center/contain no-repeat!important;display:block!important}
+.logo>.logo-mark,.logo>.logo-copy{display:none!important}
+.navbar .logo{min-width:185px;min-height:64px}
+.footer .logo{min-width:185px;min-height:72px}
+.logo:after{display:none!important}
+
+/* Public hero: use the real brand instead of the generated wordmark */
+.hero-brand-sign{width:min(100%,330px)!important;height:152px!important;margin:0 0 14px!important;background:var(--tatnera-logo) left center/contain no-repeat!important;display:block!important}
+.hero-brand-sign>*{display:none!important}
+.hero-brand-sign+ .kicker{margin-top:0}
+
+/* Login / registration */
+.tatnera-auth-brand{min-height:108px!important;padding:0 0 18px!important;margin-bottom:26px!important;background:var(--tatnera-logo) left top/220px auto no-repeat!important;border-bottom:1px solid #303036!important}
+.tatnera-auth-brand>*{display:none!important}
+.tatnera-auth-card:after{display:none!important}
+.tatnera-auth-boot-mark{background:var(--tatnera-logo) center/contain no-repeat!important;width:190px!important;height:88px!important;border-radius:0!important;color:transparent!important;box-shadow:none!important}
+.tatnera-auth-boot strong,.tatnera-auth-boot span{display:none!important}
+
+/* Logged-in app sidebar */
+.sidebar .brand-wrap{height:112px!important;min-height:112px!important;padding:9px 10px 8px!important;background:var(--tatnera-logo) center/contain no-repeat!important;border-bottom:1px solid rgba(199,154,91,.16)}
+.sidebar .brand-wrap>*{visibility:hidden!important}
+.sidebar .brand-wrap:after{content:'';display:none}
+
+/* Keep the artwork calm on very narrow screens */
+@media(max-width:900px){
+  .hero-brand-sign{width:275px!important;height:126px!important}
+}
+@media(max-width:600px){
+  .navbar .logo{min-width:150px;min-height:56px}
+  .hero-brand-sign{width:245px!important;height:112px!important}
+  .tatnera-auth-brand{min-height:94px!important;background-size:190px auto!important}
+}
