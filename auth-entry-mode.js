@@ -3,32 +3,17 @@
   'use strict';
 
   const LOGO_SRC='assets/tatnera-brand.png?v=20260904-1';
-  const authStyles=[
-    {match:'auth-marketing.css',href:'auth-marketing.css?v=20260904-2'},
-    {match:'brand-entry-palette.css',href:'brand-entry-palette.css?v=20260904-1'},
-    {match:'brand-logo.css',href:'brand-logo.css?v=20260904-5'}
-  ];
-  authStyles.forEach(item=>{
-    if(document.querySelector(`link[href^="${item.match}"]`))return;
-    const link=document.createElement('link');
-    link.rel='stylesheet';
-    link.href=item.href;
-    document.head.appendChild(link);
-  });
 
-  if(!document.querySelector('script[src^="role-access.js"]')){
-    const access=document.createElement('script');
-    access.src='role-access.js?v=20260904-1';
-    access.defer=true;
-    document.head.appendChild(access);
+  function loadOnce(src){
+    if(document.querySelector(`script[src^="${src}"]`))return;
+    const script=document.createElement('script');
+    script.src=src;
+    script.async=true;
+    document.body.appendChild(script);
   }
 
-  if(!document.querySelector('script[src="subscription-guard.js"]')){
-    const guard=document.createElement('script');
-    guard.src='subscription-guard.js';
-    guard.defer=true;
-    document.head.appendChild(guard);
-  }
+  loadOnce('role-access.js');
+  loadOnce('subscription-guard.js');
 
   function ensureAuthLogo(){
     const brand=document.querySelector('.tatnera-auth-brand');
@@ -45,7 +30,7 @@
       try{img.fetchPriority='high';}catch(_error){}
       brand.replaceChildren(img);
     }
-    if(img.getAttribute('src')!==LOGO_SRC)img.setAttribute('src',LOGO_SRC);
+    if(img.getAttribute('src')!==LOGO_SRC)img.src=LOGO_SRC;
     return true;
   }
 
@@ -99,9 +84,11 @@
   const mode=params.get('mode');
 
   function applyMode(){
+    const shell=document.getElementById('tatneraAuthShell');
+    if(!shell)return false;
     installHomeLink();
     ensureAuthLogo();
-    if(mode!=='signup'&&mode!=='login')return !!document.getElementById('tatneraAuthShell');
+    if(mode!=='signup'&&mode!=='login')return true;
     const button=document.querySelector(`[data-auth-mode="${mode}"]`);
     if(!button)return false;
     button.click();
@@ -113,9 +100,11 @@
     return true;
   }
 
-  let attempts=0;
-  const timer=window.setInterval(()=>{
-    attempts+=1;
-    if(applyMode()||attempts>40)window.clearInterval(timer);
-  },50);
+  if(!applyMode()){
+    setTimeout(()=>{
+      if(!applyMode())setTimeout(applyMode,350);
+    },60);
+  }
+
+  document.addEventListener('tatnera:auth-ready',ensureAuthLogo);
 })();
