@@ -1,0 +1,180 @@
+/* TATNERA — final responsive layout layer
+   One layout system for phone, tablet and desktop.
+   This file is intentionally loaded after the base stylesheet and uses targeted
+   overrides where older feature modules otherwise force fixed widths. */
+
+html,body{width:100%;max-width:100%;overflow-x:hidden}
+body{min-width:0}
+.app-shell,.main,.topbar,.top-actions,.view,.cockpit-grid,.cockpit-grid>*{min-width:0}
+.main{width:100%;overflow-x:hidden}
+img,svg,canvas,video{max-width:100%;height:auto}
+
+/* ---------- Desktop shell ---------- */
+@media (min-width:1101px){
+  .app-shell{grid-template-columns:230px minmax(0,1fr)}
+  .main{padding:26px clamp(24px,2.2vw,40px) 54px}
+  .topbar{gap:18px}
+  .top-actions{display:flex;align-items:center;justify-content:flex-end;gap:9px;flex-wrap:wrap;max-width:62%}
+  .cockpit-grid{grid-template-columns:minmax(0,1.45fr) minmax(330px,.82fr);gap:16px;align-items:start}
+  .cockpit-grid>.panel{width:100%;min-width:0}
+  .cockpit-today,.cockpit-tasks,.cockpit-requests,.cockpit-projects,.cockpit-unscheduled,.cockpit-nextsteps{min-height:0!important}
+
+  /* Upcoming appointments are compact cards instead of a broken row of native buttons. */
+  .cockpit-upcoming [data-upcoming-list],
+  .cockpit-requests [data-upcoming-list]{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px!important}
+  .cockpit-upcoming .dashboard-work-row,
+  .cockpit-requests .dashboard-upcoming-row{height:100%;min-width:0}
+}
+
+/* ---------- Dashboard, all sizes ---------- */
+.cockpit-grid{width:100%}
+.cockpit-grid>.panel{min-width:0}
+.dashboard-work-list{width:100%;min-width:0;display:flex;flex-direction:column;gap:8px}
+.dashboard-work-row,
+.dashboard-upcoming-row{appearance:none;width:100%;min-width:0;max-width:100%;margin:0;border:1px solid var(--line);border-radius:12px;background:var(--panel-2);color:var(--text);padding:12px 13px;display:grid;grid-template-columns:minmax(0,1fr) auto 18px;gap:11px;align-items:center;text-align:left;cursor:pointer;overflow:hidden}
+.dashboard-work-row>div,
+.dashboard-work-row strong,
+.dashboard-work-row span,
+.dashboard-work-row small,
+.dashboard-upcoming-row>div,
+.dashboard-upcoming-row strong,
+.dashboard-upcoming-row span,
+.dashboard-upcoming-row small{min-width:0;max-width:100%}
+.dashboard-work-row strong,.dashboard-upcoming-row strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
+.dashboard-work-row>div:first-child>span,.dashboard-upcoming-row>div:first-child>span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;color:var(--muted);margin-top:3px}
+.dashboard-work-row>div:nth-child(2),.dashboard-upcoming-row>div:nth-child(2){text-align:right;white-space:nowrap}
+.dashboard-work-row .work-value,.dashboard-upcoming-row .work-value{font-size:11px;font-weight:850;text-align:right}
+
+html[data-theme="light"] .dashboard-work-row,
+html[data-theme="light"] .dashboard-upcoming-row{background:#f8f9fa;color:#1a1d21;border-color:#dfe2e6}
+
+/* Keep the expiry alert inside the viewport. */
+.cockpit-ink-alert,.cockpit-ink-alert .ink-alert-inner,.ink-alert-main,.ink-alert-copy,.ink-alert-next{min-width:0;max-width:100%}
+.ink-alert-copy>div{min-width:0}
+.ink-alert-copy h3,.ink-alert-copy p,.ink-alert-next strong,.ink-alert-next small{overflow-wrap:anywhere}
+
+/* Header controls may shrink/wrap, but never create page-wide horizontal scrolling. */
+.topbar{width:100%}
+.top-actions{min-width:0}
+.top-actions>*{max-width:100%}
+
+/* ---------- Generic dialogs ---------- */
+dialog.dialog{box-sizing:border-box;max-width:calc(100dvw - 24px)}
+dialog.dialog>*{max-width:100%;min-width:0}
+.dialog form,.dialog-head,.dialog-actions,.form-grid,.form-grid>*{min-width:0}
+.dialog input,.dialog select,.dialog textarea{box-sizing:border-box;max-width:100%;min-width:0}
+
+/* Appointment dialog must never require left/right panning. */
+#appointmentDialog{box-sizing:border-box!important;width:min(860px,calc(100dvw - 24px))!important;max-width:calc(100dvw - 24px)!important;max-height:calc(100dvh - 20px)!important;margin:auto!important;overflow:hidden!important;overscroll-behavior:contain}
+#appointmentDialog>form{box-sizing:border-box!important;width:100%!important;max-width:100%!important;max-height:calc(100dvh - 20px)!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:clamp(16px,2.2vw,24px)!important}
+#appointmentDialog .form-grid,#appointmentDialog .form-grid.three{width:100%;max-width:100%}
+#appointmentDialog .form-grid>*{max-width:100%;min-width:0}
+#appointmentDialog label{min-width:0;max-width:100%}
+#appointmentDialog input,#appointmentDialog select,#appointmentDialog textarea{display:block;width:100%!important;max-width:100%!important;min-width:0!important}
+#appointmentDialog select{overflow:hidden;text-overflow:ellipsis}
+#appointmentDialog .appointment-communication-panel{box-sizing:border-box;width:100%!important;max-width:100%!important;min-width:0!important;overflow:hidden}
+#appointmentDialog .appointment-communication-grid{width:100%;min-width:0}
+#appointmentDialog .appointment-communication-item{box-sizing:border-box;min-width:0;max-width:100%;overflow:hidden}
+#appointmentDialog .appointment-communication-head p,#appointmentDialog .appointment-communication-item strong,#appointmentDialog .appointment-communication-item small{overflow-wrap:anywhere;word-break:break-word}
+#appointmentDialog .appointment-communication-actions{min-width:0;max-width:100%}
+#appointmentDialog .appointment-dialog-tools{width:100%;min-width:0;max-width:100%}
+
+/* ---------- Tablet ---------- */
+@media (min-width:761px) and (max-width:1100px){
+  .app-shell{grid-template-columns:210px minmax(0,1fr)}
+  .sidebar{padding-inline:14px}
+  .main{padding:22px 22px 48px}
+  .topbar{align-items:flex-start}
+  .top-actions{justify-content:flex-end;flex-wrap:wrap;max-width:58%}
+  .cockpit-grid{grid-template-columns:1fr!important;align-items:start}
+  .cockpit-grid>.panel{min-height:0!important}
+  .cockpit-upcoming [data-upcoming-list],.cockpit-requests [data-upcoming-list]{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px!important}
+
+  #appointmentDialog{width:min(820px,calc(100dvw - 24px))!important}
+  #appointmentDialog .form-grid.three{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  #appointmentDialog .form-grid .full{grid-column:1/-1!important}
+  #appointmentDialog .appointment-communication-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  #appointmentDialog .appointment-dialog-tools{display:grid!important;grid-template-columns:auto minmax(0,1fr) auto!important;gap:12px!important;align-items:center}
+  #appointmentDialog .appointment-dialog-tools>.appointment-communication-panel{grid-column:1/-1!important;grid-row:1!important}
+  #appointmentDialog .appointment-dialog-tools>.danger-btn{grid-column:1!important;grid-row:2!important}
+  #appointmentDialog .appointment-dialog-tools>.dialog-actions{grid-column:3!important;grid-row:2!important;margin-top:0!important;display:flex!important;flex-wrap:wrap;justify-content:flex-end}
+}
+
+/* ---------- Phone ---------- */
+@media (max-width:760px){
+  .app-shell{display:block!important;width:100%;max-width:100%}
+  .main{width:100%;max-width:100%;padding:14px 12px 92px!important;overflow-x:hidden!important}
+  .topbar{display:grid!important;grid-template-columns:minmax(0,1fr);gap:12px!important;margin-bottom:18px!important}
+  .top-actions{width:100%;max-width:none!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px!important}
+  .top-actions .btn{width:100%;min-width:0;padding-inline:10px;white-space:normal}
+  .top-actions .icon-btn{display:none!important}
+  .topbar h1{font-size:24px!important}
+
+  .cockpit-grid{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:12px!important;align-items:start}
+  .cockpit-grid>.panel{width:100%!important;min-width:0!important;min-height:0!important;padding:15px!important;border-radius:15px}
+  .cockpit-head{gap:10px;margin-bottom:12px}
+  .cockpit-head h2{font-size:21px}.cockpit-head h3{font-size:17px}
+  .cockpit-task-grid{grid-template-columns:minmax(0,1fr)!important}
+  .cockpit-task-grid>button,.cockpit-task-grid>div{min-width:0;padding:12px}
+
+  .cockpit-upcoming [data-upcoming-list],.cockpit-requests [data-upcoming-list]{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:8px!important}
+  .dashboard-upcoming-tabs{width:100%;max-width:100%;overflow-x:auto;scrollbar-width:none;gap:12px!important}
+  .dashboard-upcoming-tabs::-webkit-scrollbar{display:none}
+  .dashboard-upcoming-artists{max-width:100%}
+
+  /* On phones the date/time stays visible below the customer instead of being hidden. */
+  .dashboard-work-row,.dashboard-upcoming-row{grid-template-columns:minmax(0,1fr) 18px!important;grid-template-areas:"main arrow" "meta meta"!important;gap:7px 10px!important;padding:11px 12px!important}
+  .dashboard-work-row>div:first-child,.dashboard-upcoming-row>div:first-child{grid-area:main;min-width:0}
+  .dashboard-work-row>div:nth-child(2),.dashboard-upcoming-row>div:nth-child(2){grid-area:meta!important;display:flex!important;align-items:center;justify-content:space-between;gap:10px;text-align:left!important;white-space:normal!important;padding-top:7px;border-top:1px solid var(--line)}
+  .dashboard-work-row>span:last-child,.dashboard-upcoming-row>span:last-child{grid-area:arrow;align-self:start}
+  .dashboard-work-row .work-value,.dashboard-upcoming-row .work-value{text-align:right!important}
+  .dashboard-work-row strong,.dashboard-upcoming-row strong{white-space:normal;overflow:visible;text-overflow:clip}
+  .dashboard-work-row>div:first-child>span,.dashboard-upcoming-row>div:first-child>span{white-space:normal;overflow:visible;text-overflow:clip}
+
+  .cockpit-ink-alert .ink-alert-inner{grid-template-columns:minmax(0,1fr)!important}
+  .ink-alert-main{padding:14px!important;align-items:stretch!important;flex-direction:column!important;gap:12px!important}
+  .ink-alert-copy{gap:10px!important}
+  .ink-alert-icon{width:34px!important;height:34px!important}
+  .ink-alert-action{width:100%!important}
+  .ink-alert-next{padding:13px 14px!important;border-left:0!important;border-top:1px solid currentColor}
+
+  dialog.dialog{width:calc(100dvw - 12px)!important;max-width:calc(100dvw - 12px)!important;max-height:calc(100dvh - 12px)!important;margin:auto!important;border-radius:16px!important;overflow:hidden!important}
+  dialog.dialog>form,dialog.dialog>div{box-sizing:border-box;max-width:100%;min-width:0}
+
+  #appointmentDialog{width:calc(100dvw - 12px)!important;max-width:calc(100dvw - 12px)!important;max-height:calc(100dvh - 12px)!important;margin:auto!important}
+  #appointmentDialog>form{width:100%!important;max-width:100%!important;max-height:calc(100dvh - 12px)!important;padding:14px 12px 18px!important;overflow-y:auto!important;overflow-x:hidden!important}
+  #appointmentDialog .dialog-head{gap:10px!important;margin-bottom:13px!important}
+  #appointmentDialog .dialog-head>div{min-width:0}
+  #appointmentDialog .dialog-head h2{font-size:20px!important;line-height:1.15}
+  #appointmentDialog .form-grid,#appointmentDialog .form-grid.three{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:11px!important}
+  #appointmentDialog .form-grid .full{grid-column:1!important}
+  #appointmentDialog input,#appointmentDialog select,#appointmentDialog textarea{font-size:16px!important;min-height:46px!important;padding:11px 12px!important}
+  #appointmentDialog textarea{min-height:100px!important;resize:vertical}
+
+  #appointmentDialog .appointment-communication-panel{padding:12px!important;margin:3px 0 0!important}
+  #appointmentDialog .appointment-communication-head{display:block!important;margin-bottom:10px!important}
+  #appointmentDialog .appointment-communication-grid{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:8px!important}
+  #appointmentDialog .appointment-communication-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important}
+  #appointmentDialog .appointment-communication-actions .btn{width:100%!important;min-width:0!important;min-height:42px;white-space:normal!important;padding:9px 8px!important}
+
+  #appointmentDialog .appointment-dialog-tools{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:10px!important;margin-top:13px!important}
+  #appointmentDialog .appointment-dialog-tools>.appointment-communication-panel,
+  #appointmentDialog .appointment-dialog-tools>.danger-btn,
+  #appointmentDialog .appointment-dialog-tools>.dialog-actions{width:100%!important;max-width:100%!important;min-width:0!important;grid-column:auto!important;grid-row:auto!important}
+  #appointmentDialog .appointment-dialog-tools>.danger-btn{min-height:44px}
+  #appointmentDialog .appointment-dialog-tools>.dialog-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;margin-top:0!important}
+  #appointmentDialog .appointment-dialog-tools>.dialog-actions .btn{width:100%!important;min-width:0!important;min-height:44px;padding:10px 8px!important;white-space:normal!important}
+
+  /* Other dialogs should also stay inside the screen. */
+  .communication-message-dialog,.dashboard-action-dialog{width:calc(100dvw - 12px)!important;max-width:calc(100dvw - 12px)!important;max-height:calc(100dvh - 12px)!important;overflow-y:auto!important;overflow-x:hidden!important}
+  .communication-message-body,.dashboard-action-dialog>div{box-sizing:border-box;width:100%;max-width:100%;padding:14px!important}
+  .communication-message-actions{display:grid!important;grid-template-columns:minmax(0,1fr)!important}
+  .communication-message-actions .btn{width:100%;min-width:0}
+}
+
+@media (max-width:430px){
+  .main{padding-inline:10px!important}
+  .top-actions{grid-template-columns:minmax(0,1fr)!important}
+  #appointmentDialog .appointment-communication-actions,
+  #appointmentDialog .appointment-dialog-tools>.dialog-actions{grid-template-columns:minmax(0,1fr)!important}
+}
