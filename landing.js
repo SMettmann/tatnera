@@ -2,11 +2,6 @@
 (function(){
   'use strict';
 
-  ['pricing.css?v=4','tattoo-marketing.css?v=7','brand-entry-palette.css?v=20260904-1','brand-logo.css?v=20260904-1'].forEach(href=>{
-    if(document.querySelector(`link[href="${href}"]`))return;
-    const link=document.createElement('link');link.rel='stylesheet';link.href=href;document.head.appendChild(link);
-  });
-
   const nav=document.querySelector('.nav-links');
   if(nav&&!nav.querySelector('a[href="#preise"]')){
     const priceLink=document.createElement('a');
