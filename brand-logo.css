@@ -1,11 +1,10 @@
-/* TATNERA — stable modern tattoo wordmark. Pure text: no image masks, no disappearing logo. */
+/* TATNERA — stable rounded tattoo wordmark. Pure text, always visible. */
 :root{
   --tatnera-logo-white:#f4efe8;
   --tatnera-logo-gold:#c79a5b;
   --tatnera-logo-gold-soft:#dfbd83;
 }
 
-/* Keep the legacy image harmless and invisible. */
 .tatnera-logo-img{
   display:block!important;
   width:0!important;
@@ -38,7 +37,7 @@
   overflow:visible!important;
 }
 
-/* Modern tattoo-style lettering: condensed, slightly slanted and crisp. */
+/* Rounder tattoo-brand lettering: bold, smooth, slightly hand-lettered in stance. */
 .logo::before,
 .hero-brand-sign::before,
 .footer .logo::before,
@@ -50,24 +49,23 @@
   position:relative!important;
   z-index:2!important;
   color:var(--tatnera-logo-white)!important;
-  font-family:"Segoe UI Black","Arial Narrow","Franklin Gothic Medium",Arial,sans-serif!important;
+  font-family:"Arial Rounded MT Bold","Trebuchet MS","Segoe UI",Arial,sans-serif!important;
   font-weight:900!important;
   font-style:italic!important;
-  font-stretch:condensed!important;
   text-transform:uppercase!important;
-  letter-spacing:.12em!important;
-  line-height:.9!important;
+  letter-spacing:.055em!important;
+  line-height:.92!important;
   white-space:nowrap!important;
-  transform:skewX(-8deg)!important;
+  transform:skewX(-5deg) scaleX(1.025)!important;
   transform-origin:left center!important;
-  -webkit-text-stroke:.35px rgba(255,255,255,.28)!important;
+  -webkit-text-stroke:.45px rgba(255,255,255,.2)!important;
   text-shadow:
-    2px 2px 0 rgba(199,154,91,.18),
-    0 8px 22px rgba(0,0,0,.34)!important;
+    2px 2px 0 rgba(199,154,91,.22),
+    0 8px 22px rgba(0,0,0,.32)!important;
   pointer-events:none!important;
 }
 
-/* Gold signature stroke. */
+/* Gold tattoo flourish. */
 .logo::after,
 .hero-brand-sign::after,
 .footer .logo::after,
@@ -79,9 +77,10 @@
   position:absolute!important;
   z-index:1!important;
   height:3px!important;
+  border-radius:999px!important;
   background:linear-gradient(90deg,var(--tatnera-logo-gold-soft),var(--tatnera-logo-gold))!important;
-  transform:skewX(-28deg)!important;
-  box-shadow:0 0 10px rgba(199,154,91,.12)!important;
+  transform:rotate(-2deg) skewX(-20deg)!important;
+  box-shadow:0 0 10px rgba(199,154,91,.14)!important;
   pointer-events:none!important;
 }
 
@@ -100,15 +99,15 @@
 .navbar .logo::after{
   left:2px!important;
   top:7px!important;
-  width:96px!important;
+  width:94px!important;
 }
 
 /* Homepage hero. */
 .hero-brand-sign{
-  width:390px!important;
+  width:400px!important;
   max-width:100%!important;
-  height:92px!important;
-  min-height:92px!important;
+  height:94px!important;
+  min-height:94px!important;
   margin:0 0 18px!important;
   padding:0!important;
   border:0!important;
@@ -117,12 +116,12 @@
 }
 .hero-brand-sign>*:not(.tatnera-logo-img){display:none!important}
 .hero-brand-sign::before{
-  font-size:61px!important;
-  letter-spacing:.075em!important;
+  font-size:62px!important;
+  letter-spacing:.04em!important;
 }
 .hero-brand-sign::after{
   left:4px!important;
-  top:4px!important;
+  top:5px!important;
   width:132px!important;
 }
 .hero-brand-sign + .kicker{margin-top:0!important}
@@ -140,7 +139,7 @@
 .footer .logo::after{
   left:2px!important;
   top:7px!important;
-  width:88px!important;
+  width:86px!important;
 }
 
 /* Login / registration. */
@@ -157,7 +156,7 @@
 .tatnera-auth-brand::after{
   left:2px!important;
   top:5px!important;
-  width:96px!important;
+  width:94px!important;
 }
 .tatnera-auth-card:after{display:none!important}
 
@@ -179,7 +178,7 @@
 .tatnera-auth-boot-mark::after{
   left:2px!important;
   top:12px!important;
-  width:96px!important;
+  width:94px!important;
 }
 .tatnera-auth-boot strong,
 .tatnera-auth-boot span{display:none!important}
@@ -200,22 +199,22 @@
 .sidebar .brand-wrap>*:not(.tatnera-logo-img){display:none!important}
 .sidebar .brand-wrap::before{
   font-size:23px!important;
-  transform:skewX(-8deg)!important;
+  transform:skewX(-5deg) scaleX(1.025)!important;
 }
 .sidebar .brand-wrap::after{
   left:50%!important;
   top:25px!important;
-  width:76px!important;
-  transform:translateX(-68px) skewX(-28deg)!important;
+  width:74px!important;
+  transform:translateX(-67px) rotate(-2deg) skewX(-20deg)!important;
 }
 
 @media(max-width:900px){
   .hero-brand-sign{
-    width:330px!important;
-    height:80px!important;
-    min-height:80px!important;
+    width:340px!important;
+    height:82px!important;
+    min-height:82px!important;
   }
-  .hero-brand-sign::before{font-size:50px!important}
+  .hero-brand-sign::before{font-size:51px!important}
   .hero-brand-sign::after{width:112px!important}
 }
 
@@ -228,13 +227,13 @@
     min-height:64px!important;
   }
   .navbar .logo::before{font-size:21px!important}
-  .navbar .logo::after{width:76px!important}
+  .navbar .logo::after{width:74px!important}
   .hero-brand-sign{
-    width:280px!important;
-    height:68px!important;
-    min-height:68px!important;
+    width:290px!important;
+    height:70px!important;
+    min-height:70px!important;
   }
-  .hero-brand-sign::before{font-size:41px!important}
+  .hero-brand-sign::before{font-size:42px!important}
   .hero-brand-sign::after{width:94px!important}
   .tatnera-auth-brand::before,
   .tatnera-auth-boot-mark::before{font-size:24px!important}
