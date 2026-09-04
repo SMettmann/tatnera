@@ -118,7 +118,7 @@
   window.TatneraProjectTabs={activate,restoreCurrent};
 })();
 
-/* Calendar extensions are loaded last so they can safely wrap the base calendar runtime. */
+/* Late UI extensions are loaded here so they can safely wrap the consolidated runtime. */
 (function(){
   function load(src,guard){
     if((guard&&window[guard])||document.querySelector(`script[src="${src}"]`))return;
@@ -128,4 +128,5 @@
   }
   load('calendar-month-view.js','__tatneraMonthCalendarInstalled');
   load('calendar-appointment-ux.js','__tatneraCalendarAppointmentUxInstalled');
+  load('customer-service-tabs.js','__tatneraCustomerServiceTabsInstalled');
 })();
