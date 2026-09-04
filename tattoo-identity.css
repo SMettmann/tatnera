@@ -1,0 +1,227 @@
+/* TATNERA — Tattoo Studio Identity Layer
+   More character for tattoo & piercing studios without sacrificing usability. */
+
+/* ---------- Full-height studio rail ---------- */
+@media (min-width:761px){
+  .app-shell{min-height:100dvh!important;align-items:stretch!important}
+  .sidebar{
+    position:sticky!important;top:0!important;align-self:start!important;
+    height:100dvh!important;min-height:100vh!important;
+    display:flex!important;flex-direction:column!important;
+    overflow:hidden!important;
+  }
+  .sidebar .nav{flex:1 1 auto!important;overflow-y:auto!important;scrollbar-width:thin}
+  .sidebar-bottom{margin-top:auto!important;flex:0 0 auto!important}
+}
+
+/* ---------- Ink / flash inspired background language ---------- */
+:root[data-theme="dark"] body,
+:root[data-theme="pink"] body{
+  background-image:
+    radial-gradient(circle at 12% 0%,rgba(201,154,88,.07),transparent 28%),
+    radial-gradient(circle at 88% 8%,color-mix(in srgb,var(--accent) 5%,transparent),transparent 25%),
+    repeating-linear-gradient(135deg,rgba(255,255,255,.010) 0 1px,transparent 1px 14px)!important;
+}
+:root[data-theme="light"] body{
+  background-image:
+    radial-gradient(circle at 10% 0%,rgba(169,120,62,.08),transparent 30%),
+    repeating-linear-gradient(135deg,rgba(31,40,33,.018) 0 1px,transparent 1px 16px)!important;
+}
+
+.sidebar{
+  position:relative;
+  isolation:isolate;
+  background-image:
+    radial-gradient(circle at 50% 18%,rgba(255,255,255,.026) 0 1px,transparent 1px 20px),
+    repeating-conic-gradient(from 0deg at 50% 20%,rgba(201,154,88,.018) 0 2deg,transparent 2deg 14deg),
+    linear-gradient(180deg,#0c0e0f 0%,#0a0c0d 100%)!important;
+}
+:root[data-theme="light"] .sidebar{
+  background-image:
+    radial-gradient(circle at 50% 18%,rgba(255,255,255,.028) 0 1px,transparent 1px 20px),
+    repeating-conic-gradient(from 0deg at 50% 20%,rgba(214,181,127,.022) 0 2deg,transparent 2deg 14deg),
+    linear-gradient(180deg,#151816 0%,#111411 100%)!important;
+}
+.sidebar::before{
+  content:"✦";
+  position:absolute;z-index:-1;
+  right:-44px;top:150px;
+  width:176px;height:176px;display:grid;place-items:center;
+  border:1px solid rgba(201,154,88,.08);border-radius:50%;
+  color:rgba(201,154,88,.055);font-size:86px;line-height:1;
+  box-shadow:0 0 0 22px rgba(255,255,255,.008),0 0 0 44px rgba(201,154,88,.006);
+  transform:rotate(12deg);pointer-events:none;
+}
+
+/* ---------- Brand = studio mark, not software logo tile ---------- */
+.brand-wrap{position:relative!important;margin-bottom:4px!important}
+.brand-wrap::after{
+  content:"";position:absolute;left:0;right:0;bottom:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(201,154,88,.30),transparent)
+}
+.brand-mark{
+  position:relative!important;border-radius:0!important;
+  clip-path:polygon(22% 0,78% 0,100% 22%,100% 78%,78% 100%,22% 100%,0 78%,0 22%)!important;
+  background:linear-gradient(145deg,var(--accent),color-mix(in srgb,var(--accent) 74%,var(--dp-copper)))!important;
+  box-shadow:0 10px 28px rgba(0,0,0,.34)!important;
+  text-shadow:0 1px 0 rgba(255,255,255,.15);
+}
+.brand-mark::after{
+  content:"";position:absolute;inset:6px;border:1px solid rgba(0,0,0,.22);
+  clip-path:inherit;pointer-events:none
+}
+.brand{font-size:18px!important;letter-spacing:.15em!important;font-weight:950!important;text-transform:uppercase}
+.brand-sub{font-size:10.5px!important;text-transform:uppercase!important;letter-spacing:.13em!important;color:#7f8881!important}
+
+/* ---------- Navigation behaves like a row of flash cards ---------- */
+.nav-item{position:relative!important;overflow:hidden!important}
+.nav-item>span:first-child{
+  display:grid!important;place-items:center!important;
+  width:29px!important;height:29px!important;min-width:29px!important;
+  border:1px solid #2b302d!important;background:#131715!important;
+  border-radius:9px!important;font-size:15px!important;
+  transition:border-color .15s ease,background .15s ease,color .15s ease,transform .15s ease!important;
+}
+.nav-item:hover>span:first-child{border-color:#404740!important;background:#1b201d!important;transform:rotate(-2deg)}
+.nav-item.active{box-shadow:none!important;padding-left:11px!important}
+.nav-item.active::before{
+  content:"";position:absolute;left:0;top:9px;bottom:9px;width:3px;
+  background:linear-gradient(180deg,var(--dp-copper),var(--accent));border-radius:99px;
+  box-shadow:0 0 14px color-mix(in srgb,var(--accent) 25%,transparent)
+}
+.nav-item.active>span:first-child{
+  border-color:color-mix(in srgb,var(--accent) 40%,#30352f)!important;
+  background:color-mix(in srgb,var(--accent) 8%,#151916)!important;
+}
+
+/* ---------- Main surface gets an editorial / flash-sheet feel ---------- */
+.main{position:relative!important}
+.main::before{
+  content:"";position:fixed;pointer-events:none;z-index:-1;
+  right:3.5vw;bottom:4vh;width:240px;height:240px;border-radius:50%;
+  border:1px solid color-mix(in srgb,var(--dp-copper) 9%,transparent);
+  box-shadow:0 0 0 30px color-mix(in srgb,var(--accent) 1.5%,transparent),0 0 0 64px rgba(255,255,255,.004)
+}
+
+#pageTitle{
+  text-transform:uppercase!important;letter-spacing:.035em!important;
+  font-weight:950!important;line-height:1!important;
+}
+.topbar .eyebrow::before,.panel-head .eyebrow::before,.section-toolbar .eyebrow::before,.request-toolbar .eyebrow::before,.dialog-head .eyebrow::before{
+  content:"✦";margin-right:7px;font-size:.9em;color:var(--dp-copper)
+}
+
+/* ---------- Panels with subtle tattoo-flash corner details ---------- */
+.panel,.detail-card,.request-box,.theme-settings-panel,.calendar-shell{
+  position:relative!important;overflow:hidden
+}
+.panel::before,.detail-card::before,.request-box::before,.theme-settings-panel::before{
+  content:"";position:absolute;left:14px;top:0;width:44px;height:2px;
+  background:linear-gradient(90deg,var(--dp-copper),transparent);opacity:.72;pointer-events:none
+}
+.panel::after,.detail-card::after,.request-box::after{
+  content:"";position:absolute;right:-26px;bottom:-26px;width:78px;height:78px;border-radius:50%;
+  border:1px solid color-mix(in srgb,var(--dp-copper) 10%,transparent);pointer-events:none
+}
+
+/* ---------- Dashboard hero: more tattoo flash, less SaaS ---------- */
+.hero-card{min-height:205px!important;padding:28px 30px!important;isolation:isolate}
+.hero-card::before{
+  content:"✦";position:absolute;z-index:-1;right:48px;top:50%;transform:translateY(-52%) rotate(10deg);
+  width:150px;height:150px;display:grid;place-items:center;border-radius:50%;
+  color:rgba(217,187,126,.18);font-size:82px;
+  border:1px solid rgba(217,187,126,.14);
+  background:repeating-conic-gradient(from 0deg,rgba(217,187,126,.05) 0 2deg,transparent 2deg 15deg);
+  box-shadow:0 0 0 18px rgba(217,187,126,.018),0 0 0 38px rgba(183,212,93,.010)
+}
+.hero-card::after{
+  content:"";position:absolute;right:122px;top:24px;width:1px;height:154px;border-radius:0;
+  background:linear-gradient(180deg,transparent,rgba(217,187,126,.35),transparent);box-shadow:none
+}
+.hero-card h2{font-size:31px!important;max-width:62%!important;text-transform:uppercase!important;letter-spacing:.015em!important}
+.hero-card p{max-width:62%!important}
+.hero-card .btn{position:relative;z-index:1}
+
+/* ---------- Metrics read like compact studio cards ---------- */
+.metric-card{border-radius:13px!important}
+.metric-card::before{width:2px!important;top:12px!important;bottom:12px!important}
+.metric-card::after{
+  content:"✦";position:absolute!important;right:12px!important;top:9px!important;width:auto!important;height:auto!important;
+  background:none!important;color:color-mix(in srgb,var(--dp-copper) 28%,transparent)!important;font-size:14px!important;border-radius:0!important
+}
+.metric-card strong{font-variant-numeric:tabular-nums}
+
+/* ---------- Project cards resemble digital flash sheets ---------- */
+.project-card{border-radius:13px!important;position:relative!important}
+.project-art{position:relative!important;min-height:132px!important;overflow:hidden!important}
+.project-art::before{
+  content:"";position:absolute;inset:0;
+  background:
+    radial-gradient(circle at 72% 42%,transparent 0 23px,rgba(201,154,88,.12) 24px 25px,transparent 26px 38px,rgba(201,154,88,.055) 39px 40px,transparent 41px),
+    repeating-conic-gradient(from 0deg at 72% 42%,rgba(201,154,88,.035) 0 2deg,transparent 2deg 16deg);
+  opacity:.9;pointer-events:none
+}
+.project-art::after{
+  content:"✦";position:absolute;right:28px;top:50%;transform:translateY(-50%) rotate(-7deg);
+  color:color-mix(in srgb,var(--accent) 36%,var(--dp-copper));font-size:46px;opacity:.62;pointer-events:none
+}
+.project-body{position:relative}
+.project-body::before{content:"";position:absolute;left:0;top:0;width:32px;height:1px;background:var(--dp-copper);opacity:.55}
+.project-body h4{font-size:16px!important;text-transform:uppercase!important;letter-spacing:.025em!important}
+
+/* ---------- Requests / workflow = studio work board ---------- */
+.request-column{background:color-mix(in srgb,var(--panel) 92%,#000)!important;border-style:dashed!important}
+.request-column .column-head{position:relative!important;padding-bottom:10px!important}
+.request-column .column-head::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(90deg,var(--dp-copper),transparent)}
+.request-card{border-radius:12px!important;position:relative!important}
+.request-card::before{content:"";position:absolute;top:0;left:12px;width:28px;height:2px;background:var(--accent);opacity:.72}
+.request-service-badge,.request-stage,.status-pill,.event-type-pill{border-radius:7px!important;letter-spacing:.08em!important}
+
+/* ---------- Forms / dialogs: dark studio workstation, not admin template ---------- */
+.dialog{border-radius:18px!important}
+.dialog-head{position:relative!important;padding-bottom:15px!important}
+.dialog-head::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(90deg,var(--dp-copper),var(--line) 42%,transparent)}
+.dialog-head h2{text-transform:uppercase!important;letter-spacing:.025em!important}
+input,select,textarea{border-radius:10px!important}
+input:focus,select:focus,textarea:focus{box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 10%,transparent)!important}
+.btn{border-radius:10px!important}
+.btn.primary{position:relative!important;overflow:hidden!important}
+.btn.primary::after{content:"";position:absolute;right:-12px;top:-18px;width:34px;height:70px;transform:rotate(28deg);background:rgba(255,255,255,.10);pointer-events:none}
+
+/* ---------- Customer/table rows get a record-card edge ---------- */
+.table-panel tbody td:first-child{position:relative!important}
+.table-panel tbody td:first-child::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:2px;background:var(--dp-copper);opacity:.55}
+.customer-avatar,.big-avatar{border-radius:10px!important;transform:rotate(-1deg)}
+
+/* ---------- Light theme = tattoo flash paper, not corporate white ---------- */
+:root[data-theme="light"] .panel,
+:root[data-theme="light"] .metric-card,
+:root[data-theme="light"] .project-card,
+:root[data-theme="light"] .detail-card,
+:root[data-theme="light"] .request-card,
+:root[data-theme="light"] .request-box{
+  background:linear-gradient(180deg,#fffefa,#faf8f1)!important;
+  border-color:#d8d2c5!important;
+}
+:root[data-theme="light"] .request-column{background:#f2eee5!important;border-color:#cfc7b8!important}
+:root[data-theme="light"] .project-art{background:linear-gradient(145deg,#ece5d8,#ddd5c7)!important}
+:root[data-theme="light"] .hero-card{background:linear-gradient(135deg,#222820,#171c18 62%,#221b14 100%)!important}
+
+/* ---------- Mobile: keep flavor, remove decoration that steals space ---------- */
+@media(max-width:760px){
+  .sidebar::before,.main::before{display:none!important}
+  .hero-card{min-height:0!important;padding:20px!important}
+  .hero-card::before{right:-22px!important;width:116px!important;height:116px!important;font-size:58px!important;opacity:.45}
+  .hero-card::after{display:none!important}
+  .hero-card h2,.hero-card p{max-width:78%!important}
+  .project-art{min-height:104px!important}
+  .project-art::after{font-size:34px!important;right:20px!important}
+  .panel::after,.detail-card::after,.request-box::after{display:none!important}
+  #pageTitle{letter-spacing:.02em!important}
+}
+
+@media(max-width:430px){
+  .hero-card::before{display:none!important}
+  .hero-card h2,.hero-card p{max-width:100%!important}
+  .topbar .eyebrow::before,.panel-head .eyebrow::before,.section-toolbar .eyebrow::before,.request-toolbar .eyebrow::before,.dialog-head .eyebrow::before{margin-right:5px}
+}
