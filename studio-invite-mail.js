@@ -22,7 +22,7 @@
     const form=document.getElementById('studioInviteForm');if(!form)return;
     const button=form.querySelector('[type="submit"]');if(button)button.textContent='Einladung senden';
     const note=form.nextElementSibling;
-    if(note?.classList.contains('studio-team-note'))note.textContent='TATNERA versucht die Einladung automatisch zu senden. Falls der Supabase-Testmaildienst limitiert ist, wird sofort ein sicherer Direktlink erzeugt.';
+    if(note?.classList.contains('studio-team-note'))note.textContent='Der Mitarbeiter öffnet den Link und legt direkt E-Mail-Adresse, Namen und Passwort für seinen TATNERA-Zugang fest.';
   }
 
   function friendlyMailError(error){
@@ -49,7 +49,7 @@
 
   function mailtoUrl(email,url){
     const subject='Deine TATNERA Studio-Einladung';
-    const body=`Hallo,\n\ndu wurdest zu TATNERA eingeladen. Öffne diesen persönlichen Link und richte deinen Zugang ein:\n\n${url}\n\nDer Link ist nur für deine Einladung bestimmt.`;
+    const body=`Hallo,\n\ndu wurdest zu TATNERA eingeladen. Öffne diesen persönlichen Link und lege direkt deine E-Mail-Adresse und dein Passwort für TATNERA fest:\n\n${url}\n\nDanach öffnet sich dein Studio automatisch. Der Link ist nur für deine Einladung bestimmt.`;
     return `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   }
 
@@ -58,7 +58,7 @@
     const baseUrl=baseInviteUrl||displayUrl;
     const hasSecureFallback=!mailSent&&displayUrl&&displayUrl!==baseUrl;
     const title=mailSent?'Einladung per E-Mail gesendet ✓':hasSecureFallback?'Einladung bereit – Maildienst aktuell limitiert':'Einladung erstellt – Versand nicht bestätigt';
-    const message=mailSent?`Die Einladung wurde an ${email} geschickt.`:(mailMessage||'Die Einladung ist erstellt.');
+    const message=mailSent?`Die Einladung wurde an ${email} geschickt. Der Link öffnet direkt die Einrichtung des persönlichen Zugangs.`:(mailMessage||'Die Einladung ist erstellt.');
     const retryButton=!mailSent&&inviteId?'<button type="button" class="btn primary" style="width:100%" data-resend-studio-invite>Automatischen Versand erneut versuchen</button>':'';
     const mailButton=hasSecureFallback?`<a class="btn ghost" style="text-decoration:none;text-align:center" href="${esc(mailtoUrl(email,displayUrl))}">In E-Mail öffnen</a>`:'';
     root.innerHTML=`<div class="studio-invite-result"><strong>${esc(title)}</strong><div class="studio-team-note" data-invite-mail-message style="margin:0 0 10px">${esc(message)}</div>${retryButton}${hasSecureFallback?'<div class="studio-team-note" style="margin:9px 0 6px"><strong>Sicherer Zugangslink</strong> – damit kann der Empfänger direkt seinen Zugang einrichten.</div>':''}<div class="studio-invite-link"><input readonly value="${esc(displayUrl)}" aria-label="Einladungslink"><button type="button" class="btn ghost" data-copy-mail-invite>Kopieren</button></div>${mailButton?`<div style="margin-top:8px">${mailButton}</div>`:''}</div>`;
@@ -130,7 +130,7 @@
       }
 
       const invite=await getOrCreateInvite(c,sid,user,email,role);
-      const inviteUrl=new URL(PUBLIC_APP_URL);inviteUrl.searchParams.set('invite',invite.token);
+      const inviteUrl=new URL(PUBLIC_APP_URL);inviteUrl.searchParams.set('invite',invite.token);inviteUrl.searchParams.set('email',email);
       let mailSent=false,mailMessage='',displayUrl=inviteUrl.toString();
       try{
         const delivery=await deliverInvite(invite.id);
