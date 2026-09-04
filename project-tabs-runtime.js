@@ -139,4 +139,5 @@
   load('role-permissions.js','__tatneraRolePermissionsInstalled');
   load('team-role-ui-fix.js','__tatneraTeamRoleUiFixInstalled');
   load('role-policy-v2.js','__tatneraRolePolicyV2Installed');
+  load('calendar-full-service-flow.js','__tatneraCalendarFullServiceFlowInstalled');
 })();
