@@ -12,15 +12,14 @@
   document.head.appendChild(style);
 
   function patchTeamText(){
-    const panel=document.getElementById('studioTeamPanel');
-    if(!panel)return;
-    const intro=panel.querySelector('.studio-team-head p');
-    if(intro)intro.textContent='Rollen und Studio-Zugriff werden hier zentral verwaltet.';
+    const intro=document.querySelector('#studioTeamPanel .studio-team-head p');
+    const text='Rollen und Studio-Zugriff werden hier zentral verwaltet.';
+    if(intro&&intro.textContent!==text)intro.textContent=text;
   }
 
-  const observer=new MutationObserver(patchTeamText);
-  if(document.body)observer.observe(document.body,{childList:true,subtree:true});
-  document.addEventListener('tatnera:auth-ready',patchTeamText);
+  document.addEventListener('tatnera:auth-ready',()=>setTimeout(patchTeamText,250));
   document.addEventListener('tatnera:runtime-refresh',patchTeamText);
-  patchTeamText();
+  document.addEventListener('click',event=>{
+    if(event.target.closest('[data-view="settings"],[data-view-target="settings"]'))setTimeout(patchTeamText,150);
+  });
 })();
