@@ -1,0 +1,7 @@
+/* Mobile landing header: keep Login and trial CTA visible. */
+@media(max-width:700px){
+  .nav-inner{gap:8px!important}
+  .nav-actions{display:flex!important;align-items:center!important;gap:6px!important;flex:0 0 auto!important}
+  .nav-actions .secondary{display:inline-flex!important;padding:10px 10px!important;font-size:11px!important;white-space:nowrap!important}
+  .nav-actions .primary{padding:10px 11px!important;font-size:11px!important;white-space:nowrap!important}
+}
