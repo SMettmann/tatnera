@@ -1,5 +1,5 @@
 /* TATNERA — clean selected logo as a real SVG asset. */
-:root{--tatnera-logo-image:url('assets/tatnera-logo.svg?v=20260905-2')}
+:root{--tatnera-logo-image:url('assets/tatnera-logo.svg?v=20260905-3')}
 .tatnera-logo-img{display:none!important;pointer-events:none!important;user-select:none!important;-webkit-user-select:none!important;-webkit-user-drag:none!important}
 .logo,.hero-brand-sign,.footer .logo,.sidebar .brand-wrap,.tatnera-auth-brand,.tatnera-auth-boot-mark{position:relative!important;display:flex!important;align-items:center!important;background:none!important;overflow:visible!important}
 .logo::before,.hero-brand-sign::before,.footer .logo::before,.sidebar .brand-wrap::before,.tatnera-auth-brand::before,.tatnera-auth-boot-mark::before{content:""!important;display:block!important;flex:0 0 auto!important;background-image:var(--tatnera-logo-image)!important;background-repeat:no-repeat!important;background-position:center!important;background-size:contain!important;filter:drop-shadow(0 3px 8px rgba(0,0,0,.18))!important;pointer-events:none!important}
