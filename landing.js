@@ -15,7 +15,7 @@
   if(trialNote&&!document.querySelector('.hero-price')){
     const heroPrice=document.createElement('div');
     heroPrice.className='hero-price';
-    heroPrice.innerHTML='<span>Nach dem Test:</span><strong>19,99 € / Monat</strong><span>· nur bei aktiver Buchung</span>';
+    heroPrice.innerHTML='<span>Nach dem Test:</span><strong>19 € / Monat</strong><span>· nur bei aktiver Buchung</span>';
     trialNote.parentNode.insertBefore(heroPrice,trialNote);
   }
 
@@ -48,7 +48,7 @@
         <div class="pricing-card reveal">
           <div>
             <span class="eyebrow">Klare Kosten nach dem Test</span>
-            <h2>Erst 14 Tage kostenlos. Danach 19,99 € im Monat.</h2>
+            <h2>Erst 14 Tage kostenlos. Danach 19 € im Monat.</h2>
             <p>Wenn TATNERA zu deinem Studio passt, entscheidest du dich nach der Testphase aktiv für die weitere Nutzung. Ohne automatische Verlängerung und ohne versteckte Preisstaffelung.</p>
             <div class="price-facts">
               <span>14 Tage kostenlos testen</span>
@@ -62,7 +62,7 @@
           </div>
           <div class="price-display">
             <span class="price-label">Danach monatlich</span>
-            <strong>19,99 €</strong>
+            <strong>19 €</strong>
             <small>pro Studio</small>
           </div>
         </div>
@@ -74,7 +74,7 @@
   if(faq&&!faq.querySelector('[data-price-faq]')){
     const item=document.createElement('details');
     item.dataset.priceFaq='true';
-    item.innerHTML='<summary>Was kostet TATNERA nach den 14 Tagen?</summary><p>Nach der kostenlosen Testphase kostet TATNERA 19,99 € pro Monat. Eine kostenpflichtige Nutzung startet nur, wenn du dich aktiv dafür entscheidest.</p>';
+    item.innerHTML='<summary>Was kostet TATNERA nach den 14 Tagen?</summary><p>Nach der kostenlosen Testphase kostet TATNERA 19 € pro Monat. Eine kostenpflichtige Nutzung startet nur, wenn du dich aktiv dafür entscheidest.</p>';
     const second=faq.children[1];
     faq.insertBefore(item,second?second.nextSibling:null);
   }
