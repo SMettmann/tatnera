@@ -10,7 +10,9 @@
   const db=()=>client||(window.supabase?.createClient?(client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY)):null);
   const esc=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
   const fmt=v=>v?new Intl.DateTimeFormat('de-DE',{dateStyle:'short',timeStyle:'short'}).format(new Date(v)):'–';
-  const statusLabel=s=>({eingegangen:'Eingegangen',wird_geprueft:'In Bearbeitung',erledigt:'Erledigt'})[s]||s;
+  /* feedback_suggestions already has a constrained status field. For support, reuse its allowed value
+     "umgesetzt" internally and show it as "Erledigt" in the admin UI. */
+  const statusLabel=s=>({eingegangen:'Eingegangen',wird_geprueft:'In Bearbeitung',umgesetzt:'Erledigt'})[s]||s;
   const isSupport=x=>/^\[Support\s*·/i.test(String(x?.title||''));
   function parseTitle(title){const match=String(title||'').match(/^\[Support\s*·\s*([^\]]+)\]\s*(.*)$/i);return {category:match?.[1]||'Support',title:match?.[2]||title||''};}
 
@@ -57,7 +59,7 @@
       const count=document.getElementById('tatneraAdminSupportCount');if(count)count.textContent=`(${support.length})`;
       const kpi=document.getElementById('adminKpiSuggestions');if(kpi)kpi.textContent=String(suggestions.length);
       const open=document.getElementById('adminKpiOpen');if(open)open.textContent=String(suggestions.filter(x=>['eingegangen','wird_geprueft'].includes(x.status)).length);
-      target.innerHTML=support.length?`<table class="tatnera-admin-table"><thead><tr><th>Datum</th><th>Studio</th><th>Absender</th><th>Art</th><th>Anfrage</th><th>Status</th></tr></thead><tbody>${support.map(x=>{const st=studios.get(x.studio_id)||{},p=profiles.get(x.user_id)||{},parsed=parseTitle(x.title);return `<tr><td>${esc(fmt(x.created_at))}</td><td><strong>${esc(st.name||'Unbekannt')}</strong><br><small>${esc(st.email||'')}</small></td><td>${esc(p.display_name||p.email||'–')}</td><td><strong>${esc(parsed.category)}</strong></td><td class="tatnera-admin-details"><strong>${esc(parsed.title)}</strong><br>${esc(x.details||'')}</td><td><select data-support-status="${esc(x.id)}" data-saved-status="${esc(x.status||'eingegangen')}">${['eingegangen','wird_geprueft','erledigt'].map(v=>`<option value="${v}"${v===x.status?' selected':''}>${esc(statusLabel(v))}</option>`).join('')}</select></td></tr>`;}).join('')}</tbody></table>`:'<div class="tatnera-admin-empty">Noch keine Support-Anfragen.</div>';
+      target.innerHTML=support.length?`<table class="tatnera-admin-table"><thead><tr><th>Datum</th><th>Studio</th><th>Absender</th><th>Art</th><th>Anfrage</th><th>Status</th></tr></thead><tbody>${support.map(x=>{const st=studios.get(x.studio_id)||{},p=profiles.get(x.user_id)||{},parsed=parseTitle(x.title);return `<tr><td>${esc(fmt(x.created_at))}</td><td><strong>${esc(st.name||'Unbekannt')}</strong><br><small>${esc(st.email||'')}</small></td><td>${esc(p.display_name||p.email||'–')}</td><td><strong>${esc(parsed.category)}</strong></td><td class="tatnera-admin-details"><strong>${esc(parsed.title)}</strong><br>${esc(x.details||'')}</td><td><select data-support-status="${esc(x.id)}" data-saved-status="${esc(x.status||'eingegangen')}">${['eingegangen','wird_geprueft','umgesetzt'].map(v=>`<option value="${v}"${v===x.status?' selected':''}>${esc(statusLabel(v))}</option>`).join('')}</select></td></tr>`;}).join('')}</tbody></table>`:'<div class="tatnera-admin-empty">Noch keine Support-Anfragen.</div>';
       removeSupportFromSuggestionTable();
     } finally { loading=false; }
   }
@@ -66,7 +68,6 @@
   document.addEventListener('tatnera:auth-ready',()=>setTimeout(schedule,250));
   document.addEventListener('tatnera:runtime-refresh',schedule);
   document.addEventListener('click',event=>{if(event.target.closest('[data-view="tatnera-admin"],[data-mobile-more-admin]'))setTimeout(schedule,120);});
-  /* Only watch creation/removal of the admin view. Do not rerender while a select is being used. */
   const observer=new MutationObserver(mutations=>{if(mutations.some(m=>[...m.addedNodes,...m.removedNodes].some(n=>n.nodeType===1&&(n.id==='tatnera-admin'||n.querySelector?.('#tatnera-admin')))))schedule();});
   observer.observe(document.body,{childList:true,subtree:true});
   schedule();
