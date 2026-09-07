@@ -142,4 +142,5 @@
   load('calendar-full-service-flow.js','__tatneraCalendarFullServiceFlowInstalled');
   load('appointment-communication.js','__tatneraAppointmentCommunicationInstalled');
   load('customer-contact-history.js','__tatneraCustomerContactHistoryInstalled');
+  load('global-search.js','__tatneraGlobalSearchInstalled');
 })();
