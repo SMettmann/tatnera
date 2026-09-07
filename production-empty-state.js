@@ -10,6 +10,25 @@
     try{return localStorage.getItem(key)!==null;}catch(_error){return true;}
   }
 
+  /* The piercing compatibility layer briefly used the generic label "+ Neue Akte"
+     before the service-specific UI replaced it with "+ Neues Tattoo". On slower
+     phones that intermediate state became visible during reload. Keep the two
+     tattoo entry points stable from the first paint onward. */
+  function lockTattooCreateLabels(){
+    const entries=[
+      [document.getElementById('quickProjectBtn'),'+ Neues Tattoo'],
+      [document.getElementById('addProjectBtn'),'+ Neues Tattoo']
+    ];
+    entries.forEach(([button,label])=>{
+      if(!button)return;
+      if(button.textContent!==label)button.textContent=label;
+      const observer=new MutationObserver(()=>{
+        if(button.textContent!==label)button.textContent=label;
+      });
+      observer.observe(button,{childList:true,subtree:true,characterData:true});
+    });
+  }
+
   function neutralizeInitialDemoUi(){
     try{
       const dateNode=document.querySelector('.topbar .eyebrow');
@@ -90,5 +109,6 @@
     }
   }
 
+  lockTattooCreateLabels();
   initializeEmptyLocalData();
 })();
