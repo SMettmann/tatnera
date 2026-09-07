@@ -10,32 +10,38 @@
     style.id='tatneraCommunicationGreenStyle';
     style.textContent=`
       .appointment-communication-item.tatnera-communication-sent{
-        background:#e8f6ec!important;
-        border-color:#7fbc91!important;
-        box-shadow:inset 0 0 0 1px rgba(53,108,75,.08)!important;
+        background:#e3f5e8!important;
+        border:2px solid #4f9d68!important;
+        box-shadow:0 0 0 1px rgba(47,125,73,.05)!important;
       }
       .appointment-communication-item.tatnera-communication-sent>strong{
-        color:#245f39!important;
+        color:#1f5d35!important;
       }
       .appointment-communication-item.tatnera-communication-sent>small{
         display:inline-flex!important;
         align-items:center!important;
         width:max-content!important;
-        margin-top:6px!important;
-        padding:5px 8px!important;
-        border-radius:999px!important;
+        margin-top:7px!important;
+        padding:6px 10px!important;
+        border-radius:8px!important;
         background:#2f7d49!important;
         color:#fff!important;
-        font-weight:800!important;
+        font-weight:900!important;
+        line-height:1.2!important;
       }
       :root[data-theme="dark"] .appointment-communication-item.tatnera-communication-sent,
       :root[data-theme="pink"] .appointment-communication-item.tatnera-communication-sent{
-        background:rgba(47,125,73,.20)!important;
-        border-color:#4f9d68!important;
+        background:rgba(47,125,73,.24)!important;
+        border-color:#5bb576!important;
       }
       :root[data-theme="dark"] .appointment-communication-item.tatnera-communication-sent>strong,
       :root[data-theme="pink"] .appointment-communication-item.tatnera-communication-sent>strong{
-        color:#9ae0ae!important;
+        color:#a7e8ba!important;
+      }
+      :root[data-theme="dark"] .appointment-communication-item.tatnera-communication-sent>small,
+      :root[data-theme="pink"] .appointment-communication-item.tatnera-communication-sent>small{
+        background:#3a9458!important;
+        color:#fff!important;
       }
     `;
     document.head.appendChild(style);
@@ -43,13 +49,12 @@
 
   function sync(){
     document.querySelectorAll('.appointment-communication-item').forEach(item=>{
-      const status=String(item.querySelector('small')?.textContent||'').trim().toLowerCase();
+      const small=item.querySelector('small');
+      const raw=String(small?.textContent||'').trim();
+      const status=raw.replace(/^✓\s*/,'').trim().toLowerCase();
       const sent=status.startsWith('gesendet');
       item.classList.toggle('tatnera-communication-sent',sent);
-      if(sent){
-        const small=item.querySelector('small');
-        if(small&&!small.textContent.trim().startsWith('✓'))small.textContent='✓ '+small.textContent.trim();
-      }
+      if(sent&&small&&!raw.startsWith('✓'))small.textContent='✓ '+raw;
     });
   }
 
