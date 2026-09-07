@@ -40,7 +40,34 @@
     });
   }
 
+  function cloneCommunication(value){
+    if(!value||typeof value!=='object')return null;
+    try{return structuredClone(value);}catch(_error){
+      try{return JSON.parse(JSON.stringify(value));}catch(_error2){return {...value};}
+    }
+  }
+
+  function preserveCommunicationOnSave(event){
+    const form=event.target;
+    if(!(form instanceof HTMLFormElement)||form.id!=='appointmentForm')return;
+    const eventId=form.elements?.eventId?.value||'';
+    if(!eventId)return;
+    const existing=(window.state?.calendarEvents||state.calendarEvents||[]).find(item=>item.id===eventId);
+    const communication=cloneCommunication(existing?.communication);
+    if(!communication)return;
+
+    setTimeout(()=>{
+      const events=window.state?.calendarEvents||state.calendarEvents||[];
+      const saved=events.find(item=>item.id===eventId);
+      if(!saved)return;
+      saved.communication=communication;
+      try{persist();}catch(_error){}
+      document.dispatchEvent(new CustomEvent('tatnera:data-changed',{detail:{type:'appointment-communication-preserved',eventId,projectId:saved.projectId||'',customerId:saved.customerId||''}}));
+    },0);
+  }
+
   document.addEventListener('click',event=>forceConfirmedForRecordScheduling(event.target),true);
+  document.addEventListener('submit',preserveCommunicationOnSave,true);
 
   /* Runtime starts on dashboard before it reads the existing URL. Restore the URL route
      once all runtime wrappers are installed, so F5 stays exactly where the user was. */
