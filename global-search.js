@@ -7,7 +7,10 @@
 
   const esc=value=>String(value??'').replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
   const norm=value=>String(value??'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-  const stateRef=()=>window.state||{};
+  const stateRef=()=>{
+    try{if(typeof state!=='undefined'&&state)return state;}catch(_error){}
+    return window.state||{};
+  };
   const customerName=id=>{
     const c=(stateRef().customers||[]).find(item=>String(item.id)===String(id));
     return c?`${c.firstName||''} ${c.lastName||''}`.trim():'Kunde';
@@ -92,23 +95,23 @@
 
     (s.customers||[]).forEach(c=>{
       const text=haystack(c.firstName,c.lastName,c.email,c.phone,c.notes,c.status,c.id);
-      if(text.includes(q))out.push({group:'Kunden',kind:'Kunde',title:`${c.firstName||''} ${c.lastName||''}`.trim()||'Kunde',detail:[c.email,c.phone].filter(Boolean).join(' · ')||'Kundenakte',score:text.startsWith(q)?0:1,open:()=>window.openCustomer?.(c.id)});
+      if(text.includes(q))out.push({group:'Kunden',kind:'Kunde',title:`${c.firstName||''} ${c.lastName||''}`.trim()||'Kunde',detail:[c.email,c.phone].filter(Boolean).join(' · ')||'Kundenakte',score:text.startsWith(q)?0:1,open:()=>{try{if(typeof openCustomer==='function')openCustomer(c.id);else window.openCustomer?.(c.id);}catch(_error){}}});
     });
 
     (s.projects||[]).forEach(p=>{
       const piercing=p.serviceType==='piercing';
       const text=haystack(p.title,p.placement,p.size,p.artist,p.status,p.description,p.id,customerName(p.customerId),piercing?'piercing':'tattoo');
-      if(text.includes(q))out.push({group:'Akten',kind:piercing?'Piercing':'Tattoo',title:p.title|| (piercing?'Piercing':'Tattoo'),detail:`${customerName(p.customerId)}${p.placement?' · '+p.placement:''}`,score:text.startsWith(q)?0:1,open:()=>window.openProject?.(p.id)});
+      if(text.includes(q))out.push({group:'Akten',kind:piercing?'Piercing':'Tattoo',title:p.title|| (piercing?'Piercing':'Tattoo'),detail:`${customerName(p.customerId)}${p.placement?' · '+p.placement:''}`,score:text.startsWith(q)?0:1,open:()=>{try{if(typeof openProject==='function')openProject(p.id);else window.openProject?.(p.id);}catch(_error){}}});
     });
 
     (s.calendarEvents||[]).forEach(e=>{
       const text=haystack(e.date,e.start,e.artist,e.status,e.type,e.notes,customerName(e.customerId),projectName(e.projectId));
-      if(text.includes(q))out.push({group:'Termine',kind:'Termin',title:`${e.date||''}${e.start?' · '+e.start:''}`,detail:[customerName(e.customerId),projectName(e.projectId),e.artist].filter(Boolean).join(' · '),score:2,open:()=>{window.navigate?.('calendar');setTimeout(()=>{try{if(typeof window.openAppointmentDialog==='function')window.openAppointmentDialog(e.id,e.date);}catch(_error){}},80);}});
+      if(text.includes(q))out.push({group:'Termine',kind:'Termin',title:`${e.date||''}${e.start?' · '+e.start:''}`,detail:[customerName(e.customerId),projectName(e.projectId),e.artist].filter(Boolean).join(' · '),score:2,open:()=>{try{if(typeof navigate==='function')navigate('calendar');else window.navigate?.('calendar');}catch(_error){}setTimeout(()=>{try{if(typeof openAppointmentDialog==='function')openAppointmentDialog(e.id,e.date);else window.openAppointmentDialog?.(e.id,e.date);}catch(_error){}},80);}});
     });
 
     (s.requests||[]).forEach(r=>{
       const text=haystack(r.name,r.customerName,r.email,r.phone,r.subject,r.motif,r.placement,r.message,r.notes,r.stage,r.id);
-      if(text.includes(q))out.push({group:'Anfragen',kind:'Anfrage',title:r.name||r.customerName||r.subject||r.motif||'Anfrage',detail:[r.email,r.phone,r.placement].filter(Boolean).join(' · ')||'Anfrage öffnen',score:3,open:()=>{window.navigate?.('requests');}});
+      if(text.includes(q))out.push({group:'Anfragen',kind:'Anfrage',title:r.name||r.customerName||r.subject||r.motif||'Anfrage',detail:[r.email,r.phone,r.placement].filter(Boolean).join(' · ')||'Anfrage öffnen',score:3,open:()=>{try{if(typeof navigate==='function')navigate('requests');else window.navigate?.('requests');}catch(_error){}}});
     });
 
     const invoiceSources=[];
@@ -119,7 +122,7 @@
     invoiceSources.forEach(inv=>{
       const p=inv.__project;
       const text=haystack(inv.number,inv.invoiceNumber,inv.id,inv.status,inv.amount,inv.total,inv.date,customerName(inv.customerId||p?.customerId),p?.title);
-      if(text.includes(q))out.push({group:'Rechnungen',kind:'Rechnung',title:inv.number||inv.invoiceNumber||'Rechnung',detail:[customerName(inv.customerId||p?.customerId),p?.title,inv.status].filter(Boolean).join(' · '),score:4,open:()=>window.navigate?.('invoices')});
+      if(text.includes(q))out.push({group:'Rechnungen',kind:'Rechnung',title:inv.number||inv.invoiceNumber||'Rechnung',detail:[customerName(inv.customerId||p?.customerId),p?.title,inv.status].filter(Boolean).join(' · '),score:4,open:()=>{try{if(typeof navigate==='function')navigate('invoices');else window.navigate?.('invoices');}catch(_error){}}});
     });
 
     return out.sort((a,b)=>a.score-b.score||a.group.localeCompare(b.group,'de')||a.title.localeCompare(b.title,'de')).slice(0,40);
@@ -161,5 +164,5 @@
   document.addEventListener('tatnera:auth-ready',()=>setTimeout(ensureTrigger,100));
 
   installStyle();ensureDialog();ensureTrigger();
-  window.TatneraGlobalSearch={open:openSearch,render};
+  window.TatneraGlobalSearch={open:openSearch,render,collect};
 })();
