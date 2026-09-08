@@ -1,13 +1,33 @@
 /* TATNERA — production-safe empty state for new studios
-   Keeps existing local/cloud data untouched, but prevents demo seed records
+   Keeps existing real local/cloud data untouched, but prevents demo seed records
    and fake dashboard values from appearing in a genuinely new studio/browser. */
 (function(){
   'use strict';
 
-  const KEYS={customers:'tatnera_customers',projects:'tatnera_projects',calendarEvents:'tatnera_calendar'};
+  const KEYS={customers:'tatnera_customers',projects:'tatnera_projects',calendarEvents:'tatnera_calendar',inks:'tatnera_inks'};
+  const LEGACY_DEMO_INKS=new Map([
+    ['ink1','DB-2608'],
+    ['ink2','PG-0726'],
+    ['ink3','PB-1125'],
+    ['ink4','DR-0124']
+  ]);
 
   function hasStored(key){
     try{return localStorage.getItem(key)!==null;}catch(_error){return true;}
+  }
+
+  function removeLegacyDemoInks(){
+    try{
+      const raw=localStorage.getItem(KEYS.inks);
+      if(raw===null)return;
+      const parsed=JSON.parse(raw);
+      if(!Array.isArray(parsed))return;
+      const cleaned=parsed.filter(item=>{
+        const expectedBatch=LEGACY_DEMO_INKS.get(String(item?.id||''));
+        return !(expectedBatch&&String(item?.batch||'')===expectedBatch);
+      });
+      if(cleaned.length!==parsed.length)localStorage.setItem(KEYS.inks,JSON.stringify(cleaned));
+    }catch(_error){}
   }
 
   /* The piercing compatibility layer briefly used the generic label "+ Neue Akte"
@@ -81,7 +101,7 @@
       const freshProjects=!hasStored(KEYS.projects);
       const freshCalendar=!hasStored(KEYS.calendarEvents);
       const freshRequests=!hasStored('tatnera_requests');
-      const freshBrowser=freshCustomers&&freshProjects&&freshCalendar&&freshRequests;
+      const freshInks=!hasStored(KEYS.inks);
 
       if(typeof state==='object'&&state){
         if(freshCustomers){
@@ -98,12 +118,17 @@
         }
       }
 
-      /* requests.js still contains old development examples. By creating the
-         real production key before that module loads, new studios start empty
-         without touching any browser that already has request data. */
+      /* requests.js and ink-v2.js still contain old development examples.
+         Create real production keys before those modules load, so new studios
+         start empty. Existing genuine entries remain untouched. */
       if(freshRequests)localStorage.setItem('tatnera_requests','[]');
+      if(freshInks)localStorage.setItem(KEYS.inks,'[]');
+      else removeLegacyDemoInks();
 
-      if(freshBrowser)neutralizeInitialDemoUi();
+      /* The HTML shell still contains old visual placeholders. Neutralize them
+         on every boot; later dashboard rendering replaces these zero values
+         with real studio data when such data exists. */
+      neutralizeInitialDemoUi();
     }catch(error){
       console.warn('TATNERA production empty-state guard:',error);
     }
