@@ -1,123 +1,18 @@
-/* TATNERA admin controls — manual bonus approval + support archive */
+/* TATNERA admin controls — support separation, archive, manual bonus approval */
 (function(){
-  'use strict';
-  if(window.__tatneraAdminControlsInstalled)return;
-  window.__tatneraAdminControlsInstalled=true;
-
-  let client=null,busy=false,showArchive=false;
-  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const fmt=v=>v?new Intl.DateTimeFormat('de-DE',{dateStyle:'short'}).format(new Date(v)):'–';
-  const isSupport=x=>/^\[Support\s*·/i.test(String(x?.title||''));
-
-  async function db(){
-    if(client)return client;
-    if(!window.supabase?.createClient)return null;
-    try{
-      const source=await fetch('tatnera-admin.js',{cache:'no-store'}).then(r=>r.text());
-      const url=source.match(/SUPABASE_URL='([^']+)'/)?.[1];
-      const key=source.match(/SUPABASE_KEY='([^']+)'/)?.[1];
-      if(!url||!key)return null;
-      client=window.supabase.createClient(url,key);
-      return client;
-    }catch(error){console.warn('Admin client konnte nicht initialisiert werden.',error);return null;}
-  }
-
-  function ensureArchiveToggle(){
-    const card=document.querySelector('#tatnera-admin [data-admin-support-card]');
-    if(!card)return;
-    const head=card.querySelector('h3');
-    if(!head||card.querySelector('[data-admin-archive-toggle]'))return;
-    const button=document.createElement('button');
-    button.type='button';button.className='btn ghost';button.dataset.adminArchiveToggle='1';button.textContent='Archiv anzeigen';button.style.marginLeft='12px';
-    head.appendChild(button);
-  }
-
-  async function decorate(){
-    if(busy||!document.getElementById('tatnera-admin'))return;
-    const api=await db();if(!api)return;
-    busy=true;
-    try{
-      const [sRes,rRes]=await Promise.all([
-        api.from('feedback_suggestions').select('id,title,status,reward_months,reward_approved_at,archived_at'),
-        api.from('referrals').select('id,status,reward_months,rewarded_at')
-      ]);
-      if(sRes.error||rRes.error)return;
-      const suggestions=new Map((sRes.data||[]).map(x=>[x.id,x]));
-      const referrals=new Map((rRes.data||[]).map(x=>[x.id,x]));
-
-      ensureArchiveToggle();
-
-      document.querySelectorAll('#tatneraAdminSupport tbody tr').forEach(row=>{
-        const select=row.querySelector('[data-support-status]');if(!select)return;
-        const item=suggestions.get(select.dataset.supportStatus);if(!item)return;
-        const archived=!!item.archived_at;
-        row.style.display=(showArchive?archived:!archived)?'':'none';
-        let action=row.querySelector('[data-admin-support-action]');
-        if(!action){action=document.createElement('button');action.type='button';action.className='btn ghost';action.dataset.adminSupportAction='1';action.style.marginLeft='8px';select.insertAdjacentElement('afterend',action);}
-        if(archived){action.textContent='Wiederherstellen';action.dataset.restoreSupport=item.id;delete action.dataset.archiveSupport;}
-        else if(item.status==='umgesetzt'){action.textContent='Archivieren';action.dataset.archiveSupport=item.id;delete action.dataset.restoreSupport;action.style.display='inline-flex';}
-        else{action.style.display='none';}
-      });
-
-      document.querySelectorAll('#tatneraAdminSuggestions tbody tr').forEach(row=>{
-        const select=row.querySelector('[data-suggestion-status]');if(!select)return;
-        const item=suggestions.get(select.dataset.suggestionStatus);if(!item||isSupport(item)){row.remove();return;}
-        const bonus=row.lastElementChild;if(!bonus)return;
-        if(item.reward_approved_at){bonus.innerHTML=`<strong>${Number(item.reward_months)||1} Monat${(Number(item.reward_months)||1)===1?'':'e'}</strong><br><small>bestätigt ${esc(fmt(item.reward_approved_at))}</small>`;}
-        else if(item.status==='umgesetzt'){bonus.innerHTML=`<button type="button" class="btn primary" data-confirm-suggestion="${esc(item.id)}">Bonus bestätigen</button>`;}
-        else{bonus.textContent='–';}
-      });
-
-      document.querySelectorAll('#tatneraAdminReferrals tbody tr').forEach(row=>{
-        const select=row.querySelector('[data-referral-status]');if(!select)return;
-        const item=referrals.get(select.dataset.referralStatus);if(!item)return;
-        const belohnt=select.querySelector('option[value="belohnt"]');
-        if(belohnt&&!item.rewarded_at)belohnt.remove();
-        if(item.rewarded_at)select.disabled=true;
-        const bonus=row.lastElementChild;if(!bonus)return;
-        if(item.rewarded_at){bonus.innerHTML=`<strong>${Number(item.reward_months)||2} Monate</strong><br><small>bestätigt ${esc(fmt(item.rewarded_at))}</small>`;}
-        else if(item.status==='zahlend'){bonus.innerHTML=`<button type="button" class="btn primary" data-confirm-referral="${esc(item.id)}">Bonus bestätigen</button>`;}
-        else{bonus.textContent='–';}
-      });
-    }finally{busy=false;}
-  }
-
-  document.addEventListener('click',async event=>{
-    const toggle=event.target.closest('[data-admin-archive-toggle]');
-    if(toggle){showArchive=!showArchive;toggle.textContent=showArchive?'Aktive anzeigen':'Archiv anzeigen';decorate();return;}
-
-    const suggestion=event.target.closest('[data-confirm-suggestion]');
-    if(suggestion){
-      if(!confirm('1 Gratismonat für diesen umgesetzten Verbesserungsvorschlag gutschreiben?'))return;
-      suggestion.disabled=true;const api=await db();const {error}=await api.rpc('approve_suggestion_reward',{p_suggestion_id:suggestion.dataset.confirmSuggestion});
-      suggestion.disabled=false;if(error){alert('Bonus konnte nicht gutgeschrieben werden.');console.warn(error);return;}
-      document.getElementById('tatneraAdminRefresh')?.click();setTimeout(decorate,250);return;
-    }
-
-    const referral=event.target.closest('[data-confirm-referral]');
-    if(referral){
-      if(!confirm('Empfehlungsbonus jetzt gutschreiben?'))return;
-      referral.disabled=true;const api=await db();const {error}=await api.rpc('approve_referral_reward',{p_referral_id:referral.dataset.confirmReferral});
-      referral.disabled=false;if(error){alert('Empfehlungsbonus konnte nicht gutgeschrieben werden.');console.warn(error);return;}
-      document.getElementById('tatneraAdminRefresh')?.click();setTimeout(decorate,250);return;
-    }
-
-    const archive=event.target.closest('[data-archive-support]');
-    if(archive){
-      const api=await db();archive.disabled=true;const {error}=await api.from('feedback_suggestions').update({archived_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq('id',archive.dataset.archiveSupport).eq('status','umgesetzt');archive.disabled=false;
-      if(error){alert('Anfrage konnte nicht archiviert werden.');console.warn(error);return;}decorate();return;
-    }
-
-    const restore=event.target.closest('[data-restore-support]');
-    if(restore){
-      const api=await db();restore.disabled=true;const {error}=await api.from('feedback_suggestions').update({archived_at:null,updated_at:new Date().toISOString()}).eq('id',restore.dataset.restoreSupport);restore.disabled=false;
-      if(error){alert('Anfrage konnte nicht wiederhergestellt werden.');console.warn(error);return;}decorate();
-    }
-  });
-
-  const observer=new MutationObserver(()=>setTimeout(decorate,80));
-  observer.observe(document.body,{childList:true,subtree:true});
-  document.addEventListener('tatnera:auth-ready',()=>setTimeout(decorate,300));
-  document.addEventListener('tatnera:runtime-refresh',()=>setTimeout(decorate,150));
-  setTimeout(decorate,500);
+'use strict';if(window.__tatneraAdminControlsInstalled)return;window.__tatneraAdminControlsInstalled=true;
+let client=null,busy=false,showArchive=false;
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=v=>v?new Intl.DateTimeFormat('de-DE',{dateStyle:'short',timeStyle:'short'}).format(new Date(v)):'–';
+const isSupport=x=>/^\[Support\s*·/i.test(String(x?.title||''));
+const parseTitle=t=>{const m=String(t||'').match(/^\[Support\s*·\s*([^\]]+)\]\s*(.*)$/i);return{category:m?.[1]||'Support',title:m?.[2]||t||''};};
+async function db(){if(client)return client;if(!window.supabase?.createClient)return null;try{const s=await fetch('tatnera-admin.js',{cache:'no-store'}).then(r=>r.text()),u=s.match(/SUPABASE_URL='([^']+)'/)?.[1],k=s.match(/SUPABASE_KEY='([^']+)'/)?.[1];if(!u||!k)return null;return client=window.supabase.createClient(u,k);}catch(e){console.warn(e);return null;}}
+function ensureSupportCard(){const grid=document.querySelector('#tatnera-admin .tatnera-admin-grid');if(!grid)return null;let card=grid.querySelector('[data-admin-support-card]');if(card)return card;card=document.createElement('section');card.className='tatnera-admin-card';card.dataset.adminSupportCard='1';card.innerHTML='<div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap"><h3 style="margin:0">🛟 Support, Fehler & Fragen <span id="tatneraAdminSupportCount" class="muted" style="font-size:12px"></span></h3><button type="button" class="btn ghost" data-admin-archive-toggle>Archiv anzeigen</button></div><div id="tatneraAdminSupport" class="tatnera-admin-table-wrap" style="margin-top:12px"></div>';grid.prepend(card);return card;}
+async function decorate(){if(busy||!document.getElementById('tatnera-admin'))return;const api=await db();if(!api)return;busy=true;try{const [sRes,rRes,stRes,pRes]=await Promise.all([api.from('feedback_suggestions').select('id,studio_id,user_id,title,details,status,reward_months,reward_approved_at,archived_at,created_at').order('created_at',{ascending:false}),api.from('referrals').select('id,status,reward_months,rewarded_at'),api.from('studios').select('id,name,email'),api.from('profiles').select('id,email,display_name')]);if(sRes.error||rRes.error||stRes.error||pRes.error)return;const all=sRes.data||[],supportAll=all.filter(isSupport),real=all.filter(x=>!isSupport(x)),referrals=new Map((rRes.data||[]).map(x=>[x.id,x])),studios=new Map((stRes.data||[]).map(x=>[x.id,x])),profiles=new Map((pRes.data||[]).map(x=>[x.id,x]));const k1=document.getElementById('adminKpiSuggestions'),k2=document.getElementById('adminKpiOpen');if(k1)k1.textContent=real.length;if(k2)k2.textContent=real.filter(x=>['eingegangen','wird_geprueft'].includes(x.status)).length;
+const card=ensureSupportCard(),target=card?.querySelector('#tatneraAdminSupport');if(target){const list=supportAll.filter(x=>showArchive?!!x.archived_at:!x.archived_at),count=card.querySelector('#tatneraAdminSupportCount');if(count)count.textContent=`(${list.length})`;target.innerHTML=list.length?`<table class="tatnera-admin-table"><thead><tr><th>Datum</th><th>Studio</th><th>Absender</th><th>Art</th><th>Anfrage</th><th>Status</th><th>Aktion</th></tr></thead><tbody>${list.map(x=>{const st=studios.get(x.studio_id)||{},p=profiles.get(x.user_id)||{},q=parseTitle(x.title);return `<tr><td>${esc(fmt(x.created_at))}</td><td><strong>${esc(st.name||'Unbekannt')}</strong><br><small>${esc(st.email||'')}</small></td><td>${esc(p.display_name||p.email||'–')}</td><td><strong>${esc(q.category)}</strong></td><td class="tatnera-admin-details"><strong>${esc(q.title)}</strong><br>${esc(x.details||'')}</td><td>${showArchive?'<strong>Archiviert</strong>':`<select data-admin-support-status="${esc(x.id)}">${[['eingegangen','Eingegangen'],['wird_geprueft','In Bearbeitung'],['umgesetzt','Erledigt']].map(([v,l])=>`<option value="${v}"${v===x.status?' selected':''}>${l}</option>`).join('')}</select>`}</td><td>${showArchive?`<button class="btn ghost" data-restore-support="${esc(x.id)}">Wiederherstellen</button>`:(x.status==='umgesetzt'?`<button class="btn ghost" data-archive-support="${esc(x.id)}">Archivieren</button>`:'–')}</td></tr>`;}).join('')}</tbody></table>`:`<div class="tatnera-admin-empty">${showArchive?'Noch keine archivierten Anfragen.':'Noch keine Support-Anfragen.'}</div>`;}
+const map=new Map(real.map(x=>[x.id,x]));document.querySelectorAll('#tatneraAdminSuggestions tbody tr').forEach(row=>{const sel=row.querySelector('[data-suggestion-status]');if(!sel)return;const x=map.get(sel.dataset.suggestionStatus);if(!x){row.remove();return;}const b=row.lastElementChild;if(!b)return;if(x.reward_approved_at)b.innerHTML=`<strong>${Number(x.reward_months)||1} Monat</strong><br><small>bestätigt ${esc(fmt(x.reward_approved_at))}</small>`;else if(x.status==='umgesetzt')b.innerHTML=`<button class="btn primary" data-confirm-suggestion="${esc(x.id)}">Bonus bestätigen</button>`;else b.textContent='–';});
+document.querySelectorAll('#tatneraAdminReferrals tbody tr').forEach(row=>{const sel=row.querySelector('[data-referral-status]');if(!sel)return;const x=referrals.get(sel.dataset.referralStatus);if(!x)return;const opt=sel.querySelector('option[value="belohnt"]');if(opt&&!x.rewarded_at)opt.remove();if(x.rewarded_at)sel.disabled=true;const b=row.lastElementChild;if(!b)return;if(x.rewarded_at)b.innerHTML=`<strong>${Number(x.reward_months)||2} Monate</strong><br><small>bestätigt ${esc(fmt(x.rewarded_at))}</small>`;else if(x.status==='zahlend')b.innerHTML=`<button class="btn primary" data-confirm-referral="${esc(x.id)}">Bonus bestätigen</button>`;else b.textContent='–';});}finally{busy=false;}}
+document.addEventListener('change',async e=>{const s=e.target.closest('[data-admin-support-status]');if(!s)return;const api=await db();s.disabled=true;const {error}=await api.from('feedback_suggestions').update({status:s.value,updated_at:new Date().toISOString()}).eq('id',s.dataset.adminSupportStatus);s.disabled=false;if(error)alert('Status konnte nicht gespeichert werden.');setTimeout(decorate,100);});
+document.addEventListener('click',async e=>{const t=e.target.closest('[data-admin-archive-toggle]');if(t){showArchive=!showArchive;t.textContent=showArchive?'Aktive anzeigen':'Archiv anzeigen';decorate();return;}const a=e.target.closest('[data-archive-support]');if(a){const api=await db();a.disabled=true;const {error}=await api.from('feedback_suggestions').update({archived_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq('id',a.dataset.archiveSupport).eq('status','umgesetzt');a.disabled=false;if(error)alert('Archivieren fehlgeschlagen.');decorate();return;}const r=e.target.closest('[data-restore-support]');if(r){const api=await db();r.disabled=true;const {error}=await api.from('feedback_suggestions').update({archived_at:null,updated_at:new Date().toISOString()}).eq('id',r.dataset.restoreSupport);r.disabled=false;if(error)alert('Wiederherstellen fehlgeschlagen.');decorate();return;}const s=e.target.closest('[data-confirm-suggestion]');if(s){if(!confirm('1 Gratismonat jetzt gutschreiben?'))return;const api=await db();s.disabled=true;const {error}=await api.rpc('approve_suggestion_reward',{p_suggestion_id:s.dataset.confirmSuggestion});s.disabled=false;if(error)alert('Bonus konnte nicht gutgeschrieben werden.');document.getElementById('tatneraAdminRefresh')?.click();setTimeout(decorate,200);return;}const f=e.target.closest('[data-confirm-referral]');if(f){if(!confirm('Empfehlungsbonus jetzt gutschreiben?'))return;const api=await db();f.disabled=true;const {error}=await api.rpc('approve_referral_reward',{p_referral_id:f.dataset.confirmReferral});f.disabled=false;if(error)alert('Bonus konnte nicht gutgeschrieben werden.');document.getElementById('tatneraAdminRefresh')?.click();setTimeout(decorate,200);}});
+const mo=new MutationObserver(()=>setTimeout(decorate,80));mo.observe(document.body,{childList:true,subtree:true});document.addEventListener('tatnera:auth-ready',()=>setTimeout(decorate,300));document.addEventListener('tatnera:runtime-refresh',()=>setTimeout(decorate,150));setTimeout(decorate,500);
 })();
