@@ -10,6 +10,7 @@
   const PUBLIC_APP_URL=new URL('app.html',location.href).toString();
   const PENDING_INVITE_KEY='tatnera_pending_studio_invite_v1';
   const GATE_TOKEN_KEY='tatnera_invite_gate_token_v1';
+  const RECOVERY_KEY='tatnera_password_recovery_v1';
   const isUuid=value=>/^[0-9a-f-]{36}$/i.test(String(value||''));
 
   function queryParams(){
@@ -26,10 +27,11 @@
     const query=queryParams().get('invite')||'';
     return isUuid(query)?query:'';
   }
-  function publicRedirect(includeInvite=true){
+  function publicRedirect(includeInvite=true,mode=''){
     const url=new URL(PUBLIC_APP_URL);
     const token=pendingToken();
     if(includeInvite&&token)url.searchParams.set('invite',token);
+    if(mode)url.searchParams.set('mode',mode);
     return url.toString();
   }
 
@@ -40,6 +42,15 @@
     localStorage.removeItem(PENDING_INVITE_KEY);
     return token;
   }
+
+  /* Capture password recovery before Supabase consumes the URL fragment. */
+  (function captureRecovery(){
+    const type=hashParams().get('type')||queryParams().get('type')||'';
+    const mode=queryParams().get('mode')||'';
+    if(type==='recovery'||mode==='recovery'){
+      try{sessionStorage.setItem(RECOVERY_KEY,'1');}catch(_error){}
+    }
+  })();
 
   /* Capture every studio invite URL immediately. The verified Supabase link
      later establishes the invited user's session; TATNERA then shows only the
@@ -73,7 +84,7 @@
     };
 
     const originalReset=client.auth.resetPasswordForEmail.bind(client.auth);
-    client.auth.resetPasswordForEmail=(email,options={})=>originalReset(email,{...options,redirectTo:publicRedirect(false)});
+    client.auth.resetPasswordForEmail=(email,options={})=>originalReset(email,{...options,redirectTo:publicRedirect(false,'recovery')});
     return true;
   }
 
