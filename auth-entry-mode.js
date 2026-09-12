@@ -15,6 +15,7 @@
 
   loadOnce('role-access.js');
   loadOnce('subscription-guard.js');
+  loadOnce('recovery-session-bridge.js?v=20260912-1');
 
   function ensureAuthLogo(){
     const brand=document.querySelector('.tatnera-auth-brand');
