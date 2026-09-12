@@ -62,7 +62,7 @@
     try{
       const query=new URLSearchParams(window.location.search);
       const hash=new URLSearchParams(window.location.hash.replace(/^#/,''));
-      return query.get('type')==='recovery'||hash.get('type')==='recovery';
+      return query.get('mode')==='recovery'||query.get('type')==='recovery'||hash.get('type')==='recovery';
     }catch(_error){return false;}
   }
 
@@ -77,6 +77,10 @@
   function clearRecovery(){
     try{sessionStorage.removeItem(RECOVERY_KEY);}catch(_error){}
   }
+
+  /* Keep a durable recovery marker even if Supabase consumes the URL hash
+     before this helper installs its auth-state listener. */
+  if(recoverySignalInUrl()&&!inviteSetupRequired())markRecovery();
 
   function showRecoveryUi(){
     if(!recoveryPending()||inviteSetupRequired())return false;
@@ -99,7 +103,7 @@
   }
 
   function reinforceRecovery(){
-    [0,60,180,450,900].forEach(delay=>setTimeout(showRecoveryUi,delay));
+    [0,40,100,220,450,900,1500].forEach(delay=>setTimeout(showRecoveryUi,delay));
   }
 
   function installRecoveryGuard(){
@@ -158,7 +162,8 @@
     if(!shell)return false;
     installHomeLink();
     ensureAuthLogo();
-    if(recoveryPending()){
+    if(recoveryPending()||mode==='recovery'){
+      markRecovery();
       showRecoveryUi();
       return true;
     }
@@ -178,7 +183,7 @@
     let tries=0;
     const recoveryTimer=setInterval(()=>{
       tries++;
-      if(installRecoveryGuard()||tries>80)clearInterval(recoveryTimer);
+      if(installRecoveryGuard()||tries>120)clearInterval(recoveryTimer);
     },50);
   }
 
