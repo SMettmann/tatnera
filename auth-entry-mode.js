@@ -14,7 +14,7 @@
   function installHomeLink(){const shell=document.getElementById('tatneraAuthShell');if(!shell)return false;ensureAuthLogo();if(shell.querySelector('.tatnera-auth-home'))return true;const a=document.createElement('a');a.className='tatnera-auth-home';a.href='./';a.textContent='← Zur Startseite';a.setAttribute('aria-label','Zur TATNERA Startseite');shell.prepend(a);return true;}
   function authIsVisible(){const shell=document.getElementById('tatneraAuthShell');return !!shell&&!shell.hidden&&document.body.classList.contains('tatnera-auth-locked');}
   function inviteSetupRequired(){try{return !!window.TatneraInviteSetup?.required?.();}catch(_){return false;}}
-  function signal(){try{return !!window.TatneraInviteSetup?.required?.();}catch(_){return false;}}
+  function signal(){try{const q=new URLSearchParams(location.search),h=new URLSearchParams(location.hash.replace(/^#/,''));return q.get('mode')==='recovery'||q.get('type')==='recovery'||h.get('type')==='recovery';}catch(_){return false;}}
   function pending(){try{return sessionStorage.getItem(RECOVERY_KEY)==='1';}catch(_){return false;}}
   function mark(){try{sessionStorage.setItem(RECOVERY_KEY,'1');}catch(_){}}
   function clear(){try{sessionStorage.removeItem(RECOVERY_KEY);}catch(_){} }
