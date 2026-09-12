@@ -13,6 +13,7 @@
   const RECOVERY_REFRESH_KEY='tatnera_recovery_refresh_token_v1';
   const ACCEPT_INVITE_URL='https://ayxvspeufbsoxtccaqap.supabase.co/functions/v1/accept-studio-invite';
   const isUuid=value=>/^[0-9a-f-]{36}$/i.test(String(value||''));
+  let gateSeedToken='';
 
   function queryParams(){try{return new URLSearchParams(location.search);}catch(_){return new URLSearchParams();}}
   function hashParams(){try{return new URLSearchParams(location.hash.replace(/^#/,''));}catch(_){return new URLSearchParams();}}
@@ -101,6 +102,7 @@
       try{await client.auth.signOut();}catch(_){}
       const {error:loginError}=await client.auth.signInWithPassword({email,password});if(loginError)throw loginError;
       sessionStorage.removeItem(GATE_TOKEN_KEY);sessionStorage.removeItem(INVITE_EMAIL_KEY);localStorage.removeItem(PENDING_INVITE_KEY);
+      gateSeedToken='';
       gateMessage('Fertig. Studio wird geöffnet …','success');setTimeout(()=>location.replace(PUBLIC_APP_URL),300);
     }catch(error){gateMessage(String(error?.message||error),'error');button.disabled=false;}
   }
@@ -115,10 +117,17 @@
       if(!isUuid(token))return;
       const emailValue=invitedEmail();
       const root=ensureGate();root.hidden=false;
-      const email=root.querySelector('[name="email"]');if(email)email.value=emailValue;
-      const name=root.querySelector('[name="displayName"]');if(name)name.value='';
+      const email=root.querySelector('[name="email"]');
+      const name=root.querySelector('[name="displayName"]');
+      if(gateSeedToken!==token){
+        if(email)email.value=emailValue;
+        if(name)name.value='';
+        gateSeedToken=token;
+        if(!emailValue)gateMessage('Die Ziel-E-Mail fehlt im Einladungslink. Bitte eine neue Einladung erstellen.','error');else gateMessage('');
+      }else if(email&&!email.value&&emailValue){
+        email.value=emailValue;
+      }
       document.getElementById('tatneraAuthShell')?.setAttribute('hidden','');
-      if(!emailValue)gateMessage('Die Ziel-E-Mail fehlt im Einladungslink. Bitte eine neue Einladung erstellen.','error');else gateMessage('');
     }catch(_){}
   }
 
