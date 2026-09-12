@@ -43,3 +43,20 @@ jobs:
             exit 1
           fi
           echo "Brand spelling check passed."
+      - name: Check production Stripe configuration
+        run: |
+          set -e
+          echo "Scanning for Stripe test checkout URLs and committed secrets..."
+          if grep -RniF 'buy.stripe.com/test_' . --exclude-dir=.git --exclude='js-syntax.yml'; then
+            echo "ERROR: Stripe test Payment Link found in production repository."
+            exit 1
+          fi
+          if grep -RniE 'sk_(live|test)_[A-Za-z0-9]+' . --exclude-dir=.git --exclude='js-syntax.yml'; then
+            echo "ERROR: Stripe secret API key appears to be committed."
+            exit 1
+          fi
+          if grep -RniE 'whsec_[A-Za-z0-9]+' . --exclude-dir=.git --exclude='js-syntax.yml'; then
+            echo "ERROR: Stripe webhook signing secret appears to be committed."
+            exit 1
+          fi
+          echo "Production Stripe configuration check passed."
