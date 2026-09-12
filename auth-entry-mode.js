@@ -6,6 +6,7 @@
   function loadOnce(src){if(document.querySelector(`script[src^="${src.split('?')[0]}"]`))return;const s=document.createElement('script');s.src=src;s.async=true;document.body.appendChild(s);}
   loadOnce('role-access.js');
   loadOnce('subscription-guard.js?v=20260912-3');
+  loadOnce('billing-settings.js?v=20260912-1');
   loadOnce('recovery-session-bridge.js?v=20260912-3');
   loadOnce('studio-invite-fix.js?v=20260912-1');
   loadOnce('mobile-role-picker.js?v=20260912-1');
