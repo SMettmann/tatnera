@@ -4,25 +4,11 @@
 
   const PENDING_INVITE_KEY='tatnera_pending_studio_invite_v1';
   const Core=window.TatneraCore;
-  let members=[],profiles=new Map(),invites=[],loading=false,acceptingInvite=false;
+  let members=[],profiles=new Map(),invites=[],loading=false,acceptingInvite=false,initialTeamLoaded=false;
 
   const esc=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[ch]));
-  const roleLabel=role=>({
-    owner:'Inhaber',
-    admin:'Admin',
-    artist:'Tätowierer',
-    piercer:'Piercer',
-    artist_piercer:'Tätowierer & Piercer',
-    staff:'Mitarbeiter'
-  })[role]||role||'—';
-  const roleDescription=role=>({
-    owner:'Voller Studio-Zugriff',
-    admin:'Studio verwalten',
-    artist:'Tattoo-Arbeit & Termine',
-    piercer:'Piercing-Arbeit & Termine',
-    artist_piercer:'Tattoo- & Piercing-Arbeit',
-    staff:'Organisation & Termine'
-  })[role]||'';
+  const roleLabel=role=>({owner:'Inhaber',admin:'Admin',artist:'Tätowierer',piercer:'Piercer',artist_piercer:'Tätowierer & Piercer',staff:'Mitarbeiter'})[role]||role||'—';
+  const roleDescription=role=>({owner:'Voller Studio-Zugriff',admin:'Studio verwalten',artist:'Tattoo-Arbeit & Termine',piercer:'Piercing-Arbeit & Termine',artist_piercer:'Tattoo- & Piercing-Arbeit',staff:'Organisation & Termine'})[role]||'';
   const auth=()=>window.TatneraAuth||null;
   const client=()=>auth()?.client||null;
   const studioId=()=>auth()?.studioId?.()||'';
@@ -44,70 +30,33 @@
     `;document.head.appendChild(style);
   }
 
-  function initials(name){
-    const parts=String(name||'').trim().split(/\s+/).filter(Boolean);if(!parts.length)return 'ST';
-    return (parts.length===1?parts[0].slice(0,2):(parts[0][0]||'')+(parts.at(-1)?.[0]||'')).toUpperCase();
-  }
+  function initials(name){const parts=String(name||'').trim().split(/\s+/).filter(Boolean);if(!parts.length)return 'ST';return (parts.length===1?parts[0].slice(0,2):(parts[0][0]||'')+(parts.at(-1)?.[0]||'')).toUpperCase();}
   function profileFor(userId){return profiles.get(userId)||{};}
   function displayName(member){const profile=profileFor(member.user_id);return String(profile.display_name||profile.email||'Teammitglied').trim();}
   function displayMeta(member){const profile=profileFor(member.user_id);return `${profile.email||'Keine E-Mail'} · ${roleLabel(member.role)}`;}
-  function allowedInviteRoles(){
-    return isOwner()
-      ?['admin','artist','piercer','artist_piercer','staff']
-      :['artist','piercer','artist_piercer','staff'];
-  }
-  function allowedEditRoles(member){
-    if(member.role==='owner')return ['owner'];
-    return isOwner()
-      ?['admin','artist','piercer','artist_piercer','staff']
-      :['artist','piercer','artist_piercer','staff'];
-  }
+  function allowedInviteRoles(){return isOwner()?['admin','artist','piercer','artist_piercer','staff']:['artist','piercer','artist_piercer','staff'];}
+  function allowedEditRoles(member){if(member.role==='owner')return ['owner'];return isOwner()?['admin','artist','piercer','artist_piercer','staff']:['artist','piercer','artist_piercer','staff'];}
 
   async function loadTeam(){
     if(loading||!client()||!studioId())return;loading=true;
     try{
       const {data:memberRows,error:memberError}=await client().from('studio_members').select('id,studio_id,user_id,role,is_active,created_at').eq('studio_id',studioId()).order('created_at',{ascending:true});
       if(memberError)throw memberError;members=memberRows||[];
-      const ids=members.map(item=>item.user_id).filter(Boolean);
-      profiles=new Map();
-      if(ids.length){
-        const {data:profileRows,error:profileError}=await client().from('profiles').select('id,email,display_name').in('id',ids);
-        if(profileError)throw profileError;for(const item of profileRows||[])profiles.set(item.id,item);
-      }
+      const ids=members.map(item=>item.user_id).filter(Boolean);profiles=new Map();
+      if(ids.length){const {data:profileRows,error:profileError}=await client().from('profiles').select('id,email,display_name').in('id',ids);if(profileError)throw profileError;for(const item of profileRows||[])profiles.set(item.id,item);}
       invites=[];
-      if(canManage()){
-        const {data:inviteRows,error:inviteError}=await client().from('studio_invites').select('id,email,role,token,expires_at,created_at').eq('studio_id',studioId()).is('accepted_at',null).gt('expires_at',new Date().toISOString()).order('created_at',{ascending:false});
-        if(inviteError)throw inviteError;invites=inviteRows||[];
-      }
+      if(canManage()){const {data:inviteRows,error:inviteError}=await client().from('studio_invites').select('id,email,role,token,expires_at,created_at').eq('studio_id',studioId()).is('accepted_at',null).gt('expires_at',new Date().toISOString()).order('created_at',{ascending:false});if(inviteError)throw inviteError;invites=inviteRows||[];}
       syncArtists();renderTeam();
     }catch(error){console.error('TATNERA team load failed',error);renderTeam(String(error?.message||error));}
     finally{loading=false;}
   }
 
-  function syncArtists(){
-    if(!Core)return;
-    for(const member of members){
-      if(!member.is_active||!['owner','artist','artist_piercer'].includes(member.role))continue;
-      const name=String(profileFor(member.user_id).display_name||'').trim();if(name)Core.addArtist(name);
-    }
-    refreshArtistSelects();
-  }
-  function refreshArtistSelects(){
-    if(!Core)return;
-    const selectors=['#appointmentForm select[name="artist"]','#projectEditForm select[name="artist"]'];
-    selectors.forEach(selector=>{const select=document.querySelector(selector);if(select)Core.populateArtistSelect(select,select.value||Core.artistNameFallback());});
-  }
+  function syncArtists(){if(!Core)return;for(const member of members){if(!member.is_active||!['owner','artist','artist_piercer'].includes(member.role))continue;const name=String(profileFor(member.user_id).display_name||'').trim();if(name)Core.addArtist(name);}refreshArtistSelects();}
+  function refreshArtistSelects(){if(!Core)return;const selectors=['#appointmentForm select[name="artist"]','#projectEditForm select[name="artist"]'];selectors.forEach(selector=>{const select=document.querySelector(selector);if(select)Core.populateArtistSelect(select,select.value||Core.artistNameFallback());});}
 
-  function memberRow(member){
-    const name=displayName(member),mine=member.user_id===currentUser()?.id,roles=allowedEditRoles(member),editable=canManage()&&member.role!=='owner'&&(!(!isOwner()&&member.role==='admin'));
-    return `<div class="studio-team-row" data-team-member="${esc(member.id)}"><div class="studio-team-main"><div class="studio-team-avatar">${esc(initials(name))}</div><div><strong>${esc(name)}${mine?' · Du':''}</strong><span>${esc(displayMeta(member))}</span></div></div><div class="studio-team-actions">${editable?`<select data-team-role="${esc(member.id)}">${roles.map(role=>`<option value="${esc(role)}" ${role===member.role?'selected':''}>${esc(roleLabel(role))}</option>`).join('')}</select><button type="button" class="btn ghost studio-team-remove" data-team-remove="${esc(member.id)}">Zugang entfernen</button>`:`<span class="status-pill">${esc(roleLabel(member.role))}</span>`}</div></div>`;
-  }
-
+  function memberRow(member){const name=displayName(member),mine=member.user_id===currentUser()?.id,roles=allowedEditRoles(member),editable=canManage()&&member.role!=='owner'&&(!(!isOwner()&&member.role==='admin'));return `<div class="studio-team-row" data-team-member="${esc(member.id)}"><div class="studio-team-main"><div class="studio-team-avatar">${esc(initials(name))}</div><div><strong>${esc(name)}${mine?' · Du':''}</strong><span>${esc(displayMeta(member))}</span></div></div><div class="studio-team-actions">${editable?`<select data-team-role="${esc(member.id)}">${roles.map(role=>`<option value="${esc(role)}" ${role===member.role?'selected':''}>${esc(roleLabel(role))}</option>`).join('')}</select><button type="button" class="btn ghost studio-team-remove" data-team-remove="${esc(member.id)}">Zugang entfernen</button>`:`<span class="status-pill">${esc(roleLabel(member.role))}</span>`}</div></div>`;}
   function inviteOptions(){return allowedInviteRoles().map(role=>`<option value="${esc(role)}">${esc(roleLabel(role))}</option>`).join('');}
-  function pendingRows(){
-    if(!invites.length)return '<div class="studio-team-empty">Keine offenen Einladungen.</div>';
-    return invites.map(item=>`<div class="studio-pending-row"><div><strong>${esc(item.email)}</strong><span>${esc(roleLabel(item.role))} · gültig bis ${esc(new Intl.DateTimeFormat('de-DE',{dateStyle:'medium'}).format(new Date(item.expires_at)))}</span></div><button type="button" class="btn ghost" data-invite-cancel="${esc(item.id)}">Entfernen</button></div>`).join('');
-  }
+  function pendingRows(){if(!invites.length)return '<div class="studio-team-empty">Keine offenen Einladungen.</div>';return invites.map(item=>`<div class="studio-pending-row"><div><strong>${esc(item.email)}</strong><span>${esc(roleLabel(item.role))} · gültig bis ${esc(new Intl.DateTimeFormat('de-DE',{dateStyle:'medium'}).format(new Date(item.expires_at)))}</span></div><button type="button" class="btn ghost" data-invite-cancel="${esc(item.id)}">Entfernen</button></div>`).join('');}
 
   function renderTeam(error=''){
     const settings=document.getElementById('settings');if(!settings)return;
@@ -116,102 +65,27 @@
     bindPanel(panel);
   }
 
-  function bindPanel(panel){
-    panel.querySelector('#studioInviteForm')?.addEventListener('submit',createInvite);
-    panel.querySelectorAll('[data-team-role]').forEach(select=>select.addEventListener('change',changeRole));
-    panel.querySelectorAll('[data-team-remove]').forEach(button=>button.addEventListener('click',removeMember));
-    panel.querySelectorAll('[data-invite-cancel]').forEach(button=>button.addEventListener('click',cancelInvite));
-  }
+  function bindPanel(panel){panel.querySelector('#studioInviteForm')?.addEventListener('submit',createInvite);panel.querySelectorAll('[data-team-role]').forEach(select=>select.addEventListener('change',changeRole));panel.querySelectorAll('[data-team-remove]').forEach(button=>button.addEventListener('click',removeMember));panel.querySelectorAll('[data-invite-cancel]').forEach(button=>button.addEventListener('click',cancelInvite));}
 
-  async function createInvite(event){
-    event.preventDefault();const form=event.currentTarget,button=form.querySelector('[type="submit"]');button.disabled=true;
-    try{
-      const data=Object.fromEntries(new FormData(form).entries()),email=String(data.email||'').trim().toLowerCase(),role=String(data.role||'');
-      if(!email)throw new Error('Bitte eine E-Mail-Adresse eingeben.');if(!allowedInviteRoles().includes(role))throw new Error('Diese Rolle darfst du nicht vergeben.');
-      const existingMember=[...profiles.entries()].find(([,profile])=>String(profile.email||'').toLowerCase()===email);
-      if(existingMember)throw new Error('Diese E-Mail-Adresse gehört bereits zum Studio-Team.');
-      const {error:deleteError}=await client().from('studio_invites').delete().eq('studio_id',studioId()).ilike('email',email).is('accepted_at',null);if(deleteError)throw deleteError;
-      const {data:invite,error}=await client().from('studio_invites').insert({studio_id:studioId(),email,role,created_by:currentUser().id}).select('id,email,role,token,expires_at').single();if(error)throw error;
-      const url=new URL(location.origin+location.pathname);url.searchParams.set('invite',invite.token);
-      const result=document.getElementById('studioInviteResult');if(result)result.innerHTML=`<div class="studio-invite-result"><strong>Einladung für ${esc(email)}</strong><div class="studio-invite-link"><input readonly value="${esc(url.toString())}" aria-label="Einladungslink"><button type="button" class="btn ghost" data-copy-invite>Kopieren</button></div></div>`;
-      result?.querySelector('[data-copy-invite]')?.addEventListener('click',()=>copyText(url.toString(),result.querySelector('[data-copy-invite]')));
-      form.reset();await loadTeam();
-    }catch(error){alert(String(error?.message||error));}
-    finally{button.disabled=false;}
-  }
+  async function createInvite(event){event.preventDefault();const form=event.currentTarget,button=form.querySelector('[type="submit"]');button.disabled=true;try{const data=Object.fromEntries(new FormData(form).entries()),email=String(data.email||'').trim().toLowerCase(),role=String(data.role||'');if(!email)throw new Error('Bitte eine E-Mail-Adresse eingeben.');if(!allowedInviteRoles().includes(role))throw new Error('Diese Rolle darfst du nicht vergeben.');const existingMember=[...profiles.entries()].find(([,profile])=>String(profile.email||'').toLowerCase()===email);if(existingMember)throw new Error('Diese E-Mail-Adresse gehört bereits zum Studio-Team.');const {error:deleteError}=await client().from('studio_invites').delete().eq('studio_id',studioId()).ilike('email',email).is('accepted_at',null);if(deleteError)throw deleteError;const {data:invite,error}=await client().from('studio_invites').insert({studio_id:studioId(),email,role,created_by:currentUser().id}).select('id,email,role,token,expires_at').single();if(error)throw error;const url=new URL(location.origin+location.pathname);url.searchParams.set('invite',invite.token);const result=document.getElementById('studioInviteResult');if(result)result.innerHTML=`<div class="studio-invite-result"><strong>Einladung für ${esc(email)}</strong><div class="studio-invite-link"><input readonly value="${esc(url.toString())}" aria-label="Einladungslink"><button type="button" class="btn ghost" data-copy-invite>Kopieren</button></div></div>`;result?.querySelector('[data-copy-invite]')?.addEventListener('click',()=>copyText(url.toString(),result.querySelector('[data-copy-invite]')));form.reset();await loadTeam();}catch(error){alert(String(error?.message||error));}finally{button.disabled=false;}}
+  async function copyText(text,button){try{await navigator.clipboard.writeText(text);if(button){const old=button.textContent;button.textContent='Kopiert ✓';setTimeout(()=>button.textContent=old,1400);}}catch(_error){prompt('Einladungslink kopieren:',text);}}
+  async function changeRole(event){const select=event.currentTarget,id=select.dataset.teamRole,next=select.value,member=members.find(item=>item.id===id);if(!member)return;if(!confirm(`${displayName(member)} künftig als „${roleLabel(next)}“ führen?`)){select.value=member.role;return;}select.disabled=true;try{const {error}=await client().from('studio_members').update({role:next}).eq('id',id);if(error)throw error;await loadTeam();}catch(error){alert(String(error?.message||error));select.value=member.role;}finally{select.disabled=false;}}
+  async function removeMember(event){const id=event.currentTarget.dataset.teamRemove,member=members.find(item=>item.id===id);if(!member)return;if(!confirm(`${displayName(member)} den Zugang zu diesem Studio entziehen?\n\nDie bisherigen Tattoo-Akten und Termine bleiben erhalten.`))return;try{const {error}=await client().from('studio_members').delete().eq('id',id);if(error)throw error;await loadTeam();}catch(error){alert(String(error?.message||error));}}
+  async function cancelInvite(event){const id=event.currentTarget.dataset.inviteCancel;if(!id)return;try{const {error}=await client().from('studio_invites').delete().eq('id',id);if(error)throw error;await loadTeam();}catch(error){alert(String(error?.message||error));}}
 
-  async function copyText(text,button){
-    try{await navigator.clipboard.writeText(text);if(button){const old=button.textContent;button.textContent='Kopiert ✓';setTimeout(()=>button.textContent=old,1400);}}
-    catch(_error){prompt('Einladungslink kopieren:',text);}
-  }
-
-  async function changeRole(event){
-    const select=event.currentTarget,id=select.dataset.teamRole,next=select.value,member=members.find(item=>item.id===id);if(!member)return;
-    if(!confirm(`${displayName(member)} künftig als „${roleLabel(next)}“ führen?`)){select.value=member.role;return;}
-    select.disabled=true;
-    try{const {error}=await client().from('studio_members').update({role:next}).eq('id',id);if(error)throw error;await loadTeam();}
-    catch(error){alert(String(error?.message||error));select.value=member.role;}
-    finally{select.disabled=false;}
-  }
-
-  async function removeMember(event){
-    const id=event.currentTarget.dataset.teamRemove,member=members.find(item=>item.id===id);if(!member)return;
-    if(!confirm(`${displayName(member)} den Zugang zu diesem Studio entziehen?\n\nDie bisherigen Tattoo-Akten und Termine bleiben erhalten.`))return;
-    try{const {error}=await client().from('studio_members').delete().eq('id',id);if(error)throw error;await loadTeam();}
-    catch(error){alert(String(error?.message||error));}
-  }
-
-  async function cancelInvite(event){
-    const id=event.currentTarget.dataset.inviteCancel;if(!id)return;
-    try{const {error}=await client().from('studio_invites').delete().eq('id',id);if(error)throw error;await loadTeam();}
-    catch(error){alert(String(error?.message||error));}
-  }
-
-  function inviteToken(){
-    const query=new URLSearchParams(location.search).get('invite');
-    if(query&&/^[0-9a-f-]{36}$/i.test(query)){localStorage.setItem(PENDING_INVITE_KEY,query);return query;}
-    const saved=localStorage.getItem(PENDING_INVITE_KEY)||'';return /^[0-9a-f-]{36}$/i.test(saved)?saved:'';
-  }
-  function decorateInviteLogin(){
-    if(!inviteToken())return;const node=document.getElementById('tatneraAuthMessage');if(!node||node.textContent)return;
-    node.textContent='Studio-Einladung erkannt. Dein persönlicher Zugang wird vorbereitet …';node.className='tatnera-auth-message success';
-  }
-  function clearInviteFromUrl(){
-    localStorage.removeItem(PENDING_INVITE_KEY);const url=new URL(location.href);url.searchParams.delete('invite');history.replaceState(history.state,'',url.pathname+url.search+url.hash);
-  }
-
-  async function acceptPendingInvite(){
-    if(window.TatneraInviteSetup?.required?.())return false;
-    const token=inviteToken(),a=auth(),user=currentUser();if(!token||!a?.client||!user||acceptingInvite)return false;
-    if(a.membership?.())return false;
-    acceptingInvite=true;
-    try{
-      const {data:invite,error}=await a.client.from('studio_invites').select('id,studio_id,email,role,token,expires_at').eq('token',token).maybeSingle();
-      if(error)throw error;
-      if(!invite){
-        const node=document.getElementById('tatneraAuthMessage');if(node){node.textContent='Diese Einladung passt nicht zu diesem Konto oder ist nicht mehr gültig. Bitte den Einladungslink erneut öffnen.';node.className='tatnera-auth-message error';}
-        return false;
-      }
-      const {error:joinError}=await a.client.from('studio_members').insert({studio_id:invite.studio_id,user_id:user.id,role:invite.role,is_active:true});if(joinError)throw joinError;
-      clearInviteFromUrl();location.reload();return true;
-    }catch(error){
-      const node=document.getElementById('tatneraAuthMessage');if(node){node.textContent='Studio-Einladung konnte nicht angenommen werden: '+String(error?.message||error);node.className='tatnera-auth-message error';}
-      return false;
-    }finally{acceptingInvite=false;}
-  }
-
-  function startInviteWatcher(){
-    if(!inviteToken())return;decorateInviteLogin();let tries=0;
-    const timer=setInterval(async()=>{
-      tries++;decorateInviteLogin();
-      if(await acceptPendingInvite()){clearInterval(timer);return;}
-      if(tries>240)clearInterval(timer);
-    },500);
-  }
+  function inviteToken(){const query=new URLSearchParams(location.search).get('invite');if(query&&/^[0-9a-f-]{36}$/i.test(query)){localStorage.setItem(PENDING_INVITE_KEY,query);return query;}const saved=localStorage.getItem(PENDING_INVITE_KEY)||'';return /^[0-9a-f-]{36}$/i.test(saved)?saved:'';}
+  function decorateInviteLogin(){if(!inviteToken())return;const node=document.getElementById('tatneraAuthMessage');if(!node||node.textContent)return;node.textContent='Studio-Einladung erkannt. Dein persönlicher Zugang wird vorbereitet …';node.className='tatnera-auth-message success';}
+  function clearInviteFromUrl(){localStorage.removeItem(PENDING_INVITE_KEY);const url=new URL(location.href);url.searchParams.delete('invite');history.replaceState(history.state,'',url.pathname+url.search+url.hash);}
+  async function acceptPendingInvite(){if(window.TatneraInviteSetup?.required?.())return false;const token=inviteToken(),a=auth(),user=currentUser();if(!token||!a?.client||!user||acceptingInvite)return false;if(a.membership?.())return false;acceptingInvite=true;try{const {data:invite,error}=await a.client.from('studio_invites').select('id,studio_id,email,role,token,expires_at').eq('token',token).maybeSingle();if(error)throw error;if(!invite){const node=document.getElementById('tatneraAuthMessage');if(node){node.textContent='Diese Einladung passt nicht zu diesem Konto oder ist nicht mehr gültig. Bitte den Einladungslink erneut öffnen.';node.className='tatnera-auth-message error';}return false;}const {error:joinError}=await a.client.from('studio_members').insert({studio_id:invite.studio_id,user_id:user.id,role:invite.role,is_active:true});if(joinError)throw joinError;clearInviteFromUrl();location.reload();return true;}catch(error){const node=document.getElementById('tatneraAuthMessage');if(node){node.textContent='Studio-Einladung konnte nicht angenommen werden: '+String(error?.message||error);node.className='tatnera-auth-message error';}return false;}finally{acceptingInvite=false;}}
+  function startInviteWatcher(){if(!inviteToken())return;decorateInviteLogin();let tries=0;const timer=setInterval(async()=>{tries++;decorateInviteLogin();if(await acceptPendingInvite()){clearInterval(timer);return;}if(tries>240)clearInterval(timer);},500);}
 
   installStyle();startInviteWatcher();
-  document.addEventListener('tatnera:auth-ready',()=>loadTeam());
-  document.addEventListener('tatnera:runtime-refresh',()=>{if(studioId())renderTeam();});
+  document.addEventListener('tatnera:auth-ready',()=>{if(initialTeamLoaded)return;initialTeamLoaded=true;loadTeam();});
+  /* Do not rebuild the team panel on generic runtime refreshes. On mobile a
+     native <select> is temporarily detached by the browser while its picker is
+     open; replacing panel.innerHTML at that moment closes the picker and causes
+     the visible flicker. Team data is refreshed explicitly after team actions. */
+  document.addEventListener('tatnera:runtime-refresh',refreshArtistSelects);
   document.addEventListener('tatnera:artists-changed',refreshArtistSelects);
   window.TatneraTeam={reload:loadTeam,members:()=>members.map(item=>({...item,profile:{...profileFor(item.user_id)}})),role:()=>currentMembership()?.role||'',canManage};
 })();
