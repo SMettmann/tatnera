@@ -5,6 +5,8 @@
   window.__tatneraRecoverySessionBridgeInstalled=true;
 
   const RECOVERY_KEY='tatnera_password_recovery_v1';
+  const RECOVERY_ACCESS_KEY='tatnera_recovery_access_token_v1';
+  const RECOVERY_REFRESH_KEY='tatnera_recovery_refresh_token_v1';
 
   function queryParams(){
     try{return new URLSearchParams(location.search);}catch(_error){return new URLSearchParams();}
@@ -23,10 +25,17 @@
     node.textContent=text||'';
     node.className=`tatnera-auth-message${type?' '+type:''}`;
   }
+  function clearStoredRecoveryTokens(){
+    try{
+      sessionStorage.removeItem(RECOVERY_ACCESS_KEY);
+      sessionStorage.removeItem(RECOVERY_REFRESH_KEY);
+    }catch(_error){}
+  }
   function cleanAuthParams(){
+    clearStoredRecoveryTokens();
     try{
       const url=new URL(location.href);
-      ['code','token_hash','type'].forEach(key=>url.searchParams.delete(key));
+      ['code','token_hash','type','access_token','refresh_token'].forEach(key=>url.searchParams.delete(key));
       const cleanHash=new URLSearchParams(url.hash.replace(/^#/,''));
       ['access_token','refresh_token','expires_in','expires_at','token_type','type'].forEach(key=>cleanHash.delete(key));
       const hashText=cleanHash.toString();
@@ -40,7 +49,7 @@
 
     try{
       const {data:{session}}=await client.auth.getSession();
-      if(session)return session;
+      if(session){cleanAuthParams();return session;}
     }catch(_error){}
 
     const query=queryParams();
@@ -62,8 +71,14 @@
       }catch(_error){}
     }
 
-    const accessToken=hash.get('access_token')||query.get('access_token')||'';
-    const refreshToken=hash.get('refresh_token')||query.get('refresh_token')||'';
+    let storedAccess='',storedRefresh='';
+    try{
+      storedAccess=sessionStorage.getItem(RECOVERY_ACCESS_KEY)||'';
+      storedRefresh=sessionStorage.getItem(RECOVERY_REFRESH_KEY)||'';
+    }catch(_error){}
+
+    const accessToken=hash.get('access_token')||query.get('access_token')||storedAccess;
+    const refreshToken=hash.get('refresh_token')||query.get('refresh_token')||storedRefresh;
     if(accessToken&&refreshToken){
       try{
         const {data,error}=await client.auth.setSession({access_token:accessToken,refresh_token:refreshToken});
@@ -73,7 +88,8 @@
 
     try{
       const {data:{session}}=await client.auth.getSession();
-      return session||null;
+      if(session){cleanAuthParams();return session;}
+      return null;
     }catch(_error){return null;}
   }
 
