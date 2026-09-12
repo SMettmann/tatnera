@@ -8,6 +8,7 @@
   loadOnce('subscription-guard.js');
   loadOnce('recovery-session-bridge.js?v=20260912-3');
   loadOnce('studio-invite-fix.js?v=20260912-1');
+  loadOnce('mobile-role-picker.js?v=20260912-1');
   function ensureAuthLogo(){const brand=document.querySelector('.tatnera-auth-brand');if(!brand)return false;let img=brand.querySelector('.tatnera-logo-img');if(!img){img=document.createElement('img');img.className='tatnera-logo-img';img.alt='TATNERA Studio Software';img.width=220;img.height=101;img.loading='eager';img.decoding='sync';try{img.fetchPriority='high';}catch(_){}brand.replaceChildren(img);}if(img.getAttribute('src')!==LOGO_SRC)img.src=LOGO_SRC;return true;}
   function installHomeLink(){const shell=document.getElementById('tatneraAuthShell');if(!shell)return false;ensureAuthLogo();if(shell.querySelector('.tatnera-auth-home'))return true;const a=document.createElement('a');a.className='tatnera-auth-home';a.href='./';a.textContent='← Zur Startseite';a.setAttribute('aria-label','Zur TATNERA Startseite');shell.prepend(a);return true;}
   function authIsVisible(){const shell=document.getElementById('tatneraAuthShell');return !!shell&&!shell.hidden&&document.body.classList.contains('tatnera-auth-locked');}
