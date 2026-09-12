@@ -2,7 +2,7 @@
 (function(){
   'use strict';
   const DAY=86400000,MIN_RECHECK_MS=60000;
-  const STRIPE_PAYMENT_LINK='https://buy.stripe.com/test_28EbJ3dwv9G0fRd6mNes000';
+  const STRIPE_PAYMENT_LINK='https://buy.stripe.com/28EbJ3dwv9G0fRd6mNes000';
   let running=false,lastCheck=0;
   function installStyles(){if(document.getElementById('tatneraSubscriptionStyles'))return;const s=document.createElement('style');s.id='tatneraSubscriptionStyles';s.textContent=`
 .tatnera-trial-badge{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:8px 10px;font-size:11px;font-weight:850;white-space:nowrap}
