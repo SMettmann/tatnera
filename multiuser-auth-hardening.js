@@ -7,7 +7,7 @@
   if(window.__tatneraMultiuserAuthHardeningInstalled)return;
   window.__tatneraMultiuserAuthHardeningInstalled=true;
 
-  const PUBLIC_APP_URL='https://smettmann.github.io/tatnera/app.html';
+  const PUBLIC_APP_URL=new URL('app.html',location.href).toString();
   const PENDING_INVITE_KEY='tatnera_pending_studio_invite_v1';
   const GATE_TOKEN_KEY='tatnera_invite_gate_token_v1';
   const isUuid=value=>/^[0-9a-f-]{36}$/i.test(String(value||''));
