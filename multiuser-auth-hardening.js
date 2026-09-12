@@ -11,6 +11,8 @@
   const PENDING_INVITE_KEY='tatnera_pending_studio_invite_v1';
   const GATE_TOKEN_KEY='tatnera_invite_gate_token_v1';
   const RECOVERY_KEY='tatnera_password_recovery_v1';
+  const RECOVERY_ACCESS_KEY='tatnera_recovery_access_token_v1';
+  const RECOVERY_REFRESH_KEY='tatnera_recovery_refresh_token_v1';
   const isUuid=value=>/^[0-9a-f-]{36}$/i.test(String(value||''));
 
   function queryParams(){
@@ -45,10 +47,20 @@
 
   /* Capture password recovery before Supabase consumes the URL fragment. */
   (function captureRecovery(){
-    const type=hashParams().get('type')||queryParams().get('type')||'';
-    const mode=queryParams().get('mode')||'';
+    const hash=hashParams();
+    const query=queryParams();
+    const type=hash.get('type')||query.get('type')||'';
+    const mode=query.get('mode')||'';
     if(type==='recovery'||mode==='recovery'){
-      try{sessionStorage.setItem(RECOVERY_KEY,'1');}catch(_error){}
+      try{
+        sessionStorage.setItem(RECOVERY_KEY,'1');
+        const accessToken=hash.get('access_token')||query.get('access_token')||'';
+        const refreshToken=hash.get('refresh_token')||query.get('refresh_token')||'';
+        if(accessToken&&refreshToken){
+          sessionStorage.setItem(RECOVERY_ACCESS_KEY,accessToken);
+          sessionStorage.setItem(RECOVERY_REFRESH_KEY,refreshToken);
+        }
+      }catch(_error){}
     }
   })();
 
