@@ -5,9 +5,24 @@
   const SUPABASE_URL='https://ayxvspeufbsoxtccaqap.supabase.co';
   const SUPABASE_KEY='sb_publishable_g8Z9qVH3GSJHHkbuT-ne5A_0IfhKJz1';
   const NAV_KEY='tatnera_navigation_v1';
+  const RECOVERY_KEY='tatnera_password_recovery_v1';
   let client=null,currentUser=null,currentStudio=null,currentMembership=null,authBusy=false;
 
   const esc=value=>String(value??'').replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
+
+  function recoverySignalInUrl(){
+    try{
+      const query=new URLSearchParams(location.search);
+      const hash=new URLSearchParams(location.hash.replace(/^#/,''));
+      return query.get('mode')==='recovery'||query.get('type')==='recovery'||hash.get('type')==='recovery';
+    }catch(_error){return false;}
+  }
+  function recoveryPending(){
+    try{return recoverySignalInUrl()||sessionStorage.getItem(RECOVERY_KEY)==='1';}catch(_error){return recoverySignalInUrl();}
+  }
+  function markRecovery(){try{sessionStorage.setItem(RECOVERY_KEY,'1');}catch(_error){}}
+  function clearRecovery(){try{sessionStorage.removeItem(RECOVERY_KEY);}catch(_error){}}
+  if(recoverySignalInUrl())markRecovery();
 
   function friendlyError(error){
     const text=String(error?.message||error||'Unbekannter Fehler');
@@ -123,6 +138,7 @@
   }
 
   function showAuth(){
+    if(recoveryPending()){showRecovery();return;}
     finishAuthCheck();
     document.body.classList.add('tatnera-auth-locked');
     const shell=document.getElementById('tatneraAuthShell');if(shell)shell.hidden=false;
@@ -133,6 +149,7 @@
   }
 
   function showStudioOnboarding(user){
+    if(recoveryPending()){currentUser=user||currentUser;showRecovery();return;}
     finishAuthCheck();
     document.body.classList.add('tatnera-auth-locked');
     const shell=document.getElementById('tatneraAuthShell');if(shell)shell.hidden=false;
@@ -145,6 +162,7 @@
   }
 
   function showRecovery(){
+    markRecovery();
     finishAuthCheck();
     document.body.classList.add('tatnera-auth-locked');
     const shell=document.getElementById('tatneraAuthShell');if(shell)shell.hidden=false;
@@ -191,7 +209,8 @@
     const form=document.getElementById('tatneraLoginForm'),email=String(form?.elements.email?.value||'').trim();
     if(!email){setMessage('Bitte zuerst deine E-Mail-Adresse eintragen.','error');form?.elements.email?.focus();return;}
     try{
-      const {error}=await client.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});if(error)throw error;
+      const redirectUrl=new URL(location.origin+location.pathname);redirectUrl.searchParams.set('mode','recovery');
+      const {error}=await client.auth.resetPasswordForEmail(email,{redirectTo:redirectUrl.toString()});if(error)throw error;
       setMessage('Wir haben dir einen Link zum Zurücksetzen des Passworts geschickt.','success');
     }catch(error){setMessage(friendlyError(error),'error');}
   }
@@ -201,6 +220,7 @@
     try{
       const password=String(form.elements.password.value||'');if(password.length<8)throw new Error('Bitte mindestens 8 Zeichen verwenden.');
       const {error}=await client.auth.updateUser({password});if(error)throw error;
+      clearRecovery();
       setMessage('Passwort gespeichert.','success');
       const {data:{user}}=await client.auth.getUser();if(user)setTimeout(()=>enterUser(user,{forceDashboard:true}),350);
     }catch(error){setMessage(friendlyError(error),'error');}finally{setBusy(form,false);}
@@ -220,6 +240,7 @@
 
   async function logout(){
     resetNavigationToDashboard(false);
+    clearRecovery();
     try{await client.auth.signOut();}catch(_error){}
     currentUser=null;currentStudio=null;currentMembership=null;showAuth();
   }
@@ -237,6 +258,7 @@
 
   async function enterUser(user,{forceDashboard=false}={}){
     currentUser=user;clearMessage();
+    if(recoveryPending()){showRecovery();return;}
     try{
       if(await loadStudio(user.id)){unlockApp(forceDashboard);return;}
       showStudioOnboarding(user);
@@ -273,12 +295,29 @@
     };
 
     client.auth.onAuthStateChange((event,session)=>{
-      if(event==='PASSWORD_RECOVERY'){currentUser=session?.user||null;showRecovery();return;}
-      if(event==='SIGNED_OUT'){currentUser=null;currentStudio=null;currentMembership=null;showAuth();}
+      if(event==='PASSWORD_RECOVERY'){
+        markRecovery();
+        currentUser=session?.user||null;
+        showRecovery();
+        return;
+      }
+      if(event==='USER_UPDATED'&&recoveryPending()){
+        clearRecovery();
+        return;
+      }
+      if(event==='SIGNED_OUT'){
+        clearRecovery();
+        currentUser=null;currentStudio=null;currentMembership=null;showAuth();
+      }
     });
 
     try{
       const {data:{session},error}=await client.auth.getSession();if(error)throw error;
+      if(recoveryPending()){
+        currentUser=session?.user||null;
+        showRecovery();
+        return;
+      }
       if(session?.user)await enterUser(session.user);else showAuth();
     }catch(error){showAuth();setMessage(friendlyError(error),'error');}
   }
