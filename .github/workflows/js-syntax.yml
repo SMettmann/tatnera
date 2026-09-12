@@ -22,3 +22,24 @@ jobs:
           done
       - name: Check TATNERA structure
         run: node .github/scripts/smoke-check.mjs
+      - name: Check TATNERA brand spelling
+        run: |
+          set -e
+          echo "Scanning repository for known TATNERA misspellings..."
+          BAD='tantera|tatera|tattnera|tatnrea|tantnera|tanterra|tatt?era'
+          if grep -RniIE "\\b(${BAD})\\b|@(${BAD})\\.de|https?://(www\\.)?(${BAD})\\.de" . \
+            --exclude-dir=.git \
+            --exclude='js-syntax.yml'; then
+            echo "ERROR: A TATNERA misspelling was found. Correct spelling is TATNERA / tatnera."
+            exit 1
+          fi
+          if find . -type f \
+            \( -iname '*tantera*' -o -iname '*tatera*' -o -iname '*tattnera*' -o -iname '*tatnrea*' -o -iname '*tantnera*' -o -iname '*tanterra*' \) \
+            -not -path './.git/*' | grep -q .; then
+            echo "ERROR: A filename contains a TATNERA misspelling."
+            find . -type f \
+              \( -iname '*tantera*' -o -iname '*tatera*' -o -iname '*tattnera*' -o -iname '*tatnrea*' -o -iname '*tantnera*' -o -iname '*tanterra*' \) \
+              -not -path './.git/*'
+            exit 1
+          fi
+          echo "Brand spelling check passed."
