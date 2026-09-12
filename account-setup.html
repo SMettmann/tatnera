@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>TATNERA – Testzugang einrichten</title>
+  <title>TATNERA – Studio-Zugang einrichten</title>
   <style>
     :root{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color-scheme:dark}
     *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#111;color:#f5f2ec;padding:24px}
@@ -16,14 +16,14 @@
 </head>
 <body>
   <main class="card">
-    <div class="eyebrow">TATNERA Testzugang</div>
-    <h1>Zugang einrichten</h1>
-    <p class="muted">Der Zugang gehört zu einem eigenen, leeren Teststudio.</p>
+    <div class="eyebrow">TATNERA Studio-Einladung</div>
+    <h1>Deinen Zugang einrichten</h1>
+    <p class="muted">Du wurdest zu einem TATNERA-Studio eingeladen. Lege jetzt deinen Namen und dein eigenes Passwort fest.</p>
     <form id="setupForm">
       <label>E-Mail<input id="email" type="email" readonly></label>
-      <label>Name<input id="displayName" required value="Testzugang 1"></label>
+      <label>Name<input id="displayName" required autocomplete="name"></label>
       <label>Passwort<input id="password" type="password" required minlength="8" autocomplete="new-password"></label>
-      <button class="btn" id="submitBtn" type="submit">Testzugang erstellen</button>
+      <button class="btn" id="submitBtn" type="submit">Zugang erstellen</button>
     </form>
     <div id="status"></div>
   </main>
@@ -33,7 +33,7 @@
   const fragment=new URLSearchParams(location.hash.replace(/^#/,''));
   const invite=params.get('invite')||'';
   const email=params.get('email')||'';
-  const defaultName=params.get('name')||'Testzugang 1';
+  const defaultName=params.get('name')||'';
   const emailEl=document.getElementById('email');
   const nameEl=document.getElementById('displayName');
   const passwordEl=document.getElementById('password');
@@ -43,7 +43,7 @@
   emailEl.value=email;nameEl.value=defaultName;
   const fragmentPassword=fragment.get('pw')||'';
   if(fragmentPassword)passwordEl.value=fragmentPassword;
-  if(!invite||!email){status.className='error';status.textContent='Der Einrichtungslink ist unvollständig.';button.disabled=true;return;}
+  if(!invite||!email){status.className='error';status.textContent='Der Einladungslink ist unvollständig.';button.disabled=true;return;}
 
   async function submitSetup(){
     button.disabled=true;status.className='';status.textContent='Zugang wird erstellt …';
@@ -55,7 +55,7 @@
       const data=await response.json().catch(()=>({}));
       if(!response.ok||!data.ok)throw new Error(data.error||'Zugang konnte nicht erstellt werden.');
       history.replaceState(null,'',location.pathname+'?done=1');
-      status.className='ok';status.innerHTML='Zugang erstellt. <a href="app.html">Jetzt zu TATNERA →</a>';
+      status.className='ok';status.innerHTML='Zugang erstellt. <a href="app.html?mode=login">Jetzt bei TATNERA einloggen →</a>';
       form.style.display='none';
     }catch(error){status.className='error';status.textContent=error.message||String(error);button.disabled=false;}
   }
