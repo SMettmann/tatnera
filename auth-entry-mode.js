@@ -76,6 +76,12 @@
 
   function clearRecovery(){
     try{sessionStorage.removeItem(RECOVERY_KEY);}catch(_error){}
+    try{
+      const url=new URL(window.location.href);
+      if(url.searchParams.get('mode')==='recovery')url.searchParams.delete('mode');
+      if(url.searchParams.get('type')==='recovery')url.searchParams.delete('type');
+      window.history.replaceState(window.history.state,document.title,url.pathname+url.search+url.hash);
+    }catch(_error){}
   }
 
   /* Keep a durable recovery marker even if Supabase consumes the URL hash
