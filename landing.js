@@ -1,6 +1,24 @@
 /* TATNERA — marketing page interactions */
 (function(){
   'use strict';
+  const VISIT_SESSION_KEY='tatnera.website-visit.v1';
+  (async function recordWebsiteVisit(){
+    try{
+      if(sessionStorage.getItem(VISIT_SESSION_KEY))return;
+      const path=(location.pathname||'/').slice(0,200);
+      const response=await fetch('https://ayxvspeufbsoxtccaqap.supabase.co/rest/v1/site_visit_events',{
+        method:'POST',
+        headers:{
+          apikey:'sb_publishable_g8Z9qVH3GSJHHkbuT-ne5A_0IfhKJz1',
+          'Content-Type':'application/json',
+          Prefer:'return=minimal'
+        },
+        body:JSON.stringify({source:'website',path})
+      });
+      if(response.ok)sessionStorage.setItem(VISIT_SESSION_KEY,'1');
+      else console.warn('TATNERA Besuch konnte nicht gezählt werden.',response.status);
+    }catch(error){console.warn('TATNERA Besuch konnte nicht gezählt werden.',error);}
+  })();
   const nav=document.querySelector('.nav-links');
   if(nav&&!nav.querySelector('a[href="#preise"]')){const priceLink=document.createElement('a');priceLink.href='#preise';priceLink.textContent='Preise';const faqLink=nav.querySelector('a[href="#faq"]');nav.insertBefore(priceLink,faqLink||null)}
   const trialNote=document.querySelector('.hero-copy .trial-note');if(trialNote&&!document.querySelector('.hero-price')){const heroPrice=document.createElement('div');heroPrice.className='hero-price';heroPrice.innerHTML='<span>Nach dem Test:</span><strong>19 € / Monat</strong><span>· nur bei aktiver Buchung</span>';trialNote.parentNode.insertBefore(heroPrice,trialNote)}
