@@ -16,7 +16,8 @@
     if(loading)return loading.then(notifyOpen);
     loading=Promise.all([
       load('tatnera-admin-controls.js?v=20260909-3'),
-      load('tatnera-admin-studios.js?v=20260909-2')
+      load('tatnera-admin-studios.js?v=20260909-2'),
+      load('tatnera-admin-visits.js?v=20260915-1')
     ]).then(()=>{loaded=true;notifyOpen();}).catch(error=>{console.warn('TATNERA Admin-Erweiterungen konnten nicht geladen werden.',error);loading=null;});
     return loading;
   }
