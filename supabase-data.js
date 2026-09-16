@@ -207,6 +207,23 @@
     if(!cloudReady)return;if(syncRunning){syncAgain=true;return;}clearTimeout(syncTimer);syncTimer=setTimeout(syncNow,delay);
   }
 
+  async function refreshFromCloud(){
+    if(!cloudReady||!client||!studioId)return false;
+    if(syncRunning)return false;
+    setCloudState('Cloud wird aktualisiert …');
+    try{
+      await loadRows();
+      hydrateState();
+      setCloudState('Cloud verbunden');
+      document.dispatchEvent(new CustomEvent('tatnera:cloud-refreshed',{detail:{studioId}}));
+      return true;
+    }catch(error){
+      console.error('TATNERA cloud refresh failed',error);
+      setCloudState('Cloud-Aktualisierung fehlgeschlagen',true);
+      return false;
+    }
+  }
+
   async function bootstrapFromLocal(){
     cloudReady=true;setCloudState('Lokale Daten werden übernommen …');
     await syncNow();
@@ -244,5 +261,5 @@
     persist=function(){const result=localPersist.apply(this,arguments);scheduleSync();return result;};
   }
   document.addEventListener('tatnera:auth-ready',onAuthReady);
-  window.TatneraCloud={sync:()=>scheduleSync(0),isReady:()=>cloudReady,studioId:()=>studioId};
+  window.TatneraCloud={sync:()=>scheduleSync(0),refresh:refreshFromCloud,isReady:()=>cloudReady,studioId:()=>studioId};
 })();
