@@ -170,10 +170,43 @@
     }finally{booting=false;}
   }
 
+  async function refreshFromCloud(){
+    if(!ready||!client||!studioId||booting)return false;
+    try{
+      clearTimeout(pushTimer);
+      const localPending=[...pendingKeys];pendingKeys.clear();
+      if(localPending.length)await pushKeys(localPending);
+
+      const keys=allowedKeys();
+      const {data,error}=await client.from('studio_state').select('state_key,value,updated_at').eq('studio_id',studioId).in('state_key',keys);
+      if(error)throw error;
+      const cloud=new Map((data||[]).map(row=>[row.state_key,row.value]));
+
+      applyingCloud=true;
+      try{
+        for(const key of keys){
+          if(cloud.has(key)){
+            const cloudValue=cloud.get(key),local=localValue(key);
+            if(stable(local)!==stable(cloudValue))originalSetItem.call(localStorage,key,JSON.stringify(cloudValue));
+          }else if(localStorage.getItem(key)!==null){
+            originalRemoveItem.call(localStorage,key);
+          }
+        }
+      }finally{applyingCloud=false;}
+
+      document.dispatchEvent(new CustomEvent('tatnera:studio-state-refreshed',{detail:{studioId,role}}));
+      document.dispatchEvent(new CustomEvent('tatnera:runtime-refresh'));
+      return true;
+    }catch(error){
+      console.error('TATNERA studio state refresh failed',error);
+      return false;
+    }
+  }
+
   function syncAll(){return pushKeys(allowedKeys());}
 
   document.addEventListener('tatnera:auth-ready',bootstrap);
   document.addEventListener('tatnera:data-changed',()=>{for(const key of allowedKeys())schedulePush(key);});
   window.addEventListener('pagehide',()=>{if(ready&&pendingKeys.size)pushKeys([...pendingKeys]);});
-  window.TatneraStudioState={isReady:()=>ready,syncAll,keys:()=>allowedKeys(),role:()=>role};
+  window.TatneraStudioState={isReady:()=>ready,syncAll,refresh:refreshFromCloud,keys:()=>allowedKeys(),role:()=>role};
 })();
