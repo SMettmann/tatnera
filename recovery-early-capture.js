@@ -2,6 +2,17 @@
 (function(){
   'use strict';
 
+  /* TATNERA saves continuously. A manual reload/close must never trigger the
+     browser's generic "unsaved changes" confirmation. This script is loaded
+     synchronously before the application modules, so it blocks any later
+     beforeunload handler from cancelling F5, tab close or navigation. */
+  if(!window.__tatneraNoUnloadPromptInstalled){
+    window.__tatneraNoUnloadPromptInstalled=true;
+    window.addEventListener('beforeunload',function(event){
+      event.stopImmediatePropagation();
+    },true);
+  }
+
   /* Run before app.js so legacy seed/demo content can never become the initial app state. */
   try{
     const DEMO_EMAILS=new Set(['lea@example.de','max@example.de','jonas@example.de','mia@example.de']);
