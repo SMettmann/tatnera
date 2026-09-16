@@ -12,7 +12,7 @@
   const daysLeft=v=>{if(!v)return null;return Math.ceil((new Date(v).getTime()-Date.now())/86400000);};
 
   function activityLabel(value){
-    if(!value)return 'Noch keine Aktivität';
+    if(!value)return '–';
     const date=new Date(value),now=new Date();
     const time=new Intl.DateTimeFormat('de-DE',{hour:'2-digit',minute:'2-digit'}).format(date);
     const sameDay=date.getFullYear()===now.getFullYear()&&date.getMonth()===now.getMonth()&&date.getDate()===now.getDate();
@@ -27,7 +27,7 @@
     if(row.usage_available===false)return {label:'Nicht verfügbar',kind:'unknown'};
     const customers=Number(row.customer_count)||0,appointments=Number(row.appointment_count)||0,invoices=Number(row.invoice_count)||0;
     const total=customers+appointments+invoices;
-    if(total===0)return {label:'Noch nicht genutzt',kind:'unused'};
+    if(total===0)return {label:'Keine Daten angelegt',kind:'unused'};
     if(invoices>0||appointments>=2||total>=3)return {label:'Aktiv genutzt',kind:'active'};
     return {label:'Ausprobiert',kind:'tried'};
   }
@@ -45,7 +45,7 @@
       .tatnera-admin-trial-warning{font-weight:800;color:#9a6500}.tatnera-admin-trial-expired{font-weight:800;color:#9a3030}
       .tatnera-admin-usage{display:grid;grid-template-columns:repeat(3,max-content);gap:4px 10px;align-items:center}.tatnera-admin-usage span{font-size:11px;white-space:nowrap}.tatnera-admin-usage strong{font-variant-numeric:tabular-nums}
       .tatnera-admin-usage-state{display:inline-flex;align-items:center;padding:5px 8px;border-radius:999px;font-size:10px;font-weight:800;margin-bottom:5px}.tatnera-admin-usage-state.unused{background:#f0f0f3;color:#666}.tatnera-admin-usage-state.tried{background:#fff4d8;color:#7a5a00}.tatnera-admin-usage-state.active{background:#e4f5e9;color:#245f39}.tatnera-admin-usage-state.unknown{background:#ececf2;color:#666}
-      .tatnera-admin-last-activity{white-space:nowrap;font-size:11px}.tatnera-admin-last-activity strong{display:block;font-size:11px}.tatnera-admin-last-activity span{display:block;color:var(--muted);font-size:10px;margin-top:3px}
+      .tatnera-admin-last-activity{white-space:nowrap;font-size:11px}.tatnera-admin-last-activity strong{display:block;font-size:11px}.tatnera-admin-last-activity span{display:block;color:var(--muted);font-size:10px;margin-top:4px}
       @media(max-width:980px){.tatnera-admin-table{min-width:980px}}@media(max-width:760px){.tatnera-admin-studio-kpis{grid-template-columns:1fr 1fr}.tatnera-admin-studio-tools input{min-width:100%;width:100%}}
     `;document.head.appendChild(style);
   }
@@ -71,11 +71,13 @@
     const target=document.getElementById('tatneraAdminStudios');if(!target)return;
     const q=(document.getElementById('tatneraAdminStudioSearch')?.value||'').trim().toLowerCase(),filter=document.getElementById('tatneraAdminStudioFilter')?.value||'all';
     const shown=rows.filter(x=>(filter==='all'||x.subscription_status===filter)&&(!q||[x.name,x.email,x.city].some(v=>String(v||'').toLowerCase().includes(q))));
-    target.innerHTML=shown.length?`<table class="tatnera-admin-table"><thead><tr><th>Studio</th><th>Registriert</th><th>Testphase</th><th>Status</th><th>Nutzung</th><th>Letzte Aktivität</th></tr></thead><tbody>${shown.map(x=>{
+    target.innerHTML=shown.length?`<table class="tatnera-admin-table"><thead><tr><th>Studio</th><th>Registriert</th><th>Testphase</th><th>Status</th><th>Nutzung</th><th>Letzte Nutzung</th></tr></thead><tbody>${shown.map(x=>{
       const left=daysLeft(x.trial_ends_at),trialText=x.subscription_status==='trial'?(left>0?`${left} Tag${left===1?'':'e'} übrig`:left===0?'endet heute':'abgelaufen'):statusLabel(x.subscription_status),trialClass=x.subscription_status==='trial'?(left!==null&&left<0?'tatnera-admin-trial-expired':left!==null&&left<=3?'tatnera-admin-trial-warning':''):'';
       const usage=usageState(x),available=x.usage_available!==false;
       const customers=available?Number(x.customer_count)||0:'–',appointments=available?Number(x.appointment_count)||0:'–',invoices=available?Number(x.invoice_count)||0:'–';
-      return `<tr><td><strong>${esc(x.name||'Ohne Namen')}</strong><div class="tatnera-admin-studio-meta">${esc(x.email||'')}${x.city?' · '+esc(x.city):''}</div></td><td>${esc(fmt(x.created_at))}</td><td>${esc(fmt(x.trial_started_at))} → ${esc(fmt(x.trial_ends_at))}<div class="tatnera-admin-studio-meta ${trialClass}">${esc(trialText)}</div></td><td><span class="tatnera-admin-studio-state ${esc(x.subscription_status)}">${esc(statusLabel(x.subscription_status))}</span><br><select data-studio-subscription-status="${esc(x.id)}">${['trial','active','past_due','expired','paused','cancelled'].map(v=>`<option value="${v}"${v===x.subscription_status?' selected':''}>${esc(statusLabel(v))}</option>`).join('')}</select></td><td><span class="tatnera-admin-usage-state ${usage.kind}">${esc(usage.label)}</span><div class="tatnera-admin-usage"><span><strong>${customers}</strong> Kunden</span><span><strong>${appointments}</strong> Termine</span><span><strong>${invoices}</strong> Rechnungen</span></div></td><td><div class="tatnera-admin-last-activity"><strong>${esc(available?activityLabel(x.last_activity_at):'Nicht verfügbar')}</strong><span>${available&&x.last_activity_at?'Kunden, Termine, Tattoo-Akten oder Rechnung':'Noch keine gespeicherte Nutzung'}</span></div></td></tr>`;
+      const login=available?activityLabel(x.last_login_at):'Nicht verfügbar';
+      const dataActivity=available?activityLabel(x.last_data_activity_at):'Nicht verfügbar';
+      return `<tr><td><strong>${esc(x.name||'Ohne Namen')}</strong><div class="tatnera-admin-studio-meta">${esc(x.email||'')}${x.city?' · '+esc(x.city):''}</div></td><td>${esc(fmt(x.created_at))}</td><td>${esc(fmt(x.trial_started_at))} → ${esc(fmt(x.trial_ends_at))}<div class="tatnera-admin-studio-meta ${trialClass}">${esc(trialText)}</div></td><td><span class="tatnera-admin-studio-state ${esc(x.subscription_status)}">${esc(statusLabel(x.subscription_status))}</span><br><select data-studio-subscription-status="${esc(x.id)}">${['trial','active','past_due','expired','paused','cancelled'].map(v=>`<option value="${v}"${v===x.subscription_status?' selected':''}>${esc(statusLabel(v))}</option>`).join('')}</select></td><td><span class="tatnera-admin-usage-state ${usage.kind}">${esc(usage.label)}</span><div class="tatnera-admin-usage"><span><strong>${customers}</strong> Kunden</span><span><strong>${appointments}</strong> Termine</span><span><strong>${invoices}</strong> Rechnungen</span></div></td><td><div class="tatnera-admin-last-activity"><strong>Login: ${esc(login)}</strong><span>Datenaktion: ${esc(dataActivity)}</span></div></td></tr>`;
     }).join('')}</tbody></table>`:'<div class="tatnera-admin-empty">Keine passenden Studios gefunden.</div>';
   }
 
@@ -95,7 +97,7 @@
       }
       rows=(studiosRes.data||[]).map(x=>{
         const usage=usageMap.get(x.id);
-        return {...x,customer_count:Number(usage?.customer_count)||0,appointment_count:Number(usage?.appointment_count)||0,invoice_count:Number(usage?.invoice_count)||0,last_activity_at:usage?.last_activity_at||null,usage_available:!usageRes.error};
+        return {...x,customer_count:Number(usage?.customer_count)||0,appointment_count:Number(usage?.appointment_count)||0,invoice_count:Number(usage?.invoice_count)||0,last_data_activity_at:usage?.last_data_activity_at||null,last_login_at:usage?.last_login_at||null,usage_available:!usageRes.error};
       });
       const set=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
       set('adminStudiosTotal',rows.length);
