@@ -19,10 +19,12 @@
     'tatnera_invoices_v1',
     'tatnera_archive_v1'
   ]);
+  const PRESENCE_INTERVAL_MS=120000;
+  const PRESENCE_MIN_GAP_MS=60000;
   const originalSetItem=Storage.prototype.setItem;
   const originalRemoveItem=Storage.prototype.removeItem;
   let client=null,studioId='',userId='',role='',ready=false,booting=false,applyingCloud=false;
-  let pushTimer=null,pendingKeys=new Set();
+  let pushTimer=null,pendingKeys=new Set(),presenceTimer=null,lastPresenceTouch=0;
 
   function isManager(){return ['owner','admin'].includes(role);}
   function canUseKey(key){return CLOUD_KEY_SET.has(key)&&(!MANAGER_ONLY_KEYS.has(key)||isManager());}
@@ -50,6 +52,29 @@
         originalRemoveItem.call(localStorage,key);
       }
     }finally{applyingCloud=false;}
+  }
+
+  async function touchPresence(force=false){
+    if(!client||!studioId||!userId)return false;
+    if(document.visibilityState==='hidden'&&!force)return false;
+    const now=Date.now();
+    if(!force&&now-lastPresenceTouch<PRESENCE_MIN_GAP_MS)return false;
+    lastPresenceTouch=now;
+    try{
+      const {error}=await client.rpc('touch_studio_presence',{p_studio_id:studioId});
+      if(error)throw error;
+      return true;
+    }catch(error){
+      console.warn('TATNERA presence heartbeat failed',error);
+      return false;
+    }
+  }
+
+  function startPresence(){
+    clearInterval(presenceTimer);
+    lastPresenceTouch=0;
+    touchPresence(true);
+    presenceTimer=setInterval(()=>touchPresence(false),PRESENCE_INTERVAL_MS);
   }
 
   async function upsertValues(entries){
@@ -121,6 +146,7 @@
     if(!nextClient||!nextStudioId||!nextUserId)return;
 
     booting=true;ready=false;client=nextClient;studioId=nextStudioId;userId=nextUserId;role=nextRole;
+    startPresence();
     clearRestrictedLocalState();
     try{
       const keys=allowedKeys();
@@ -207,6 +233,9 @@
 
   document.addEventListener('tatnera:auth-ready',bootstrap);
   document.addEventListener('tatnera:data-changed',()=>{for(const key of allowedKeys())schedulePush(key);});
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')touchPresence(true);});
+  window.addEventListener('focus',()=>touchPresence(false));
+  window.addEventListener('pageshow',()=>touchPresence(false));
   window.addEventListener('pagehide',()=>{if(ready&&pendingKeys.size)pushKeys([...pendingKeys]);});
-  window.TatneraStudioState={isReady:()=>ready,syncAll,refresh:refreshFromCloud,keys:()=>allowedKeys(),role:()=>role};
+  window.TatneraStudioState={isReady:()=>ready,syncAll,refresh:refreshFromCloud,keys:()=>allowedKeys(),role:()=>role,touchPresence:()=>touchPresence(true)};
 })();
